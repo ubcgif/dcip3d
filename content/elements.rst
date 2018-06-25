@@ -8,11 +8,9 @@ The DCIP3D library consists of three core programs and nine utilities.
 Core Programs:
 
 - ``DCIPF3D``: Forward model conductivity/chargeability models to calculate data.
-- ``DCINV3D``: Invert 3D DC data to develop a conductivity models using a Gauss-
-Newton method
+- ``DCINV3D``: Invert 3D DC data to develop a conductivity models using a Gauss-Newton method
 - ``IPSEN3D``: calculates the sensitivity matrix for the 3D IP inversion
-- ``IPINV3D``: Invert 3D IP data to develop a chargeability models using a Gauss-
-Newton method
+- ``IPINV3D``: Invert 3D IP data to develop a chargeability models using a Gauss-Newton method
 
 Utilities:
 

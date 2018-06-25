@@ -1,14 +1,14 @@
 .. _dcinv:
 
-DCoctreeInv
+DCInv3D
 ===========
 
-``DCoctreeInv`` performs the inversion of the DC resistivity data over octree meshes. 
+``DCInv3D`` performs the inversion of the DC resistivity data over octree meshes.
 
 Control parameters and input files
 ----------------------------------
 
-As a command line argument, ``DCoctreeInv`` requires an input file containing all parameters and files needed to carry out the inversion. The following shows the required format:
+As a command line argument, ``DCInv3D`` requires an input file containing all parameters and files needed to carry out the inversion. The following shows the required format:
 
 .. figure:: ../../images/dcinv.PNG
         :figwidth: 75%
@@ -27,10 +27,10 @@ reference model file | VALUE v
         The reference conductivity model can be defined as VALUE, followed by a constant "v" or as a :ref:`model file <modelfile>` for a non-uniform reference model.
 
 topography active cells | ALL_ACTIVE
-        If there is a topography file involved in creation of the octree mesh, then the utility :ref:`create_octree_mesh <createoctreemesh>` will generate a file named active_cells.txt along with the mesh file. If there is no topography, ALL_ACTIVE can be used to indicate all cells in the model are active. 
-     
+        If there is a topography file involved in creation of the octree mesh, then the utility :ref:`create_octree_mesh <createoctreemesh>` will generate a file named active_cells.txt along with the mesh file. If there is no topography, ALL_ACTIVE can be used to indicate all cells in the model are active.
+
 model active cell | ALL_ACTIVE
-        An :ref:`active cell file <activeFile>` which controls which model cells are included in the inversion. Inactive cells in the recovered model are set to the corresponding physical property value from the reference model. If you wish to solve for all model cells, then ALL_ACTIVE should be selected. 
+        An :ref:`active cell file <activeFile>` which controls which model cells are included in the inversion. Inactive cells in the recovered model are set to the corresponding physical property value from the reference model. If you wish to solve for all model cells, then ALL_ACTIVE should be selected.
 
 cell weighting | NO_WEIGHT
         :ref:`File <weightsFile>` containing the cell weighting vector. If NO_WEIGHT is entered, default values of 1 are used.
@@ -68,12 +68,12 @@ SMOOTH_MOD | SMOOTH_MOD_DIF
         This option is used to define the reference model in and out of the derivative terms of the model objective function (Equations :eq:`mof1` and :eq:`mof2`). The options are: SMOOTH_MOD_DIF (reference model is defined in the derivative terms of the model objective function) and SMOOTH_MOD (reference model is defined only the smallest model term of the objective function).
 
 BOUNDS_NONE | BOUNDS CONST bl bu | BOUNDS_FILE file
-        There are three options regarding the bound selection. BOUNDS_NONE lifts any boundary constraints and releases the sought parameter range to infinity. 
-        
-        BOUNDS_CONST followed by a lower bound (bl) and an upper bound (bu) is used in cases where there are some generalized restrictions on the recovered model properties (as is the case with chargeability, which must be fall within the range [0,1)). 
-        
+        There are three options regarding the bound selection. BOUNDS_NONE lifts any boundary constraints and releases the sought parameter range to infinity.
+
+        BOUNDS_CONST followed by a lower bound (bl) and an upper bound (bu) is used in cases where there are some generalized restrictions on the recovered model properties (as is the case with chargeability, which must be fall within the range [0,1)).
+
         BOUNDS_FILE is a more advanced option, which is followed by the name of the bounds file. This option allows the user to enforce individual bound constraints on each model cell, which can be very useful when there is reliable a priori physical property information available. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding the physical property values of known geological formations.
-        
+
 
 **NOTE**: Formats of the files listed in this control file are explained :ref:`here <fileformats>`.
 
@@ -81,14 +81,14 @@ BOUNDS_NONE | BOUNDS CONST bl bu | BOUNDS_FILE file
 
 .. code-block:: rst
 
-        DCoctreeInv -inp
+        DCInv3D -inp
 
-**NOTE**: ``DCoctreeInv`` will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved or if the model norm has plateaued. However, if the program is terminated by the maximum iteration limit, the file DC_octree_inv_log and DC_octree_inv.out should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If neither of these conditions have been met, then the inversion should be reevaluated.
+**NOTE**: ``DCInv3D`` will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved or if the model norm has plateaued. However, if the program is terminated by the maximum iteration limit, the file DC_octree_inv_log and DC_octree_inv.out should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If neither of these conditions have been met, then the inversion should be reevaluated.
 
 Output files
 ------------
 
-``DCoctreeInv`` saves a model after each iteration. The models are ordered: inv_01.con, inv_02.con, etc. Similarly, the predicted data is output at each iteration into a predicated data file: dpred_01.txt, dpred_02.txt, etc. The following is a list of all output files created by the program ``DCoctreeInv``:
+``DCInv3D`` saves a model after each iteration. The models are ordered: inv_01.con, inv_02.con, etc. Similarly, the predicted data is output at each iteration into a predicated data file: dpred_01.txt, dpred_02.txt, etc. The following is a list of all output files created by the program ``DCInv3D``:
 
 inv.con
         Conductivity model from the latest inversion. The model is stored in :ref:`model format <modelfile>` and is overwritten at the end of each iteration.
@@ -100,8 +100,8 @@ dpred.txt
         Predicted data from the recovered model in the latest iteration. The predicted data is in the :ref:`observation file format <dcipfile>`, with the final column corresponding to apparent conductivity (instead of standard deviation).
 
 DC_octree_inv.out
-        This file is appended at the end of each iteration and has 7 columns: 
-        
+        This file is appended at the end of each iteration and has 7 columns:
+
         beta (value of regularization parameter)
 
         iter (number of IPCG iteration in a beta loop)
@@ -125,12 +125,12 @@ mumps.log
 Example files
 -------------
 
-Example of a ``DCoctreeInv`` inversion input file:
+Example of a ``DCInv3D`` inversion input file:
 
 .. figure:: ../../images/dcinvexample.PNG
         :figwidth: 75%
         :align: center
 
 
-        
+
 
