@@ -1,0 +1,53 @@
+\section{Elements of the program MAG3D}
+\label{Elements}
+
+\subsection{Introduction}
+
+The \codeName{\prog} ~program library consists of four major programs:
+\begin{enumerate}
+\item \codeName{MAGFOR3D}: performs forward modelling.
+\item \codeName{MAGSEN3D}: calculates sensitivity and the depth weighting function.
+\item \codeName{MAGINV3D}: performs 3D magnetic inversion.
+\item \codeName{MAGPRE3D}: multiplies the sensitivity file by the model to get the predicted data. This rarely used utility multiplies a model by the sensitivity matrix in maginv3d.mtx to produce the predicted data. This program is included so that users who are not familiar with the wavelet transform and the structure of maginv3d.mtx can utilize the available sensitivity matrix to carry out model studies.
+\end{enumerate}
+
+Each of the above programs requires input files, as well as the specification of parameters, in order to run. However, some files are used by a number of programs. Before detailing the procedures for running each of the above programs, we first present information about these general files.
+
+\subsection{General files for \prog ~programs}
+
+There are eight general files which are used in \prog. All are in ASCII text format. \textbf{Input} files can have any user-defined name. Only program \textbf{output} files have restricted file names. Also the filename extensions are not important. Many prefer to use the \codeName{*.txt} filename convention so that files are more easily read and edited in the Windows environment. The files contain components of the inversion:
+
+\begin{enumerate}
+\item \fileName{mesh}: 3D mesh defining the discretization of the 3D model region.
+\item \fileName{topography}: specifies the surface topography
+\item \fileName{location}: specifies the inducing field parameters, anomaly type, and data locations, and is typically used for forward modelling
+\item \fileName{observation}: specifies the inducing field parameters, anomaly type, observation locations, and the observed magnetic anomalies with estimated standard deviation, and is used for the inversion
+\item \fileName{model}: model file structure for forward, initial, reference, and recovered models
+\item \fileName{weighting}: file that contains user-supplied 3D weighting functions
+\item \fileName{bounds}: optional file that contains values for upper and lower bounds
+\item \fileName{active}: Contains location information about active/inactive cells
+\end{enumerate}
+
+% Standard mesh file description
+\input mesh3dfile.tex
+
+% Topography file description
+\input topographyfile.tex
+
+% Mag lcoaions file description
+\input maglocationsfile.tex
+
+% Mag observations file description
+\input magobservationsfile.tex
+
+% Model file description
+\input susmodelfile.tex
+
+% Weights file description
+\input weightsfile.tex
+
+% Bounds file description
+\input boundsfile.tex
+
+% Active cells file description
+\input activecellsfile.tex

@@ -1,0 +1,24 @@
+\subsubsection{Bounds file}
+
+This file contains an upper and lower physical property bound for each cell in the model. It is optional for the inversion program. Bounds files have the following structure:
+%
+\begin{fileExample}
+\begin{tabular}{|cc|}
+\hline
+b$^l_{1}$ & b$^u_{1}$\\
+b$^l_{2}$ & b$^u_{2}$\\
+\vdots & \vdots \\
+b$^l_{i}$ & b$^u_{i}$\\
+\vdots & \vdots \\
+b$^l_{M}$ & b$^u_{M}$\\
+\hline
+\end{tabular}
+\end{fileExample}
+
+Parameter definitions:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{{b}$^l_{i}$}] Is the lower bound on the $i^th$ model cell.
+\item[\codeName{{b}$^u_{i}$}] Is the upper bound on the $i^th$ model cell.
+\end{description}
+
+The ordering of the cells is the same as that for \fileName{model} files. The total number of lines in this file should be equal to \codeName{$M$}, where \codeName{$M$} is the total number of cells in the octree mesh and model. If a surface \fileName{topography} file is supplied, the bounds for cells above the surface will be ignored. It is recommended that these values be assigned a negative value (e.g. \codeName{-1.0}) to avoid confusion.

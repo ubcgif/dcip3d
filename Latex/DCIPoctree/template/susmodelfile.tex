@@ -1,0 +1,31 @@
+% General model description associated with a 3D, staggered mesh. 
+% Can switch these out to pretty much be done
+\newcommand{\property}{susceptibility}
+\newcommand{\propertycap}{Susceptibility}
+\newcommand{\propunits}{SI}
+\newcommand{\propgreek}{\kappa}
+
+\subsubsection{Model file}
+This file contains the cell values of the \property ~model. The \property ~must have values in \propunits ~units. The \fileName{initial}, \fileName{reference}, and \fileName{forward} models must be in this format. Likewise, the \fileName{recovered} model files will be in this format. The following is the file structure of the model file
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+$\propgreek_{1,1,1}$ & \\
+$\propgreek_{1,1,2}$ & \\
+\vdots & \\
+$\propgreek_{1,1,NV}$ & \\
+$\propgreek_{1,2,1}$ & \\
+\vdots & \\
+$\propgreek_{1,j,k}$ &\\
+\vdots & \\
+$\propgreek_{NN,NE,NV}$ & \\
+\hline
+\end{tabular}
+\end{fileExample}
+Each $\propgreek_{i,j,k}$ is \property ~at location $[i,j,k]$.
+
+\begin{itemize}
+\item[{$\propgreek_{i,j,k}$}] \propertycap ~in cell $[i, j, k]$. The \property ~is always in \propunits ~units and always positive. There are no a priori bound constraints set on recovered \property, however it is recommended that positivity condition to be enforced during the inversion.
+\end{itemize}
+
+$[i, j, k]=[1, 1, 1]$ is defined as the cell at the top, south-west corner of the model. The total number of lines in this file should equal \codeName{$NN \times NE \times NV$}, where \codeName{$NN$} is the number of cells in the north direction, \codeName{$NE$} is the number of cells in the east direction, and \codeName{$NV$} is the number of cells in the vertical direction.

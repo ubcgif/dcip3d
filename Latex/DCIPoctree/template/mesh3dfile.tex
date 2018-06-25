@@ -1,0 +1,47 @@
+\subsubsection{Mesh file}
+
+This file contains the 3D mesh, for example \fileName{mesh.msh}, which defines the model region. Mesh file has the following structure:
+
+\begin{fileExample}
+\begin{tabular}{|cccc|}
+\hline
+NE & NN & NV & \\
+E$_o$ & N$_o$ & Z$_o$ & \\
+$\Delta$E$_1$ & $\Delta$E$_2$ & $\cdots$ & $\Delta$E$_{NE}$ \\
+$\Delta$N$_1$ & $\Delta$N$_2$ & $\cdots$ & $\Delta$N$_{NN}$ \\
+$\Delta$V$_1$ & $\Delta$V$_2$ & $\cdots$ & $\Delta$V$_{NV}$ \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+\begin{enumerate}
+\item[\codeName{NE}] Number of cells in the East direction.
+\item[\codeName{NN}] Number of cells in the North direction
+\item[\codeName{NV}] Number of cells in the vertical direction
+\item[\codeName{E$_o$ N$_o$ V$_o$}] Coordinates, in meters, of the southwest top corner, specified in (Easting, Northing, Elevation). The elevation can be relative to a reference elevation other than the sea level, but it needs to be consistent with the elevation used to specify the locations, observations, and topography files (see the relevant file descriptions).
+\item[\codeName{$\Delta$E$_n$}] $n^{th}$ cell width in the easting direction (ordered W to E).
+\item[\codeName{$\Delta$N$_n$}] $n^{th}$ cell width in the northing direction (ordered S to N).
+\item[\codeName{$\Delta$V$_n$}] $n^{th}$ cell thickness (ordered top to bottom).
+\end{enumerate}
+
+The mesh can be designed in accordance with the area of interest and the spacing of the data available in the area. In general, the mesh consists of a core region which is directly beneath the area of available data, and a padding zone surrounding this core mesh. Within the core mesh, the size of the cells should be comparable with the spacing of the data. There is no restriction on the relative position of data location and nodal points in horizontal direction. The cell width in this area is usually uniform.
+
+The maximum depth of the mesh used for inversion should be large enough so that no magnetic material below that depth would produce a noticeable anomaly with the length scale covered by the data area. A rule of thumb is that the maximum depth should be at least half of the longest side of the data area. Based upon the user's knowledge of the survey area, one may adjust the maximum depth as necessary. The cell thickness in vertical direction usually increases slightly with depth. In the shallow region, the ratio of thickness to width of about half is good, especially when surface topography is present. At depth, a cell thickness close to the cell width is advisable. Once this core mesh is designed, it can be extended laterally by padding with a few cells, possibly of variable width. This padding is necessary when the extracted anomalies are close to the boundary of the core mesh or if there are influences from anomalies outside the area which cannot be easily removed. Problems with more than 1,000,000 model cells, and/or more than a few thousand data points would be considered large, and can be expected to require a considerable amount of computing memory and time.
+
+The vertical position of the mesh is specified in elevation. This is to accommodate the inversion of a data set acquired over a topographic surface. When there is strong topographic relief, which the user wishes to incorporate it into the inversion, special care should be taken to design the mesh. A conceptually simple approach is first to design a rectangular mesh whose top (specified by $Z_o$) is just below the highest elevation point, and then to strip off cells that are above the topographic surface. This is the approach taken in \prog. The number of cells to be stripped off in each column is determined by the user-supplied topography file. Only the remaining cells will be used in the forward modelling or included in the inversion as model parameters.
+
+\subsubsection*{Example of mesh file}
+
+This example shows a mesh that consists of 26 cells in easting, 27 cells in the northing, and 23 cells in the vertical directions. The top of the mesh is located at 0 m of elevation and the southwest corner is at -350 m easting and -400 m northing. The cells in the core portion of the mesh are all 50 m $\times$ 50 m $\times$ 25 m. There are three cells in the padding zone in every direction.
+%
+\begin{fileExample}
+\begin{tabular}{|lcccccc|}
+\hline
+26   &   27 & 23 &         &    &     & \\
+-350 & -400 & 0  &         &    &     & \\
+200  & 100  & 50 & 21*50.0 & 50 & 100 & 200 \\
+200  & 100  & 50 & 20*50.0 & 50 & 100 & 200 \\
+20*25.0 & 50 & 100 & 200   &    &     & \\
+\hline
+\end{tabular}
+\end{fileExample}

@@ -1,0 +1,658 @@
+\section{Running the programs}
+
+The software package \programName ~includes three three core programs and nine utilities.
+
+Core Programs:
+\begin{enumerate}
+\item \codeName{DCIPoctreeFwd}: Forward model conductivity/chargeability models
+to calculate data.
+\item \codeName{DCoctreeInv}: Invert 3D DC data to develop a conductivity model.
+\item \codeName{IPoctreeInv}: Invert 3D IP data to develop a chargeablility model.
+\end{enumerate}
+
+Utilities:
+\begin{enumerate}
+\item \codeName{create\_octree\_mesh}: Create an octree mesh file from electrode locations and optionally
+topography.
+\item \codeName{3DModel2Octree}: Convert from a 3D UBC-GIF model to an octree mesh/model.
+\item \codeName{octreeTo3D}: Convert from an octree model to a standard 3D UBC-GIF model.
+\item \codeName{refine\_octree}: Make an octree mesh finer based on the values of the input model.
+\item \codeName{remesh\_octree\_model}: Convert a model from one octree mesh to another.
+\item \codeName{surface\_electrodes}: Place the electrodes on the topographic surface.
+\item \codeName{octree\_cell\_centre}: Read in an octree mesh, and output a 3-columns file of cell centres.
+\item \codeName{interface\_weights}: Create a weight file for the octree cell interfaces.
+\item \codeName{create\_weight\_file}: Create an octree cell weighting file.
+\end{enumerate}
+This section discusses the use of these codes individually.
+
+\subsection{Introduction}
+
+All programs in the package can be executed under Windows or Linux environments. They can be run by either typing the program name by itself, or followed by a control file in the ``command prompt'' (Windows) or ``Terminal'' (Linux). They can be executed directly on the command line or in a shell script or batch file. When a program is executed without any arguments, it will either print a simple message describing the usage or otherwise search for a proper control file name in the working directory (this is the case, when the control file name is hard coded). If this is the case, then the name of the corresponding control file if changed by user will result in termination of the executable, followed by an error message. Some executables require more than one input argument.
+
+\subsubsection{Execution on a single computer}
+
+The command format for use on a single processsor are described below. Within the command prompt or terminal, any of the programs can be called using:
+\begin{fileExample}
+program arg$_1$ [arg$_2$ $\cdots$ arg$_i$]
+\end{fileExample}
+%
+where:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{program}] is the name of the executable
+\item[\codeName{arg$_i$}] is a command line argument, which can be a name of corresponding required or optional file. Typing \codeName{-inp} as the control file, serves as a help function and returns an example input file. Some executables do not require control files and should be followed by multiple arguments instead. This will be discussed in more detail later in this section.
+\end{description}
+
+Each input control file contains a formatted list of arguments, parameters and filenames specific to the executable. All input control file formats are explained in detail within this section.
+
+For many large data sets running one of the codes may require a prohibitively long time, so it is often useful parallelize the job and send it to multiple processors (cores) on the same computer. The \prog ~program library's main programs have been parallelized with Message Pass Interface (MPI).The MPI installation package can be downloaded from \url{http://www.mcs.anl.gov/research/projects/mpich2/}. The following is an example of a command line executing an MPI process to run \codeName{DCIPoctreeFwd} on 4 processors of the local machine:
+
+\begin{fileExample}	
+"C:\textbackslash Program Files\textbackslash MPICH2\textbackslash bin\textbackslash mpiexec.exe" -localonly 4 -priority 1  DCIPoctreeFwd
+\end{fileExample}
+
+Here, the input arguements are:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{PATH}] Properly defined path to the \codeName{mpiexec.exe}.
+\item[\codeName{-localonly}] Tells the machine that the job is only going to be run on the local machine, and not on a local network or cluster. The number which follows \codeName{-localonly} specifies the total number of processors (cores) to be used.
+\item[\codeName{-priority \#}] Sets the priority of the process. Integer grades from -1 (lowest) to 4 (highest) follow. Higher priority means that RAM and processing resources will be primarily allocated for this process, at expense of lower priority processes. Generally, a large job should be assigned a lower priority, as selective resource allocation may slow down other important processes on the computer, including those needed for stable functioning of the operating system.
+\item[\codeName{DCIPoctreeFwd}] The name of the executable. In our case it is assumed that there is an existing path to the executable directory, otherwise proper path should be provided.
+\end{description} 
+
+
+
+\subsubsection{Execution on a local network or cluster}
+
+MPI can also be used to run the \programName~ core programs on a local nestwork or cluster. The requirements for running an MPI job on a local network or cluster are as follows:
+\begin{itemize}
+\item An identical version of MPI must be installed on all participating machines
+\item The user must create an identical network account with matching \codeName{username} and \codeName{password} on every machine.
+\item Both the executable folder and the working directory need to be shared and visible on every participating computer.
+\item Before the MPI job is executed, the firewall on all participating computers should be turned off.
+\item The path should be defined to the executable directory
+\end{itemize}
+
+\begin{fileExample}	
+``C:\textbackslash Program Files\textbackslash MPICH2\textbackslash bin\textbackslash mpiexec.exe'' -machinefile machine.txt nproc -priority 0 DCIPoctreeFwd
+\end{fileExample}
+
+Where the input arguements are:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{PATH}] Properly defined path to the \codeName{mpiexec.exe}.
+\item[\codeName{-machinefile}] The list of participating machines will be read from a ``machine file.''
+\item[\codeName{machine.txt}] Name of the machine file. This file lists the network names of the participating machines and number of processors to be allocated for the MPI job for each machine. The following is an example of a machine file:
+
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+machine01 & 16 \\
+machine02 & 16 \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+In this simple example, there are two participating machines (named \codeName{machine01} and \codeName{machine02} and each is required to allocate 16 processors for the MPI job.
+
+\item[\codeName{nproc}] The total number of allocated processors. This number should be equal to the sum of all processors listed for all machines in the machine file.
+\item[\codeName{-priority 0}] Sets the priority of the process. Integer grades from -1 (lowest) to 4 (highest) follow. Higher priority means that RAM and processing resources will be primarily allocated for this process, at expense of lower priority processes. Generally, a large job should be assigned a lower priority, as selective resource allocation may slow down other important processes on the computer, including those needed for stable functioning of the operating system.
+\item[\codeName{DCIPoctreeFwd}] The name of the executable. In our case it is assumed that there is an existing path to the executable directory, otherwise proper path should be provided.
+\end{description} 
+
+\subsection{DCIPoctreeFwd}
+
+This program performs 3D forward modelling of DC resistivity and IP data over octree meshes. 
+
+\subsubsection{Control parameters and input files}
+
+As a command line argument, \codeName{DCIPoctreeFwd} requires an input file containing all parameters and files needed to carry out the forward modelling calculations. This input control file must be named \fileName{DCIP\_octree\_fwd.inp} and needs to be located in the working directory, from which \codeName{DCIPoctreeFwd} is executed. The following is the input control file format:
+
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+DC \textbar IP \textbar IPL & \\
+octree mesh file & \\
+LOC\_XY \textbar LOC\_XYZ locations file & \\
+conductivity model & \\
+chargeability model & \\
+topography active cell file & \textbar ALL\_ACTIVE \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\textbf{NOTE:} Formats of the files listed in this control file are explained in section \ref{Elements} of this document.
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{DC\textbar IP\textbar IPL}] The \codeName{DC} option to performs only DC forward modelling, while the \codeName{IP} option performs both DC and IP forward modelling. The \codeName{IPL} option calculates the IP data by multiplying the sensitivity matrix by the chargeability model. When the \codeName{DC} is chosen, the chargeability model line is ignored.
+\item[\fileName{octree mesh}] Name of the octree mesh file.
+\item[\fileName{LOC\_XY(Z)}] \codeName{LOC\_XY} specifies that the electrode location file only has surface electrodes (no Z coordinate is provided), while \codeName{LOC\_XYZ} indicates there may be a mix of surface and subsurface electrodes requiring Z locations to assigned for each current and potential electrode in the file. This is followed by the user-defined name of the file, which contains electrode location coordinates.
+\item[\fileName{conductivity model}] File containing the cell values of a conductivity model in S/m.
+\item[\fileName{chargeability model}] File containing the cell values of a chargeability model. Required only if the \codeName{IP} or \codeName{IPL} option is selected in the first line. This model must be provided in dimensionless units, ranging from $[0,1)$.
+\item[\fileName{topography active cells}] If there is a topography file involved in creation of the octree mesh, then the utility \codeName{create\_octree\_mesh} will generate a file named \fileName{active\_cells.txt} along with the mesh file. This file has exactly the same format as the model file. It is a single column with number of elements equal to number of cells in the octree mesh. The column is populated by 0's (inactive ``air'' cells) and 1's (active cells). Inactive cells do not participate in the forward modeling or inversion. For DC inversions inactive cells are assigned an air conductivity value of $10^-8$ S/m, while in IP inversions air cells have a chargeability of 0.
+\end{description} 
+
+\subsubsection{Output files}    
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{data\_dc.txt}] The DC potential data
+\item[\fileName{data\_ip.txt}] The IP data (only if the \codeName{IP} or \codeName{IPL} option was selected in line 1 of the control file.
+\item[\fileName{mumps.txt}] A diagnostic log file output by the MUMPS (a \textbf{MU}ltifrontal \textbf{M}assively \textbf{P}arallel sparse direct \textbf{S}olver) package.
+\item[\fileName{model0.(con/chg)}] The conductivity/chargeability model that was used for forward modelling with air cells removed.
+\item[\fileName{DCIP\_octree\_fwd.txt}] Log file which provides details about the parameters used in the forward modelling and diagnostic imformation about the results.
+\end{description} 
+
+Example of \fileName{DCIP\_octree\_fwd.inp} control file
+
+\begin{fileExample}\
+\begin{tabular}{|ll|}
+\hline
+DC & ! Output data type \\
+octree\_mesh.txt & ! Octree mesh file \\
+LOC\_XYZ obs\_3d.loc & ! 3D (XYZ) electrode location file\\
+model.con & ! Conductivity model\\
+model.chg & ! Chargeability model\\
+ALL\_ACTIVE & ! No topography\\
+\hline
+\end{tabular}
+\end{fileExample}
+
+
+\subsection{DCoctreeInv}
+
+\codeName{DCoctreeInv} performs the inversion of the DC resistivity data, using the parameters defined in the control file. The program does not require entry of any additional arguments in the command line, however it will be looking for a control file with the specific name (\fileName{dc\_octree\_inv.inp}), which should not be renamed by user. This input control file contains the parameters and input file names required for the inversion in the following format:
+
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+octree mesh file & \\
+LOC\_XY \textbar LOC\_XYZ data file & \\
+initial model file & \textbar VALUE \\
+reference model file & \textbar VALUE \\
+topography active cell file & \textbar ALL\_ACTIVE \\
+model active cell file & \textbar ALL\_ACTIVE \\
+cell weighting file & \textbar NO\_WEIGHT \\
+interface weighting file & \textbar NO\_FACE\_WEIGHT \\
+DEFAULT & \textbar beta\_max beta\_min beta\_factor \\
+alpha\_s alpha\_x alpha\_y alpha\_z & \\
+chifact & \\
+tol\_nl mindm iter\_per\_beta & \\
+tol\_ipcg max\_iter\_ipcg & \\
+CHANGE\_MREF & \textbar NOT\_CHANGE\_MREF \\
+SMOOTH\_MOD & \textbar SMOOTH\_MOD\_DIF \\
+BOUNDS\_NONE & \textbar BOUNDS\_CONST bl bu \textbar BOUNDS\_FILE file \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\subsubsection{Control parameters and input files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{octree mesh}] Name of octree mesh file.
+\item[\fileName{LOC\_XY(Z)}] \codeName{LOC\_XY} specifies that the \fileName{observation} file only has surface electrodes (no Z coordinate is provided), while \codeName{LOC\_XYZ} indicates there may be a mix of surface and subsurface electrodes requiring Z locations to assigned for each current and potential electrode in the file. This is followed by the user-defined name of the \fileName{observation} file.
+\item[\fileName{initial model}] The starting conductivity model can be defined as \codeName{VALUE}, followed by a constant or as a \fileName{model} file for a non-uniform starting model. The latter is especially useful when a previously terminated inversion has to be restarted.
+\item[\fileName{reference model}] The reference conductivity model can be defined as \codeName{VALUE}, followed by a constant or as a \fileName{model} file for non-uniform reference models. 
+\item[\fileName{topography active cell}] This active cell file is used to simulate topography, it has the same format as the \fileName{model} file and should be compatible with the \fileName{octree mesh}. In this file active cells are denoted by a 1, while inactive cells are denoted by a 0. Inactive cells are assigned a conductivity of 10e-8 S/m in the recovered model. If no topography is considered for the inversion then \codeName{ALL\_ACTIVE} should be selected. 
+\item[\fileName{model active cell}] An active cell file which controls which model cells are included in the inversion. Like the \fileName{topography active cell} file, it has the same format as the \fileName{model} file and should be compatible with  the \fileName{octree mesh}.  In this file active cells are denoted by a 1, while inactive cells are denoted by a 0. Inactive cells in the recovered model are set to the corresponding physical property value in the refernece model. If you wish to solve for all model cells then \codeName{ALL\_ACTIVE} should be selected.
+\item[\fileName{cell weighting}] File containing the cell weighting vector (one weight for each cell in the octree model). If \codeName{NO\_WEIGHT} is entered, default values of unity are used.
+\item[\fileName{interface weighting}] File containing information for cell interface weighting (i.e one weighting value for each cell interface). The utility \codeName{interface\_weights} is used to create this \fileName{interface weighting} file. If \codeName{NO\_FACE\_WEIGHT} is entered, default values of unity are used.      
+\item[\codeName{beta}] This line controls the selection of the initial regularization parameter (\codeName{beta\_max}), as well as its cooling step (\codeName{beta\_factor}) and the minimum $\beta$ value (\codeName{beta\_min}). These values are computed automatically if \codeName{DEFAULT} option is selected. However if a previously terminated inversion has to be restarted it is convenient to quickly resume the job at its last step by assigning these parameters manually.
+\item [\fileName{$\alpha_s, \alpha_x, \alpha_y, \alpha_z$}] Coefficients for each model component: $\alpha_s$ is the smallest model component, $\alpha_x$ is the coefficient for the derivative in the easting direction, $\alpha_y$ is the coefficient for the derivative in the northing direction, and $\alpha_z$ is the coefficient for the derivative in the vertical direction.
+
+Some reasonable starting values might be: \fileName{$\alpha_s=0.0001, \alpha_x=\alpha_y=\alpha_z = 1.0$}. None of the alpha's can be negative and they cannot be all set equal to zero.
+
+\textbf{NOTE:} The four coefficients \codeName{$\alpha_s$, $\alpha_x$, $\alpha_y$} and \codeName{$\alpha_z$} in line 10 of the control file can be though of in terms of three corresponding length scales \codeName{$L_x$, $L_y$} and \codeName{$L_z$}. To understand the meaning of the length scales, consider the ratios $\alpha_x/\alpha_s$, $\alpha_y/\alpha_s$ and $\alpha_z/\alpha_s$. They generally define the smoothness of the recovered model in each direction. Larger ratios result in smoother models, while smaller ratios result in blockier models. The conversion from $\alpha$'s to length scales can be done by:
+\begin{equation}
+\label{eq:lengthscale}
+L_x = \sqrt{\frac{\alpha_x}{\alpha_s}} ; ~L_y = \sqrt{\frac{\alpha_y}{\alpha_s}} ; ~L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}
+\end{equation}
+where length scales are defined in metres. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
+\item[\codeName{chifact}] Chi-factor can be used to scale the data misfit tolerance. By default a \codeName{chifact}=1 should be used. Increasing or decreasing the \codeName{chifact} is equivalent to scaling the assigned standard deviations, an increased \codeName{chifact} corresponds to increased error values, which allows for a larger data misfit at convergence. 
+\item[\codeName{tol\_nl, mindm, iter\_per\_beta}] The first parameter \codeName{tol\_nl} defines a tolerance for the relative gradient at each $\beta$ step. $tol\_nl=\frac{\left\|g\right\|}{\left\|g_{o}\right\|}$, where $g$ is the current gradient and $g_o$ is the gradient at the start of the current $\beta$ step iteration. If the relative gradient is less than \codeName{tol\_nl} then the code exits the current $\beta$ iteration and dereases $\beta$ by \codeName{beta\_factor}. \codeName{mindm} defines the smallest allowable model perturbation (if the $\Delta m$ recovered as a result of IPCG iteration is smaller than \codeName{mindm}, then the current $\beta$ iteration is terminated and the regularization parameter ($\beta$) is reduced by \codeName{beta\_factor} before the next $\beta$ step. \codeName{iter\_per\_beta} sets the maximum number of times that the model can be updated within a given $\beta$ iteration.
+\item[\codeName{tol\_ipcg, max\_iter\_ipcg}] \codeName{tol\_ipcg} is the fit tolerance to the IPCG iteration needs to solve the model perturbation ($\Delta m$) (defines how well the system $(\mathbf{J}^T\mathbf{J}+\beta\mathbf{W}_m^T\mathbf{W}_m)\Delta m=-g$ is solved); while \codeName{max\_iter\_ipcg} defines the maximum number of IPCG iterations allowed per $\beta$ step to solve for the model perturbation ($\Delta m$).
+\item[\codeName{CHANGE\_MREF \textbar  NOT\_CHANGE\_MREF}] This parameter provides the optional capability to change the reference model at each $\beta$ step. If the \codeName{CHANGE\_MREF} option is selected, then reference model is updated every time the regularization parameter changes and is set to the last recovered model from previous iteration. This may result in quicker convergence. If the \codeName{NOT\_CHANGE\_MREF} option is used, then the same reference model, as originally defined in line 4 is used throughout the inversion.
+\item[\codeName{SMOOTH\_MOD \textbar SMOOTH\_MOD\_DIF}] This option is used to define the reference model in and out of the derivative terms of the objective function. The options are: \fileName{SMOOTH\_MOD\_DIF} (reference model is defined in the derivative terms of the objective function) and \fileName{SMOOTH\_MOD} (reference model is defined only the smallest model term of the objective function).
+\item[\codeName{BOUNDS}] There are three options regarding the bound selection. \codeName{BOUNDS\_NONE} lifts any boundary constraints and releases the sought parameter range to infinity. \codeName{BOUNDS\_CONST} followed by a lower bound (\codeName{bl}) and an upper bound (\codeName{bu}) is used in cases, where there are some generalized restrictions on the recovered model properties (as is the case with chargeability, which must be fall within the range $[0,1)$). \codeName{BOUNDS\_FILE} is a more advanced option, which is followed by the name of your bounds file. This option allows the user to enforce individual bound constraints on each model cell, which can be very useful when there is reliable a-priori physical property information available. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding the physical property values of known geological formations.
+\end{description}
+
+Example of \codeName{DCOctreeInv} control File: 
+
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+octree\_mesh.txt & ! mesh file \\
+LOC\_XYZ data.dat & ! data file \\
+VALUE 0.001 & ! initial conductivity model \\
+VALUE 0.001 & ! reference conductivity model \\
+active\_cells.txt & ! topography active cells file \\
+ALL\_ACTIVE & ! model active cells file \\
+w.dat & ! weighting file\\
+NO\_FACE\_WEIGHT  & ! no interface weighting applied \\
+DEFAULT & ! beta\_max  beta\_min  beta\_factor \\
+1.e-5  1.  1.  1. & ! alpha\_s  alpha\_x  alpha\_y  alpha\_z \\
+1. & ! chifactor\\
+1.e-2  1.e-3  2 & ! tol\_nl  mindm  iter\_per\_beta \\
+1.e-2  15 & ! tol\_ipcg  max\_iter\_ipcg \\
+NOT\_CHANGE\_MREF & ! does not change reference model \\
+SMOOTH\_MOD\_DIF & ! reference model used in derivative \\
+BOUNDS\_CONST  0.0001  1 & ! bounds \\
+\hline
+\end{tabular}
+\end{fileExample} 
+
+\textbf{NOTE:} A sample input file can be obtained by executing: \codeName{DCoctreeInv -inp} in the command prompt.
+
+\textbf{NOTE:} \codeName{DCoctreeInv} will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved or if the model norm has plateaued. However, if the program is terminated by the maximum iteration limit, the file \fileName{DC\_octree\_inv.log} and \fileName{DC\_octree\_inv.out} should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If neither of these conditions have been met then the inversion should be restarted.
+
+
+\subsubsection{Output files:}
+
+\codeName{DCctreeInv} saves a model after each iteration. The models are ordered: \fileName{inv\_01.con}, \fileName{inv\_02.con}, \fileName{inv\_03.con}, etc. Similarly, the predicted data is output at each iteration into a predicted data file: \fileName{dpred\_01.txt}, \fileName{dpred\_02.txt}, \fileName{dpred\_03.txt}, etc.
+The following is a list of all output files created by the program \codeName{DCctreeInv}.
+
+ 
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{inv.con}] Conductivity model from the latest iteration. The model is stored in \fileName{model} format and is overwritten at the end of each iteration. 
+\item[\fileName{DC\_octree\_inv.txt}] A log file in which all of the important information regarding the flow of the inversion is stored, including the starting inversion parameters, mesh information, details regarding the computation (CPU time, number of processors, etc), and information about each iteration of the inversion (i.e. data misfit, model norm components (S,X,Y,Z), model norm, total objective function, norm gradient and relative residuals at each $\beta$ iteration).
+\item[\fileName{dpred.txt}] Predicted data from the inverted model in the latest iteration. The predicted data is in the \fileName{observation} file format, with the final column corresponding to data error/standard deviation replaced by apparent conductivity. 
+\item[\fileName{DC\_octree\_inv.out}] This file is appended at the end of each iteration and has 7 columns, which are as follows: \codeName{beta} (value of regularization parameter); \codeName{iter} (number of IPCG iteration in a beta loop); \codeName{misfit} (data misfit * 2); \codeName{phi\_d} (data misfit); \codeName{phi\_m} (model norm); \codeName{phi} (total objective function); \codeName{norm g}(gradient equal to -RHS when solving Gauss-Newton) and \codeName{g rel}(relative gradient equal to $\left\|g\right\|/\left\|g_{o}\right\|$). 
+\item[\fileName{mumps.txt}] A diagnostic log file output by the MUMPS (a \textbf{MU}ltifrontal \textbf{M}assively \textbf{P}arallel sparse direct \textbf{S}olver) package.
+\end{description}
+
+
+\subsection{IPoctreeInv}
+
+\codeName{IPoctreeInv} performs the inversion of the IP data, using the parameters defined in the control file. The program does not require entry of any additional arguments in the command line, however it does look for an input control file with the specific name (\fileName{ip\_octree\_inv.inp}), which must be in the working directory. This control file contains the parameters and input file names required for the inversion, and has the following format:
+
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+octree mesh file & \\
+LOC\_XY \textbar LOC\_XYZ data file & \\
+initial model file & \textbar VALUE \\
+reference model file & \textbar VALUE \\
+conductivity model file & \\
+topography active cell file & \textbar ALL\_ACTIVE \\
+model active cell file & \textbar ALL\_ACTIVE \\
+cell weighting file & \textbar NO\_WEIGHT \\
+interface weighting file & \textbar NO\_FACE\_WEIGHT \\
+DEFAULT & \textbar beta\_max beta\_min beta\_factor \\
+alpha\_s alpha\_x alpha\_y alpha\_z & \\
+chifact & \\
+tol\_nl mindm iter\_per\_beta & \\
+tol\_ipcg max\_iter\_ipcg & \\
+CHANGE\_MREF & \textbar NOT\_CHANGE\_MREF \\
+SMOOTH\_MOD & \textbar SMOOTH\_MOD\_DIF \\
+BOUNDS\_NONE & \textbar BOUNDS\_CONST bl bu \textbar BOUNDS\_FILE file \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\subsubsection{Control parameters and input files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{octree mesh}] Name of octree mesh file.
+\item[\fileName{LOC\_XY(Z)}] \codeName{LOC\_XY} specifies that the \fileName{observation} file only has surface electrodes (no Z coordinate is provided), while \codeName{LOC\_XYZ} indicates there may be a mix of surface and subsurface electrodes requiring Z locations to assigned for each current and potential electrode in the file. This is followed by the user-defined name of the \fileName{observation} file.
+\item[\fileName{initial model}] The starting chargeability model can be defined as \codeName{VALUE}, followed by a constant or as a \fileName{model} file for a non-uniform starting model. The latter is especially useful when a previously terminated inversion has to be restarted.
+\item[\fileName{reference model}] The reference chargeability model can be defined as \codeName{VALUE}, followed by a constant or as a \fileName{model} file for non-uniform reference models. 
+\item[\fileName{conductivity model}] The conductivity model is required for the IP inversions since it is needed to compute sensitivites. In most circumstances DC data is collected along with IP data, allowing the user to first invert the DC data and then use the recovered conductivity model as input for the IP inversion.
+\item[\fileName{topography active cell}] This active cell file is used to simulate topography, it has the same format as the \fileName{model} file and should be compatible with the \fileName{octree mesh}. In this file active cells are denoted by a 1, while inactive cells are denoted by a 0. Inactive cells are assigned a chargeability of 0 in the recovered model. If no topography is considered for the inversion then \codeName{ALL\_ACTIVE} should be selected. 
+\item[\fileName{model active cell}] An active cell file which controls which model cells are included in the inversion. Like the \fileName{topography active cell} file, it has the same format as the \fileName{model} file and should be compatible with  the \fileName{octree mesh}.  In this file active cells are denoted by a 1, while inactive cells are denoted by a 0. Inactive cells in the recovered model are set to the corresponding physical property value in the refernece model. If you wish to solve for all model cells then \codeName{ALL\_ACTIVE} should be selected.
+\item[\fileName{cell weighting}] File containing the cell weighting vector (one weight for each cell in the octree model). If \codeName{NO\_WEIGHT} is entered, default values of unity are used.
+\item[\fileName{interface weighting}] File containing information for cell interface weighting (i.e one weighting value for each cell interface). The utility \codeName{interface\_weights} is used to create this \fileName{interface weighting} file. If \codeName{NO\_FACE\_WEIGHT} is entered, default values of unity are used.      
+\item[\codeName{beta}] This line controls the selection of the initial regularization parameter (\codeName{beta\_max}), as well as its cooling step (\codeName{beta\_factor}) and the minimum $\beta$ value (\codeName{beta\_min}). These values are computed automatically if \codeName{DEFAULT} option is selected. However if a previously terminated inversion has to be restarted it is convenient to quickly resume the job at its last step by assigning these parameters manually.
+\item [\fileName{$\alpha_s, \alpha_x, \alpha_y, \alpha_z$}] Coefficients for each model component: $\alpha_s$ is the smallest model component, $\alpha_x$ is the coefficient for the derivative in the easting direction, $\alpha_y$ is the coefficient for the derivative in the northing direction, and $\alpha_z$ is the coefficient for the derivative in the vertical direction.
+
+Some reasonable starting values might be: \fileName{$\alpha_s=0.0001, \alpha_x=\alpha_y=\alpha_z = 1.0$}. None of the alpha's can be negative and they cannot be all set equal to zero.
+
+\textbf{NOTE:} The four coefficients \codeName{$\alpha_s$, $\alpha_x$, $\alpha_y$} and \codeName{$\alpha_z$} in line 10 of the control file can be though of in terms of three corresponding length scales \codeName{$L_x$, $L_y$} and \codeName{$L_z$}. To understand the meaning of the length scales, consider the ratios $\alpha_x/\alpha_s$, $\alpha_y/\alpha_s$ and $\alpha_z/\alpha_s$. They generally define the smoothness of the recovered model in each direction. Larger ratios result in smoother models, while smaller ratios result in blockier models. The conversion from $\alpha$'s to length scales can be done by:
+\begin{equation}
+L_x = \sqrt{\frac{\alpha_x}{\alpha_s}} ; ~L_y = \sqrt{\frac{\alpha_y}{\alpha_s}} ; ~L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}
+\end{equation}
+where length scales are defined in metres. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
+\item[\codeName{chifact}] Chi-factor can be used to scale the data misfit tolerance. By default a \codeName{chifact}=1 should be used. Increasing or decreasing the \codeName{chifact} is equivalent to scaling the assigned standard deviations, an increased \codeName{chifact} corresponds to increased error values, which allows for a larger data misfit at convergence. 
+\item[\codeName{tol\_nl, mindm, iter\_per\_beta}] The first parameter \codeName{tol\_nl} defines a tolerance for the relative gradient at each $\beta$ step. $tol\_nl=\frac{\left\|g\right\|}{\left\|g_{o}\right\|}$, where $g$ is the current gradient and $g_o$ is the gradient at the start of the current $\beta$ step iteration. If the relative gradient is less than \codeName{tol\_nl} then the code exits the current $\beta$ iteration and dereases $\beta$ by \codeName{beta\_factor}. \codeName{mindm} defines the smallest allowable model perturbation (if the $\Delta m$ recovered as a result of IPCG iteration is smaller than \codeName{mindm}, then the current $\beta$ iteration is terminated and the regularization parameter ($\beta$) is reduced by \codeName{beta\_factor} before the next $\beta$ step. \codeName{iter\_per\_beta} sets the maximum number of times that the model can be updated within a given $\beta$ iteration.
+\item[\codeName{tol\_ipcg, max\_iter\_ipcg}] \codeName{tol\_ipcg} is the fit tolerance to the IPCG iteration needs to solve the model perturbation ($\Delta m$) (defines how well the system $(\mathbf{J}^T\mathbf{J}+\beta\mathbf{W}_m^T\mathbf{W}_m)\Delta m=-g$ is solved); while \codeName{max\_iter\_ipcg} defines the maximum number of IPCG iterations allowed per $\beta$ step to solve for the model perturbation ($\Delta m$).
+\item[\codeName{CHANGE\_MREF \textbar  NOT\_CHANGE\_MREF}] This parameter provides the optional capability to change the reference model at each $\beta$ step. If the \codeName{CHANGE\_MREF} option is selected, then reference model is updated every time the regularization parameter changes and is set to the last recovered model from previous iteration. This may result in quicker convergence. If the \codeName{NOT\_CHANGE\_MREF} option is used, then the same reference model, as originally defined in line 4 is used throughout the inversion.
+\item[\codeName{SMOOTH\_MOD \textbar SMOOTH\_MOD\_DIF}] This option is used to define the reference model in and out of the derivative terms of the objective function. The options are: \fileName{SMOOTH\_MOD\_DIF} (reference model is defined in the derivative terms of the objective function) and \fileName{SMOOTH\_MOD} (reference model is defined only the smallest model term of the objective function).
+\item[\codeName{BOUNDS}] There are three options regarding the bound selection. \codeName{BOUNDS\_NONE} lifts any boundary constraints and releases the sought parameter range to infinity. \codeName{BOUNDS\_CONST} followed by a lower bound (\codeName{bl}) and an upper bound (\codeName{bu}) is used in cases, where there are some generalized restrictions on the recovered model properties (as is the case with chargeability, which must be fall within the range $[0,1)$). \codeName{BOUNDS\_FILE} is a more advanced option, which is followed by the name of your bounds file. This option allows the user to enforce individual bound constraints on each model cell, which can be very useful when there is reliable a-priori physical property information available. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding the physical property values of known geological formations.
+\end{description} 
+
+Example of \codeName{IPOctreeInv} control File: 
+
+\begin{adjustwidth}{-1in}{-1in}
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+octree\_mesh.txt & ! mesh file \\
+LOC\_XYZ  data.dat & ! data file \\
+VALUE  0 & ! initial chargeability model \\
+VALUE  0 & ! reference chargeability model \\
+inv.con & ! conductivity file \\
+active\_cells.txt & ! topography active cells file \\
+ALL\_ACTIVE & ! model active cells file \\
+w.dat & ! weighting file \\
+NO\_FACE\_WEIGHT  & ! no interface weighting applied \\
+DEFAULT & ! beta\_max  beta\_min  beta\_factor \\
+1.e-5  1.  1.  1. & ! alpha\_s  alpha\_x  alpha\_y  alpha\_z \\
+1. & ! chifactor\\
+1.e-2  1.e-3  2 & ! tol\_nl  mindm  iter\_per\_beta \\
+1.e-2  15 & ! tol\_ipcg  max\_iter\_ipcg \\
+NOT\_CHANGE\_MREF & ! does not change reference model \\
+SMOOTH\_MOD\_DIF & ! reference model used in derivative \\
+BOUNDS\_CONST  0  1 & ! bounds \\
+\hline
+\end{tabular}
+\end{fileExample}
+\end{adjustwidth} 
+
+\subsubsection{Output files}
+
+\codeName{IPctreeInv} saves a model after each iteration. The models are ordered: \fileName{inv\_01.chg}, \fileName{inv\_02.chg}, \fileName{inv\_03.chg}, etc. Similarly, the predicted data is being written at each iteration into predicted data files: \fileName{dpred\_01.txt}, \fileName{dpred\_02.txt}, \fileName{dpred\_03.txt}, etc.
+Following is the list of all files created by the program \codeName{IPctreeInv}.
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{inv.chg}] Chargeability model from the latest iteration. The model is stored in the standard \fileName{model} format and the file is overwritten at the end of each iteration. 
+\item[\fileName{IP\_octree\_inv.txt}] A log file in which all of the important information about the flow of the inversion is stored, including the starting inversion parameters, mesh information, details regarding the computation (CPU time, number of processors, etc), and information about each iteration of the inversion (i.e. data misfit, model norm components (S,X,Y,Z), model norm, total objective function, norm gradient and relative residuals at each $\beta$ iteration).
+\item[\fileName{dpred.txt}] Predicted data from the inverted model in the latest iteration. The predicted data is in the \fileName{observation} file format, with the final column corresponding to data error/standard deviation replaced by apparent chargeability. 
+\item[\fileName{IP\_octree\_inv.out}] This file is appended at the end of each iteration and has 7 columns, which are as following: \codeName{beta} (value of regularization parameter); \codeName{iter} (number of IPCG iteration in a beta loop); \codeName{misfit} (data misfit * 2); \codeName{phi\_d} (data misfit); \codeName{phi\_m} (model norm); \codeName{phi} (total objective function); \codeName{norm g}(gradient equal to -RHS when solving Gauss-Newton) and \codeName{g rel}(relative gradient equal to $g/g_0$). 
+\item[\fileName{mumps.txt}] A diagnostic log file output by the MUMPS (a \textbf{MU}ltifrontal \textbf{M}assively \textbf{P}arallel sparse direct \textbf{S}olver) package.
+\end{description}
+
+
+\subsection{create\_octree\_mesh}
+
+This utility creates an octree mesh from electrode locations and optionally a topography file.
+
+\subsubsection{Command line usage}
+\begin{fileExample}
+create\_octree\_mesh
+\end{fileExample}
+This utility requires an input control file ``\fileName{create\_mesh.inp}'' to exist in the working directory. The input control file should not be changed by the user.
+\subsubsection{Input files}
+
+The following is the control file format:
+
+\begin{fileExample}
+\begin{tabular}{|lcc|} 
+\hline
+min\_dx & min\_dy & min\_dz \\
+total\_expansion\_x & total\_expansion\_y & total\_expansion\_z \\
+LOC\_XY \textbar LOC\_XYZ & electrode location file & \\
+topography file & \textbar NO\_TOPO & \\
+APPROXTOPO \textbar GOODTOPO & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+The input parameters for the control file are:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{min\_dx(dy,dz)}] The size of base mesh cell (smallest possible cell) in metres.
+\item[\codeName{expansion}] Defines the padding distance in metres outside of the survey area in each direction.
+\item[\fileName{LOC\_XY(Z)}] Electrode location file which is needed for assigning the lateral extent and the depth of the core mesh region based on the electrode geometry. The lateral extent is consistent with the lateral extent of the survey and the depth is assigned as 1/2 of the maximum Tx - Rx distance.
+\item[\fileName{topography}] Topography file. If no topography is used then the \codeName{NO\_TOPO} option should be selected.
+\item[\codeName{APPROXTOPO \textbar GOODTOPO}] This option allows the user to control the number of cells that are used to define topography in the padding cell region. \codeName{GOODTOPO} will define the topography in the padding region very accurately using a large number of fine cells, while \codeName{APPROXTOPO} will appoximate the topo in the padding region using a smaller number of coarse cells. Since it is typically not crucial to have well defined topography in the padding region \codeName{APPROXTOPO} minimizes the number of padding cells in the octree mesh, which helps improve computational efficiency. 
+\end{description}
+
+\subsubsection{Output files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{octree\_mesh.log}] Log file specifying the parameters used by the \codeName{create\_octree\_mesh} utility.
+\item[\fileName{octree\_mesh\_\#.txt}] Output octree mesh. During the mesh creation process the user is given 40 different size options which allows them to control the total number of cells in the output octree mesh (cell sizes will range from relatively coarse to nearly as fine as the underlaying mesh). The selected number will be reflected in the name of the produced octree mesh where the ``\#'' now appears.
+\item[\fileName{active\_cells.txt}] The active cell file which defines the inactive air cells as those which lie above the topographic surface. (This file is only is output if a topography file is provided.)
+\item[\fileName{3D\_mesh\_core.txt}] Standard 3D mesh for only the core region of the survey.
+\item[\fileName{3D\_mesh.txt}] Standard 3D mesh for the entire volume.
+\item[\fileName{data\_z.txt}] Contains the data file with electrodes placed on the surface. If \codeName{LOC\_XYZ} is specified, electrodes above the surface will be moved to the surface, and electrode locations below the surface will be unchanged. This file is only output when there is topography specified.
+\end{description}
+
+
+\subsection{refine\_octree}
+
+This utility is designed to refine a previously created octree mesh at intermediate iteration steps to make it finer, given the corresponding octree conductivity or chargeability model. The idea is that a balance needs to be  maintained between the accuracy of the forward model and the computational speed. It is therefore expected that on the first run, the data will be fit to an increased \codeName{chifact} on a rather coarse mesh. The mesh should be refined again so that at each refinement step the data can be fit to a progressively decreasing chifact, which will eventually become 1.
+
+Unlike the initial mesh, the discretization process (which was only dependent on electrode locations), the post refinement discretization will also be based on the curvature of the model. Regions with more abrupt property variations will be discretized to greater degree (although not smaller than the initial underlaying base mesh).
+
+\subsubsection{Command line usage}
+\begin{fileExample}
+refine\_octree
+\end{fileExample}
+This utility requires a control file \fileName{refine\_mesh.inp} to exist in the working directory. The control file name is not to be changed by the user.
+
+\subsubsection{Input files}
+
+The following is the control file format:
+
+\begin{fileExample}
+\begin{tabular}{|l|}
+\hline
+LOG\_MODEL \textbar LIN\_MODEL\\
+input octree mesh file \\
+input octree model file \\
+output octree mesh file \\
+output model file \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+The input parameters for the control file are:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{LOG\_MODEL \textbar LIN\_MODEL}] Linear versus logrithmically scaled model file. \codeName{LOG\_MODEL} is typically used for DC conductivity models while \codeName{LIN\_MODEL} is usually used for IP chargeability models.
+\item[\fileName{input octree mesh}] Defines the input (initial) octree mesh.
+\item[\fileName{input octree model}] Defines the input octree model.
+\end{description}
+
+\subsubsection{Output files}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{refine\_mesh.log}] Log file specifying the parameters used by the \codeName{refine\_octree} utility.
+\item[\fileName{output octree mesh}] Defines the output (refined) octree mesh.
+\item[\fileName{output octree model}] Defines the output (refined) octree model.
+\end{description}
+
+
+\subsection{remesh\_octree\_model} 
+
+This utility is used to convert a previously created 3D octree model from one existing octree mesh to another existing octree mesh.
+
+
+\subsubsection{Command line usage}
+
+\begin{fileExample}
+remesh\_octree\_model.exe  mesh1\_in  model1\_in  mesh2\_in  model2\_out \\
+\end{fileExample}
+
+\subsubsection{Input files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{mesh1\_in}] Input octree mesh.
+\item[\fileName{model1\_in}] Input octree model.
+\item[\fileName{mesh2\_in}] Octree mesh to be used for remeshing.
+\end{description} 
+
+\subsubsection{Output files}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{model\_out}] New remeshed octree model, defined on \fileName{mesh2\_in}.
+\end{description}
+
+
+\subsection{octreeTo3D}
+
+This utility is designed to convert an existing 3D octree model defined over an octree mesh into a standard model defined over an existing standard 3D mesh.
+
+
+\subsubsection{Command line usage}
+\begin{fileExample}
+octreeto3D octreeMesh\_in octreeModel\_in 3Dmesh\_in 3Dmodel\_out
+\end{fileExample}
+
+\subsubsection{Input files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{octreeMesh\_in}] Input octree mesh.
+\item[\fileName{octreeModel\_in}] Input model based on the octree mesh.
+\item[\fileName{3Dmesh\_in}] Input standard 3D mesh that you wish to convert your model to.
+\end{description}
+
+\subsubsection{Output files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{3Dmodel\_out}] Output standard 3D model, defined on the input standard 3D mesh (\codeName{3Dmesh\_in}).
+\end{description}
+
+
+\subsection{3Dmodel2Octree} 
+
+This utility is designed to convert an existing standard 3D model, defined over an standard mesh, into a new octree model defined over an existing 3D octree mesh. Inorder for this utility to work the standard 3D mesh and model must have a uniform cell size (i.e. all cells need to have the same dimensions, padding cells need to be removed) and this cell size should be the same as the minimum octree mesh cell size.
+
+
+\subsubsection{Command line usage}
+\begin{fileExample}
+3Dmodel2octree control\_file.inp
+\end{fileExample}
+This utility works with an arbitrary (user-defined) input control file name.
+
+\subsubsection{Input files}
+The input control file format is as follows:
+
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+LOG\_MODEL \textbar LIN\_MODEL & \\
+input octree mesh file & \\
+input standard 3D mesh file & \\
+input standard 3D model file & \\
+output octree mesh file & \textbar USE\_INPUT\_MESH\\
+output octree model file & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{LOG\_MODEL \textbar LIN\_MODEL}] Linear versus logrithmically scaled model file. \codeName{LOG\_MODEL} is typically used for DC conductivity models while \codeName{LIN\_MODEL} is usually used for IP chargeability models.
+\item[\fileName{input octree mesh}] Input 3D octree mesh on which to define the new 3D octree model.
+\item[\fileName{input standard mesh}] Input standard 3D mesh on which the standard 3D model is based.
+\item[\fileName{input standard model}] Input standard 3D model that you wish to convert to an 3D octree model.
+\end{description}
+
+\subsubsection{Output files}
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{output octree mesh}] Output octree mesh file on which the new octree model is defined. The  \codeName{USE\_INPUT\_MESH} option can be specified if you want the output model to be defined on the \fileName{input octree mesh}.
+\item[\fileName{output octree model}] Output 3D octree model which hopefully contains the structures from the \fileName{input standard model}. 
+\end{description}
+
+\textbf{NOTE:} Unless the \codeName{USE\_INPUT\_MESH} option is selected, your input and output octree mesh will not be the same. This is because the \fileName{input octree mesh}, which was dependent on the electrode locations and optionally topography, is refined and cells are subdivided to to improve model resolution in regions of the model where sturctures exist. For this reason the output octree mesh will always have more cells than the input octree mesh unless the input standard model is a uniform half/wholespace. The more structure that your input standard model has the larger the size of your output octree mesh and model.   
+
+\subsection{surface\_electrodes} 
+
+This utility is designed to drape the existing surface electrode survey geometry onto a user-provided 3D topographic surface. This essentially takes a \fileName{LOC\_XY} location file and interpolates the defined topographic surface to determine the Z location of each electrode on the tomographic surface. The electrode locations are then output in a \fileName{LOC\_XYZ} location file.
+
+\subsubsection{Command line usage}
+\begin{fileExample}
+surface\_electrodes
+\end{fileExample}
+This utility requires a control file \fileName{surface\_electrodes.inp} to exist in the working directory. The control file name is not to be changed by the user.
+
+\subsubsection{Input files}
+The following is the control file format:
+
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+input octree mesh file & \\
+topography active cell file & \\
+$[$ONLY\_LOC$]$ LOC\_XY \textbar LOC\_XYZ & electrode location file \\
+output data file & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{input octree mesh}] Input octree mesh on which the \fileName{topography active cell} file is defined.
+\item[\fileName{topography active cell}] Input active cell file which defines topography.
+\item[\fileName{LOC\_XY(Z)}] Input observation file. If the \codeName{ONLY\_LOC} option is specified a locations file may be used in place of an observation file
+\end{description}
+
+\textbf{NOTE:} If an \fileName{LOC\_XYZ} observation or location file is specified in the input control file, electrodes above the surface will be draped to the surface, while electrode locations below the surface will remain unchanged.
+
+\subsubsection{Output files}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{LOC\_XYZ}] Output observation/location file, in which the electrodes have been draped onto the topographic surface.
+\end{description}
+
+\subsection{create\_weight\_file}
+ 
+This utility is designed to build an octree cell weighting file. Since these are cell weights they are assigned to cell centers. While the primary use of this weighting file is to help control the variability of physical properties in the near surface layers of your recovered model, it can also be manually edited to place more/less wieght on particular model cells where you might have a-priori information.  
+
+\subsubsection{Command line usage}
+
+\begin{fileExample}
+create\_weight\_file weight.inp
+\end{fileExample}
+
+\subsubsection{Input files}
+
+\begin{fileExample}
+\begin{tabular}{|lcl|}
+\hline
+input octree mesh file & & \\
+topography active cell file & \textbar ALL\_ACTIVE & \\
+3 & & ! \# of surface layers \\
+10  5  2.5 & & ! cell weight values \\
+output weight file & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{input octree mesh}] Input octree mesh on which the \fileName{topography active cell} file is defined.
+\item[\fileName{topography active cell}] Input active cell file which defines topography. \codeName{ALL\_ACTIVE} can be selected if there is no topography and all model cells are active.
+\item[\codeName{\# of surface layers}] An integer that defines the number of surface layers that you would like to apply weights to. Each layer is a single cell in thickness. Since cell thickness will vary throughout the octree model the layers are defined on the core region of the model where you have the smallest cells. The cell weights are then assigned based on where the top SW corner of the cell falls (i.e. for a large padding cell near the edge of your octree model the topmost cell might be ten times thicker than your smallest surface cell in the core region. In this case this entire cell would be assigned the weight of your surface layer. All of the cells beneath this edge cell would remain unweighted though, because the top SW corners lie below the depth of the second and third layers, as defined by the smaller surface cells in the core region of the model). 
+\item[\codeName{surface weight values}] One surface weight value is required for each of the surface layers. All weight values must be greater than or equal to 1, with 1 denoting no weight (identity) and high numbers heavily weighting the cell towards the refernece model.  
+\end{description}
+
+\subsubsection{Output files}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{output weight file}] Output cell surface weight file. This file has the same general structure as the \fileName{model} files, except with the physical property values are replaced by cell weights. 
+\end{description}
+
+
+\subsection{interface\_weights}
+
+This utility is designed to build an interface weighting file which can be particularly useful if you know the location a sharp boundary within your model with a large physical property contrast across it. This utility looks at the physical property gradient across all cell faces within the input model and assigns a small interface weight (less than 1) if the gradient is above a specified tolerance. Assigning the small interface weight (less than 1) forces a sharp contact. This utility is also used to smooth surface variations laterally by placing large weights (greater than 1) on the topographic surface.
+
+
+\subsubsection{Command line usage}
+
+\begin{fileExample}
+interface\_weights  weight.inp
+\end{fileExample}
+This utility works with an arbitrary (user-defined) input control file name.
+
+\subsubsection{Input files}
+The following is the control file format:
+
+\begin{fileExample}
+\begin{tabular}{|lcl|}
+\hline
+input octree mesh file & & \\
+topography active cell file & \textbar ALL\_ACTIVE & \\
+input octree model file & \textbar NO\_MODEL & \\
+LOG\_MODEL \textbar LIN\_MODEL & & \\
+1.e-3  0.01 & & ! gradtol  weightedge \\
+3 & & ! \# of surface layers \\
+200.  100.  50. & & ! surface weight values for X and Y faces \\
+output face weight file & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{input octree mesh}] Input octree mesh on which the \fileName{topography active cell} file and the input octree model are defined.
+\item[\fileName{topography active cell}] Input active cell file which defines topography. \codeName{ALL\_ACTIVE} can be selected if there is no topography and all model cells are active.
+\item[\fileName{input octree model}] Input octree model upon which to compute the physical property gradient across all cell faces. The \codeName{NO\_MODEL} option is used if you only with to apply surface interface weights.
+\item[\codeName{LOG\_MODEL \textbar LIN\_MODEL}] Linear versus logrithmically scaled model file. \codeName{LOG\_MODEL} is typically used for DC conductivity models while \codeName{LIN\_MODEL} is usually used for IP chargeability models.
+\item[\codeName{gradtol}] Gradient tolerance above which to assign to assign an interface weight of \codeName{weightedge} to the cell interface.  
+\item[\codeName{weightedge}] Interface weight to assign to cell interfaces with a large physical property gradient, which exceeds \codeName{gradtol}. Small weight values (less than 1) will force a sharp contact.
+\item[\codeName{\# of surface layers}] An integer that defines the number of surface layers that you would like to apply weights to. Each layer is a single cell in thickness. Since cell thickness will vary throughout the octree model the layers are defined on the core region of the model where you have the smallest cells. The interface weights are then assigned based on where the top SW corner of the cell falls (i.e. for a large padding cell near the edge of your octree model the topmost cell might be ten times thicker than your smallest surface cell in the core region. In this case this entire cell would be assigned the weight of your surface layer. All of the cells beneath this edge cell would remain unweighted though, because the top SW corners lie below the depth of the second and third layers, as defined by the smaller surface cells in the core region of the model). 
+\item[\codeName{interface weight values}] One interface weight value is required for each of the surface layers. This defines a lateral interface weight for the near surface cells. As these lateral interface weights are increased so does the degree of lateral smoothing.  
+\end{description}
+
+\subsubsection{Output files}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\fileName{output face weight}] Output interface weighting file which contains three interface weighting vectors: $mathbf{w}_x$, $mathbf{w}_y$, and $mathbf{w}_z$. These vectors are listed in a single column with $mathbf{w}_x$ followed by $mathbf{w}_y$ and $mathbf{w}_z$. 
+\end{description}

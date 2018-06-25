@@ -1,0 +1,25 @@
+\subsubsection{Weights file}
+This file supplies the user-based weights that acts upon the model objective function. The following is the file structure is for the weights file:
+
+\begin{fileExample}
+\begin{tabular}{|ccc|}
+\hline
+W.S$_{1,1,1}$ & $\cdots$ & W.S$_{NN,NE,NV}$   \\
+W.E$_{1,1,1}$ & $\cdots$ & W.E$_{NN,NE-1,NV}$ \\
+W.N$_{1,1,1}$ & $\cdots$ & W.N$_{NN-1,NE,NV}$ \\
+W.Z$_{1,1,1}$ & $\cdots$ & W.Z$_{NN,NE,NV-1}$ \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+Parameter definitions:
+\begin{itemize}
+\item[\codeName{W.S$_{i,j,k}$}] Cell weights for the smallest model.
+\item[\codeName{W.E$_{i,j,k}$}] Cell weights for the interface perpendicular to the easting direction.
+\item[\codeName{W.N$_{i,j,k}$}] Cell weights for the interface perpendicular to the northing direction.
+\item[\codeName{W.Z$_{i,j,k}$}] Cell weights for the interface perpendicular to the vertical direction.
+\end{itemize}
+
+Within each part, the values are ordered in the same way as in \fileName{model file}, however, they can be all on one line, or broken up over several lines. Since the weights for a derivative term are applied to the boundary between cells, the weights have one fewer value in that direction. For instance, the weights for the derivative in easting direction has \codeName{${(NE-1)\times NN \times NV}$} values, whereas the number of cells is \codeName{${NE \times NN \times NV}$}.
+
+If the surface \fileName{topography file} is supplied, the cell weights above the surface will be ignored. It is recommended that these weights be assigned a value of \codeName{$-1.0$} to avoid confusion. If \codeName{null} is entered instead of the weights file, then all of the cell weights will be set equal (\codeName{$1.0$}).

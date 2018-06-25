@@ -1,0 +1,31 @@
+% General model description associated with a 3D, staggered mesh. 
+% Can switch these out to pretty much be done
+\newcommand{\propertyOne}{conductivity}
+\newcommand{\propertyOnecap}{Conductivity}
+\newcommand{\propOneunits}{[S/m]}
+\newcommand{\propOnegreek}{\sigma}
+\newcommand{\propertyTwo}{chargeability}
+\newcommand{\propertyTwocap}{Chargeability}
+\newcommand{\propTwounits}{[unitless]}
+\newcommand{\propTwogreek}{\eta}
+
+\subsubsection{Model file}
+This file contains the cell values of the \propertyOne ~or \propertyTwo ~model. The \propertyOne ~must have values in S/m, while \propertyTwo is often unitless. The \fileName{initial}, \fileName{reference}, and \fileName{forward} models must be in this format. Likewise, the \fileName{recovered} model files will be in this format. Model files have the following structure:
+\begin{fileExample}
+\begin{tabular}{|lcl|}
+\hline
+$\propOnegreek_{1}$ & or & $\propTwogreek_{1}$ \\
+$\propOnegreek_{2}$ & or & $\propTwogreek_{2}$ \\
+\vdots & & \vdots \\
+$\propOnegreek_{i}$ & or & $\propTwogreek_{i}$ \\
+\vdots &  & \vdots \\
+$\propOnegreek_{M}$ & or &$\propTwogreek_{M}$ \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{$\propOnegreek_{i}$}] \propertyOnecap ~of the $i^th$ cell. The \propertyOne ~is always in S/m. There are no a priori bound constraints set on the recovered \propertyOne model unless specific bound constraints are applied by the user.
+\item[\codeName{$\propTwogreek_{i}$}] \propertyTwocap ~of the $i^th$ cell. The \propertyTwo ~is typically unitless. Since chargeability ranges between [0,1) a positivity constraint should be applied.
+\item[\codeName{$M$}] The total number of cells in the octree model and its associated octree mesh.
+\end{description}

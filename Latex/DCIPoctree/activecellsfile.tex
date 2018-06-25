@@ -1,0 +1,17 @@
+\subsubsection{Active cells file}
+This file is optional. It has exact same format as the \fileName{model} file, and thus must be the same size. The active cells file contains information about the cells that will be incorporated into the inversion. There are 2 basic types of active cell files: topography active cell and model active cell files. As the name suggests, the topography active cell file defines which cells within the model fall above the topographic surface. By default all cells below the earth's surface are active (set to 1) and incorporated into the inversion while the air cells will be marked as inactive (set to 0) and excluded from the inversion. The model active cell file can be used to make additional cells, which lie beneath the topographic surface, inactive. In doing this the inactive cells are fixed to their corresponding value in the reference model. As in the topography active cell file a 0 marks inactive cells while a 1 marks active cells. Any inactive cells will not influence the minimization of the model objective function. The following is an example of an active cells file:
+\begin{fileExample}
+\begin{tabular}{|cl|}
+\hline
+0 & \\
+0 & ! inactive cell\\
+\vdots & \\
+0 & \\
+1 & ! active cell\\
+\vdots & \\
+0 & \\
+\vdots & \\
+1 & \\
+\hline
+\end{tabular}
+\end{fileExample}

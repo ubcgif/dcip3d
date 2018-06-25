@@ -1,0 +1,97 @@
+\subsubsection{Observations file}
+This file is used to specify the current/potential electrode locations along with the observed potential differences (voltages) and their estimated standard deviation. The general format of the observations file is identical to that of the locations file, except for the addition of the voltage and standard deviation columns to the lines specifying the location of potential electrodes M and N. It is important to note that the output of the forward modelling program \codeName{DCIPoctreeFwd} does not quite have the correct format to be considered an observation file since the final column which is supposed to contain standard deviations for the error is instead replaced with computed apparent conductivities/chargeabilities. To convert the \codeName{DCIPoctreeFwd} output into an observation file to be used as the input for the inversion code the column of apparent conductivities/chargeabilities needs to be deleted and proper standard deviations need to be assigned. The following is the file structure of an observation file:
+\begin{adjustwidth}{-1in}{-1in} % adjust the L and R margins by 1 inch
+\begin{fileExample}\scriptsize
+\begin{tabular}{|lccccccc|}
+\hline
+! Comment & & & & & & & \\
+$[$IPTYPE=int$]$ & & & & & & & \\
+XA(1)  & YA(1)  & [ZA(1)]  & XB(1)  & YB(1)  & [ZB(1)]  & n(1) & \\
+XM(1,1)  & YM(1,1)  & [ZM(1,1)]  & XN(1,1)  & YN(1,1)  & [ZN(1,1)]  & V(1,1) & SD(1,1)\\
+XM(1,2)  & YM(1,2)  & [ZM(1,2)]  & XN(1,2)  & YN(1,2)  & [ZN(1,2)]  & V(1,2) & SD(1,2) \\
+XM(1,3)  & YM(1,3)  & [ZM(1,3)]  & XN(1,3)  & YN(1,3)  & [ZN(1,3)]  & V(1,3) & SD(1,3) \\
+\vdots  & \vdots  & \vdots  & \vdots  & \vdots  & & & \\
+XM(1,n(1))  & YM(1,n(1))  & [ZM(1,n(1))]  & XN(1,n(1))  & YN(1,n(1))  & [ZN(1,n(1))]  & V(1,n(1)) & SD(1,n(1)) \\
+ & & & & & & & \\
+XA(2)  & YA(2)  & [ZA(2)]  & XB(2)  & YB(2)  & [ZB(2)]  & n(2) & \\
+XM(2,1)  & YM(2,1)  & [ZM(2,1)]  & XN(2,1)  & YN(2,1)  & [ZN(2,1)]  & V(2,1) & SD(2,1) \\
+\vdots  & \vdots  & \vdots  & \vdots  & \vdots  & & & \\
+XM(2,n(2))  & YM(2,n(2))  & [ZM(2,n(2))]  & XN(2,n(2))  & YN(2,n(2))  & [ZN(2,n(2))]  & V(2,n(2)) & SD(2,n(2)) \\
+ & & & & & & & \\
+\vdots  & \vdots  & \vdots  & \vdots  & \vdots  & & & \\
+ XM(NC,n(NC)) & YM(NC,n(NC)) & [ZM(NC,n(NC))] & XN(NC,n(NC)) & YN(NC,n(NC)) & [ZN(NC,n(NC))] & V(NC,n(NC)) & SD(NC,n(NC))\\
+\hline
+\end{tabular}
+\end{fileExample}
+\end{adjustwidth}
+%
+Parameter definitions:
+%
+%
+Parameter definitions:
+%
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{!}] Lines starting with ! are comments.
+\item[\codeName{IPTYPE}] A special directive that indicates the IP data type. This directive is only required in IP data files. The \codeName{IPTYPE} enables the IP inversion programs to distinguish the apparent chargeability and other similar IP measurements from the basic secondary potentials. \codeName{IPTYPE = 1} is commonly used for IP data in which apparent chargeability is well defined (i.e. using dimensionless apparent chargeability, integrated chargeability, PFE, or phase data acquired using electrode configurations that do not produce zero crossings in the measured total potential). The following are some examples of this type of geometry: any pole-pole array (surface or borehole), surface pole-dipole or dipole-dipole array along the same traverse, gradient arrays where the potential electrodes are parallel to the current electrodes, or borehole pole-dipole or dipole-dipole array with all active electrodes in the same borehole. \codeName{IPTYPE = 2} is used for secondary potential IP data measured using any electrode geometry. This is typically used when cross-line surface data or cross-hole borehole data are inverted. For these array geometries, the apparent chargeability cannot be defined since the total potential can be zero. The dimensionless apparent chargeabilities (\codeName{IPTYPE = 1}) and the secondary potentials (\codeName{IPTYPE = 2}) can be mixed in the same file. Thus an IP data file can have several occurrences of IPTYPE. All the data are treated as the same type following an IPTYPE directive until a new line changes the type.
+\item[\codeName{XA(i),YA(i),ZA(i)}] Location (X,Y,Z) of the i$^{th}$, current electrode A (measured in metres).
+\item[\codeName{XB(i),YB(i),ZB(i)}] Location (X,Y,Z) of the i$^{th}$, current electrode B (measured in metres). 
+\item[\codeName{XM(i,j),YM(i,j),ZM(i,j)}] Location (X,Y,Z) of the j$^{th}$ potential electrode M, corresponding with the i$^{th}$ current electrode or electrode pair (measured in metres).
+\item[\codeName{XN(i,j),YN(i,j),ZN(i,j)}] Location of the j$^{th}$, potential electrode N corresponding with the i$^{th}$ current electrode or electrode pair (measured in metres).
+\item[\codeName{V(i,j)}] Data value. The DC data should be the potential difference normalized by the current strength and has the units of V/A. While the IP data can have a variety of different units depending on the \codeName{IPTYPE}. When aparent chargeability is specified using \codeName{IPTYPE=1} the data can have a variety of units, but is most commonly dimensionless. When the secondary potential is specified by using \codeName{IPTYPE = 2}, the data must also be in V/A.
+\item[\codeName{SD(i,j)}] Standard deviation of the datum \codeName{V(i,j)}. This is an absolute value and should not be specified as a percentage.
+\item[\codeName{NC}] The total number of current electrodes or electrode pairs.
+\end{description}
+
+\textbf{NOTE:} The brackets $[\cdots]$ indicate that the Z loaction of the electrodes is optional if you as working only with surface data (i.e. your electrodes are dramped to topography).
+
+\textbf{NOTE:} Special care needs to be taken when mixed IP data are present. Only the dimensionless apparent chargeability can be mixed with the secondary potential data. In this case, the recovered chargeability will be the dimensionless quantity. Any other chargeability data (e.g., PFE or phase) must be first converted to dimensionless apparent chargeability. If no conversion is possible, then the data must be inverted as a single data type (\codeName{IPTYPE}). In that case, the recovered chargeability model has the same units as the data.
+
+\subsubsection*{Examples of an observation file}
+
+We provide two example files below. The first file is for a simple surface dataset while the second file shows how borehole data can be incorporated. 
+
+Example of surface data observations:
+\begin{fileExample}
+\begin{tabular}{|cccccl|}
+\hline
+! & surface & data & & & \\
+0.00 & 100.00 & 0.00 & 100.00 &	6 & \\
+50.00	&  100.00 & 100.00	& 100.00	&	-5.72998E-04	&	5.00012E-03\\
+100.00	&	100.00	&	150.00	& 100.00 &	-9.99526E-03	&	5.00041E-03\\
+150.00	&	100.00	&	200.00	&	100.00	&	-1.23266E-03	&	5.00083E-03\\
+200.00	&	100.00	&	250.00	&	100.00	&	3.53100E-03	&	5.00116E-03\\
+250.00	&	100.00	&	300.00	&	100.00	&	-1.91704E-03	&	5.00129E-03\\
+300.00	&	100.00	&	350.00	&	100.00	&	-6.31114E-03	&	5.00038E-03\\
+ &  &  &  &  & \\
+50.00	& 100.00	&	50.00	& 100.00	& 6 & \\
+100.00	&	100.00	&	150.00	&	100.00	&	5.75265E-03	&	5.00014E-03\\
+150.00	&	100.00	&	200.00	&	100.00	&	2.28981E-04	&	5.00052E-03\\
+200.00	&	100.00	&	250.00	&	100.00	&	2.14355E-03	&	5.00075E-03\\
+250.00	&	100.00	&	300.00	&	100.00	&	-4.12922E-03	&	5.00129E-03\\
+300.00	&	100.00	&	350.00	&	100.00	&	-3.93082E-03	&	5.00057E-03\\
+350.00	&	100.00	&	400.00	&	100.00	&	8.30425E-03	&	5.00117E-03\\
+ &  &  &  &  & \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+Example with borehole observations:
+\begin{fileExample}
+\begin{tabular}{|cccccccl|}
+\hline
+! & borehole & data &  &  &  &  & \\
+500.0 & 200.0 &	0.0 & 500.0 & 200.0 &	0.0 &	45 & \\
+500.0 & 800.0 &	0.0 & 500.0 & 800.0 &	-50.0 & -3.18948E-05 & 1.113E-05\\
+500.0 & 800.0 &	-25.0 & 500.0 & 800.0 &	-75.0 & -6.511E-05 & 1.215E-05\\
+500.0 & 800.0 &	-50.0 & 500.0 & 800.0 & -100.0 & -6.198E-05 & 1.266E-05\\
+500.0 & 800.0 &	-75.0 & 500.0 & 800.0 & -125.0 & -3.357E-05 & 1.248E-05\\
+500.0 & 800.0 & -100.0 & 500.0 & 800.0 & -150.0 & -1.701E-05 & 1.195E-05\\
+500.0 & 800.0 & -125.0 & 500.0 & 800.0 & -175.0 & -2.955E-05 & 1.133E-05\\
+500.0 & 800.0 & -150.0 & 500.0 & 800.0 & -200.0 & -2.266E-05 & 1.082E-05\\
+500.0 & 800.0 & -175.0 & 500.0 & 800.0 & -225.0 &	3.665E-06 & 1.049E-05\\
+500.0 & 800.0 & -200.0 & 500.0 & 800.0 & -250.0 & -2.053E-06 & 1.036E-05\\
+\vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+\hline
+\end{tabular}
+\end{fileExample}

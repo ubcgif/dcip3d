@@ -1,0 +1,17 @@
+\subsubsection{Active cells file}
+This file is optional. It has exact same format as the \fileName{model file}, and thus must be the same size. The active cells file contains information about the cells that will be incorporated into the inversion. By default all cells below the earth's surface are active and incorporated into the inversion. If the active cells file is provided, then zeros will mark the inactive cells (will NOT be included in the inversion), and cells set to 1, will define active cells. Any inactive cells will not influence the minimization in equation \ref{eq:globphi}. The cells will remain the user given value (via the \fileName{reference} models) and do not factor into the model objective function calculation. The following is an example of an active cells file:
+\begin{fileExample}
+\begin{tabular}{|cl|}
+\hline
+0 & \\
+0 & ! inactive cell\\
+\vdots & \\
+0 & \\
+1 & ! active cell\\
+\vdots & \\
+0 & \\
+\vdots & \\
+1 & \\
+\hline
+\end{tabular}
+\end{fileExample}

@@ -1,0 +1,28 @@
+% Subsubsections for generic depth and distance weighting. Make sure to change alphas and p as necessary:
+\newcommand{\pvalue}{3} % Rate of decay
+\newcommand{\alphavalue}{3.0}
+\subsubsection{Depth weighting for surface or airborne data}
+\label{Depthw}
+
+For surface data, the sensitivity decays predominantly in the depth direction. Numerical experiments indicate that the function of the form $(z+z_o)^{-\pvalue}$ closely approximates the kernel's decay directly under the observation point provided that a reasonable value is chosen for $z_o$. The value of $\pvalue$ in the exponent is consistent with the fact that, to first order, a cuboidal cell acts like a dipole source whose magnetic field decays as inverse distance cubed. The value of $z_o$ can be obtained by matching the function 1/$(z+z_o)^\pvalue$ with the field produced at an observation point by a column of cells. Thus we use a depth weighting function of the form
+
+\begin{equation}
+\label{eq:depthw}
+w(\mathbf{r}_j)=\left[\frac{1}{\Delta z_{j}}\int\limits_{\Delta z_{ij}}\frac{dz}{(z+z_o)^\alpha}\right]^{1/2}, ~~ j=1,...,M.
+\end{equation}
+%
+For the inversion of surface data, where $\alpha=\alphavalue$, $\mathbf{r}_j$ is used to identify the $j^{th}$ cell, and $\Delta z_j$ is its thickness. This weighting function is first normalized so that the maximum value is unity. Numerical tests indicate that when this weighting is used, the susceptibility model constructed by minimizing a model objective function in equation \ref{eq:mof}, subject to fitting the data, places the recovered anomaly at approximately the correct depth.
+
+If the data set involves highly variable observation heights the normal depth weighting function might not be most suitable. Distance weighting used for borehole data may be more appropriate as explained in the next section.
+
+\subsubsection{Distance weighting for borehole data}
+\label{Distw}
+
+For data sets that contain borehole measurements, the sensitivities do not have a predominant decay direction, therefore a weighting function that varies in three dimensions is needed. We generalize the depth weighting used in surface data inversion to form such a 3D weighting function called distance weighting:
+
+\begin{equation}
+\label{eq:distw}
+w(\mathbf{r}_j)=\frac{1}{\sqrt{\Delta V_{j}}} \left\{\sum_{i=1}^{N}\left[\int\limits_{\Delta V_{j}}\frac{dv}{(R_{ij}+R_o)^\alpha}\right]^{2}\right\}^{1/4}, ~~j=1,...,M,
+\end{equation}
+%
+where $\alpha=\alphavalue$, $V_j$ is the volume of $j^{th}$ cell, $R_{ij}$ is the distance between a point within the source volume and the $i^{th}$ observation, and $R_o$ is a small constant used to ensure that the integral is well-defined (chosen to be a quarter of the smallest cell dimension). Similarly, this weighting function is normalized to have a maximum value of unity. For inversion of borehole data, it is necessary to use this more general weighting. This weighting function is also advantageous if surface data with highly variable observation heights are inverted.

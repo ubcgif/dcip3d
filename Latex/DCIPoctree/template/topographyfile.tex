@@ -1,0 +1,47 @@
+
+\subsubsection{Topography file}
+This optional file is used to define the surface topography of the 3D model by the elevation at different locations. The topography file has the following structure:
+%
+\begin{fileExample}
+\begin{tabular}{|lcc|}
+\hline
+! & comment & \\
+npt & & \\
+E$_1$ & N$_1$ & ELEV$_1$ \\
+E$_2$ & N$_2$ & ELEV$_2$ \\
+\vdots & \vdots & \vdots \\
+E$_n$ & N$_n$ & ELEV$_n$ \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+Parameter definitions:
+\begin{itemize}
+\item[\codeName{!}] Top lines starting with ! are comments.
+\item[\codeName{npt}] Number of points defining the topographic surface.
+\item[\codeName{E$_i$}] Easting of the $i^{th}$  point on the surface.
+\item[\codeName{N$_j$}] Northing of the $j^{th}$  point on the surface.
+\item[\codeName{ELEV$_n$}] Elevation of the $n^{th}$  point on the profile.
+\end{itemize}
+%
+The lines in this file can be in any order as long as the total number is equal to \codeName{npt}. The topographic data need not be supplied on a regular grid. \prog ~assumes a set of scattered points for generality and uses triangulation-based interpolation to determine the surface elevation above each column of cells. To ensure the accurate discretization of the topography, it is important that the topographic data be supplied over the entire area above the model and that the supplied elevation data points are not too sparse.
+
+\subsubsection*{Example of topography file}
+The following is an example of a topography file:
+\begin{fileExample}
+\begin{tabular}{|lcc|}
+\hline
+2007 & & \\
+12300.00 & 9000.00 & 0.109411E+04 \\
+12300.00 & 9025.00 & 0.109545E+04 \\
+12300.00 & 9050.00 & 0.109805E+04 \\
+12300.00 & 9075.00 & 0.110147E+04 \\
+12300.00 & 9100.00 & 0.110555E+04 \\
+12300.00 & 9125.00 & 0.111011E+04 \\
+12300.00 & 9150.00 & 0.111490E+04 \\
+12300.00 & 9175.00 & 0.111971E+04 \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+\textbf{NOTE}: Although the cells above the topographic surface are removed from the model, they must still be included in the \fileName{model file} as if they are a part of the model. For input model files these cells can be assigned any value. The recovered model produced by inversion program also includes the cells that are excluded from the model, but these cells will have unrealistic values as an identifier (e.g. \codeName{-100}).

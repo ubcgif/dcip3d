@@ -1,0 +1,74 @@
+% Magnetics locations file
+\subsubsection{Locations file}
+This file is used to specify the inducing field parameters, anomaly type, and observation locations specifically for the forward modelling of magnetic data. The following is the file structure:
+%
+\begin{fileExample}
+\begin{tabular}{|lcccc|}
+\hline
+! & comment & & &  \\
+incl & decl & geomag  & & \\
+aincl & adecl & idir  & & \\
+ndat & & & &  \\
+E$_1$ & N$_1$ & ELEV$_1$ & [aincl$_1$ & adecl$_1$] \\
+E$_2$ & N$_2$ & ELEV$_2$ & [aincl$_2$ & adecl$_2$] \\
+$\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ \\
+E$_{ndat}$ & N$_{ndat}$ & ELEV$_{ndat}$ & [aincl$_{ndat}$ & adecl$_{ndat}$] \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+Parameter definitions:
+%
+\begin{itemize}
+\item[\codeName{!}] Lines starting with ! are comments.
+\item[\codeName{incl/decl}] Inclination and declination of the inducing magnetic field. The declination is specified positive east with respect to the northing used in the mesh. These value should be the same in the observations file. 
+\item[\codeName{geomag}] Strength of the inducing field in nanoTesla (nT).
+\item[\codeName{aincl/adecl/idir}] Inclination and declination of the anomaly projection. Set \codeName{idir=0} for a multi-component dataset and \codeName{idir=1} for a single component dataset where all the observations have the same inclination and declination of the anomaly projection.
+\item[\codeName{ndat}] Number of observations. When single component data are specified the number of observations is equal to the number of data locations. When multi-component data are specified the number of observations will exceed the number of data locations. For example, if three-component data are specified at $N$ locations, the number of observations is $3N$.
+\item[\codeName{E$_n$,N$_n$,Elev$_n$}] Easting, northing and elevation of the observation, measured in meters. Elevation should be above the topography for surface data, and below the topography for borehole data. The observation locations can be listed in any order.
+\item[\codeName{ainc$_n$/adec$_n$}] Inclination and declination of the anomaly projection for the n$^{th}$ observation. This is used only when \codeName{idir = 0}. The brackets ``$[\cdots]$'' indicate that these two field are optional depending on the value of \codeName{idir}.
+\end{itemize}
+%
+The total field anomaly is calculated when \codeName{aincl} equals \codeName{incl} and \codeName{adecl} equals \codeName{decl}. The vertical field anomaly is calculated when \codeName{aincl=$90^\circ$} and \codeName{adecl=$0^\circ$}. The user can specify other (\codeName{aincl}, \codeName{adecl}) pairs to calculate the anomaly component in those directions. Easting, northing and elevation information should be in the same coordinate system as defined in the mesh.
+
+\subsubsection*{Examples of a locations file}
+
+We provide two example files below. The first file is for calculating total field anomaly at 441 stations. The inducing field has an inclination of $45^o$ and a declination of $45^\circ$. The second file is for calculating multi-component anomalies in boreholes and each datum is specified by its own inclination and declination of anomaly projection.
+
+Example of single-component data:
+\begin{fileExample}
+\begin{tabular}{|ccclcl|}
+\hline
+! & & & surface data  & & \\
+45.0 & 45.0 & 50000 & !! Incl & Decl & geomag\\
+45.0 & 45.0 & 0 & !! AIncl & Adecl & idir \\
+441 & & & !! \# of data & & \\
+0.00 & 0.00 & 1.00   & & & \\
+0.00 & 50.00 & 1.00  & & &\\
+0.00 & 100.00 & 1.00 & & & \\
+\vdots & \vdots & \vdots & & & \\
+1000.00 & 900.00 & 1.00 & & &\\
+1000.00 & 950.00 & 1.00 & & &\\
+1000.00 & 1000.00 & 1.00 & & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+Example of multi-component data:
+\begin{fileExample}
+\begin{tabular}{|cccccl|}
+\hline
+! & & &  & & borehole data \\
+45.0 & 45.0 & 50000 & !! Incl & Decl & geomag\\
+45.0 & 45.0 & 0 & !! AIncl & Adecl & idir \\
+441 & & & & & !! \# of data \\
+-12.50 & -137.50 & -12.50 & 0.0 & 0.0 & \\
+-12.50 & -137.50 & -37.50 & 0.0 & 0.0 & \\
+-12.50 & -137.50 & -62.50 & 0.0 & 0.0 & \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \\
+-237.50 & -12.50 & -337.50 & 90.0 & 0.0 & \\
+-237.50 & -12.50 & -362.50 & 90.0 & 0.0 & \\
+-237.50 & -12.50 & -387.50 & 90.0 & 0.0 & \\
+\hline
+\end{tabular}
+\end{fileExample}

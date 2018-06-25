@@ -1,0 +1,29 @@
+\BOOKMARK [1][-]{section.1}{DCIP3D Octree v1.0: Package overview}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{New capabilities}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Array types and Earth models}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{Program library contents}{section.1}% 4
+\BOOKMARK [1][-]{section.2}{Theoretical background for DCIP3D Octree}{}% 5
+\BOOKMARK [2][-]{subsection.2.1}{Introduction}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.2}{Forward Modelling}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.3}{General inversion methodology}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.4}{Inversion of DC resistivity data}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.5}{Inversion of IP data}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{Elements of the program DCIP3D Octree}{}% 11
+\BOOKMARK [2][-]{subsection.3.1}{Introduction}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.2}{General files for DCIP3D Octree v1.0 programs}{section.3}% 13
+\BOOKMARK [1][-]{section.4}{Running the programs}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{Introduction}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.2}{DCIPoctreeFwd}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.3}{DCoctreeInv}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.4}{IPoctreeInv}{section.4}% 18
+\BOOKMARK [2][-]{subsection.4.5}{create\137octree\137mesh}{section.4}% 19
+\BOOKMARK [2][-]{subsection.4.6}{refine\137octree}{section.4}% 20
+\BOOKMARK [2][-]{subsection.4.7}{remesh\137octree\137model}{section.4}% 21
+\BOOKMARK [2][-]{subsection.4.8}{octreeTo3D}{section.4}% 22
+\BOOKMARK [2][-]{subsection.4.9}{3Dmodel2Octree}{section.4}% 23
+\BOOKMARK [2][-]{subsection.4.10}{surface\137electrodes}{section.4}% 24
+\BOOKMARK [2][-]{subsection.4.11}{create\137weight\137file}{section.4}% 25
+\BOOKMARK [2][-]{subsection.4.12}{interface\137weights}{section.4}% 26
+\BOOKMARK [1][-]{section.5}{Example}{}% 27
+\BOOKMARK [2][-]{subsection.5.1}{5 Prism example}{section.5}% 28
+\BOOKMARK [1][-]{section.6}{References}{}% 29

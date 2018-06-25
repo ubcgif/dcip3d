@@ -1,0 +1,28 @@
+
+\subsubsection{Bounds file}
+
+This file contains the cell values of the lower and upper bounds on the sought model. It is an optional for the inversion program. The bounds have the same dimension as the model. The following is the file structure of a bounds file:
+%
+\begin{fileExample}
+\begin{tabular}{|cc|}
+\hline
+b$^l_{1,1,1}$ & b$^u_{1,1,1}$\\
+b$^l_{1,1,2}$ & b$^u_{1,1,2}$\\
+\vdots & \vdots \\
+b$^l_{1,1,NV}$ & b$^u_{1,1,NV}$\\
+b$^l_{1,2,1}$ & b$^u_{1,2,1}$\\
+\vdots & \vdots \\
+b$^l_{i,j,k}$ & b$^u_{i,j,k}$\\
+\vdots & \vdots \\
+b$^l_{NN,NE,NV}$ & b$^u_{NN,NE,NV}$\\
+\hline
+\end{tabular}
+\end{fileExample}
+
+Parameter definitions:
+\begin{itemize}
+\item[\codeName{{b}$^l_{i,j,k}$}] Is the lower bound on cell $[i, j, k]$.
+\item[\codeName{{b}$^u_{i,j,k}$}] Is the upper bound on cell $[i, j, k]$.
+\end{itemize}
+
+The ordering of the cells is the same as that for model cells: $[i, j, k]=[1, 1, 1]$ is defined as the cell at the top, south-west corner of the model. The total number of lines in this file should equal \codeName{$NN \times NE \times NV$}, where \codeName{NN} is the number of cells in the North direction, \codeName{NE} is the number of cells in the East direction, and \codeName{NV} is the number of cells in the vertical direction. The lines must be ordered so that $k$ changes the quickest (from 1 to \codeName{NV}), followed by $j$ (from 1 to \codeName{NE}), then followed by $i$ (from 1 to \codeName{NN}). If the surface \fileName{topography file} is supplied, the bounds for cells above the surface will be ignored. It is recommended that these values be assigned a negative value (e.g. \codeName{-1.0}) to avoid confusion.

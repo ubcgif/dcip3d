@@ -1,0 +1,77 @@
+\section{Elements of the program \programName}
+\label{Elements}
+
+\subsection{Introduction}
+
+The \codeName{\prog} ~program library consists of three core programs and a nine utilities.
+
+Core Programs:
+\begin{enumerate}
+\item \codeName{DCIPoctreeFwd}: Forward model conductivity/chargeability models to calculate data.
+\item \codeName{DCoctreeInv}: Invert 3D DC data to develop a conductivity model.
+\item \codeName{IPoctreeInv}: Invert 3D IP data to develop a chargeablility model.
+\end{enumerate}
+
+Utilities:
+\begin{enumerate}
+\item \codeName{create\_octree\_mesh}: Create an octree mesh file from electrode locations and optionally
+topography.
+\item \codeName{3DModel2Octree}: Convert from a 3D UBC-GIF model to an octree mesh/model.
+\item \codeName{octreeTo3D}: Convert from an octree model to a standard 3D UBC-GIF model.
+\item \codeName{refine\_octree}: Make an octree mesh finer based on the values of the input model.
+\item \codeName{remesh\_octree\_model}: Convert a model from one octree mesh to another.
+\item \codeName{surface\_electrodes}: Place the electrodes on the topographic surface.
+\item \codeName{octree\_cell\_centre}: Read in an octree mesh, and output a 3-columns file of cell centres.
+\item \codeName{interface\_weights}: Create a weight file for the octree cell interfaces.
+\item \codeName{create\_weight\_file}: Create an octree cell weighting file.
+\end{enumerate}
+
+Each of the above programs requires an input file or files in order to run. Before detailing the procedures for running each of the above programs, we first present information about these general input/output files.
+
+\subsection{General files for \prog ~programs}
+
+\textbf{Input} files can have any user-defined name, while \textbf{output} files have restricted file names. Generall speaking, the filename extensions are not important. While the user can provide different file extensions for each file type (i.e. \codeName{*.msh} for mesh files, \codeName{*.con} for conductivity models), some users prefer to use the \codeName{*.txt} filename convention so that files are more easily read and edited in the Windows environment. There are ten general file types which are used by the different codes in \programName~ library:
+
+\begin{enumerate}
+\item \fileName{3D octree mesh}: 3D octree mesh defining the discretization of the 3D model region.
+\item \fileName{3D standard mesh}: 3D octree mesh defining the discretization of the 3D model region.
+\item \fileName{topography}: Specifies the surface topography.
+\item \fileName{location}: Specifies the spatial location of all current and potential electrodes.
+\item \fileName{observation}: specifies the spatial location of all current and potential electrodes along with the observed/predicted potential differences with estimated standard deviations.
+\item \fileName{model}: Physical property model file structure for forward, initial, reference, and recovered models.
+\item \fileName{cell weighting}: Optional file the contains a user defined 3D cell weighting function.
+\item \fileName{interface weighting}: Optional file the contains a user supplied interface weighting function for each spatial direction.
+\item \fileName{bounds}: Optional file that contains values for upper and lower physical property bounds on each model cell.
+\item \fileName{active cell}: Contains location information about active/inactive cells to be used in the inversion.
+\end{enumerate}
+
+% Octree mesh file description
+\input octreemesh3dfile.tex
+
+% Standard mesh file description
+\input mesh3dfile.tex
+
+% Topography file description
+\input topographyfile.tex
+
+% Mag lcoaions file description
+\input locationsfile.tex
+
+% Mag observations file description
+\input observationsfile.tex
+
+% Model file description
+\input modelfile.tex
+
+% Cell weights file description
+\input cellweightsfile.tex
+
+% Interface weights file description
+\input interfaceweightsfile.tex
+
+% Bounds file description
+\input boundsfile.tex
+
+% Active cells file description
+\input activecellsfile.tex
+

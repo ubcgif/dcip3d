@@ -1,0 +1,1496 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{color}
+\usepackage{hyperref}
+\graphicspath{{Figures/}}
+
+\begin{document}
+
+\title{\bf{DCIP3D\_Octree} \\* \vspace{0.25in} A Program Library for Forward Modelling and\\*  Inversion of DC/IP data over 3D Structures using Octree meshes \vspace{0.3in} \\* \underline{VERSION 1.0}\vspace{1in}} 
+
+\author{UBC Geophysical Inversion Facility\\* Department of Earth and Ocean Sciences \\* University of British Columbia \\* Vancouver, BC \vspace{1in}}
+\maketitle
+
+\begin{figure}[hb]
+\center
+\includegraphics[height=1.5in]{logo.png}
+\end{figure}
+
+\center{UBC - Geophysical Inversion Facility 1988 - 2011}
+
+\newpage
+\flushleft
+\definecolor{brown}{rgb}{0.55,0.27,0.08}
+
+\section{DCIP3D for octree meshes manual: Package overview}
+\vspace{0.3in}
+
+\subsection{New capabilities}
+\vspace{0.15in}
+DCIP3D for octree meshes is a program library for carrying out forward modelling and inversion of DC resistivity and induced polarization data over 3D structures. The forward and inverse modeling is done on pre-defined base (underlaying) mesh, which can be selectively refined as per curvature amplitude, as dictated by property variations. Version 1.0 of the code is a newly developed algorithm, which has been developed for increased computational efficiency and higher level of modeling accuracy. The code is designed to replicate the capabilities available in the old UBC-GIF DCIP3D program library and its functionality, allows working with old data formats, whenever possible. In addition to the forward modeling and inversion routines, the program library includes numerous utility executables, designed to facilitate the transition from regular to octree meshes  and to support format exchange between the new and the old code versions.
+\vspace{0.15in}
+
+In addition to the new approach in discretization, the DCIP3D for octree meshes has been released with implemented parallelization using OpenMP, optimized for usage on multi-core computers with hyperthreading functionality. For parallel usage on local networks and commodity clusters, DCIP3D for octree meshes has been compiled with Message Pass Interface (MPI) using MUMPS solver (\url{http://graal.ens-lyon.fr/MUMPS/}). Among the newly implemented modifications to the beta version of the code, the most significant are the capability to invert borehole (subsurface) data, to drape the 2D (XY) survey geometries over 3D topography, the added ability to incorporate a-priori electrical resistivity or chargeability information by utilizing a 3D weighting function which can be designed to emphasize or suppress some known spatial or directional features of the recovered model or otherwise, to force desired model conditions via property bound constraints. 
+\vspace{0.15in}
+
+Boundary constraint is achieved by imposing restrictions on each cell in the mesh to have a model value of \bm{$m_j$}, such that \bm{$m_j^{low}< m_j<m_j^{high}$}, where the bounds \bm{$m_j^{low}$} and \bm{$m_j^{high}}$ are prescribed by the user. The CG solution implements this through projected gradient techniques.
+
+\subsection{Array types and Earth models}
+\vspace{0.15in}
+All linear survey surface-array types, including non-standard or uneven arrays, as well as their combinations can be inverted. There is no restriction on array geometry or electrode positioning, as well as the electrode locations are within the extent of the mesh. Recently, capability to invert borehole data and combined surface-borehole data sets has been added to the code.
+Inversion for a 3D model of the earth implies that data were gathered either at the surface or in the borehole, or as a combination of surface-borehole stations. 
+\vspace{0.15in}
+
+DCIP3D\_V1.0 for octree meshes considers the subsurface in terms of a mesh of rectangular cells. Numerical accuracy is increased with usage of smaller cells, but this also drastically increases the size of the problem. The idea behind usage of octree meshes is that in order to minimize the computational costs, the discretization of the volume should be adaptive, based on the quickness of recovered property transition in each direction. Figure (\ref{fig:mesh}) shows an example of adaptive refinement for a circular structure. 
+\vspace{0.15 in}
+
+\begin{figure}[h!]
+\center
+\includegraphics[height=2.5 in]{mesh}
+\caption{An example of adaptive refinement concept used in octree meshes.}
+\label{fig:mesh}
+\end{figure}
+
+When working with octree meshes, the \textbf{underlaying mesh} is defined as a regular 3D discretization with number of cells in each dimension equal to some power of 2. This \textbf{underlaying mesh} is the finest possible discretization, which can be used in the inversion at any later stage, without using remeshing procedure. The idea is that if recovered model properties change slowly over certain volume, the cells bound by this volume can be merged into one without losing the accuracy in modeling, and only refined when the model begins changing. The quickness of this change in model properties is the measure of the refinement.
+
+\subsection{Program library contents}
+\vspace{0.15in}
+
+The package that can be licensed includes the following executable programs for performing forward modeling, and inversion of 3D DC resistivity or induced polarization surveys. Additional functionality is included in supplementary utility programs, which can be used to create and refine octree meshes, calculate octree cell centres, remesh octree models, convert octree model to non-octree model and vise-versa (Both: Windows and Linux platforms are supported):
+\vspace{0.15in}
+
+\begin{itemize}
+	\item \underline{\textbf{DCIPoctreeFwd.exe}}: program to calculate DC resistivity and/or IP data based on a given 3D model of the earth, discretized to an octree mesh
+  \item \underline{\textbf{DCoctreeInv.exe}}: program to invert 2D DC resistivity data
+  \item \underline{\textbf{IPoctreeInv.exe}}: program to invert 2D IP resistivity data
+  \item create\_octree\_mesh: utility to create octree mesh, goven the electrode locations and the topography (optional).
+  \item refine\_octree.exe: utility to refine previously created octree mesh at intermediate step, given the conductivity model, defined on a mesh, subject to be refined
+  \item remesh\_octree\_model.exe: utility to translate a previously created 3D model from one existing octree mesh to another existing octree mesh
+  \item octreeTo3D.exe: utility designed to convert an existing octree model defined over an existing octree mesh into a non-octree model defined over an existing non-octree mesh
+  \item 3Dmodel2Octree: utility designed to convert an existing non-octree model, defined over an existing non-octree mesh into a new octree model defined over an existing octree mesh
+  \item surface\_electrodes.exe: utility designed to drape the existing 2D (XY) survey geometry onto a user-provided 3D topographic surface.
+  \item create\_weight\_file.exe: utility designed to build a weighting file "`\textbf{weights.txt}"'.
+\end{itemize}
+\vspace{0.15in}
+
+\newpage
+\section{Theoretical background for DCIP3D}
+\vspace{0.3in}
+\subsection{Introduction}
+\vspace{0.15in}
+
+This manual  presents  theoretical  background,  numerical  examples,  and  explanation  for implementing the program library DCIP3D for octree meshes. This suite of algorithms, developed at the UBC-GIF, is needed to efficiently invert large sets of DC potential data and IP responses over a 3D earth structure. The manual is designed so that a geophysicist who has understanding of DC resistivity and induced polarization field experiments, but who is not necessarily versed in the details of inverse theory, can use the codes and invert his or her data.
+\vspace{0.15in}
+
+\begin{figure}[ht]
+\center
+\includegraphics[height=2 in]{potentials}
+\caption{Definition of three potentials associated with DC/IP experiments.}
+\label{fig:potentials}
+\end{figure}
+\vspace{0.15in}
+
+A typical DC/IP experiment involves inputting a current \textit{\textbf{I}} to the ground and measuring the potential away from the source.  In a time-domain system the current alternates the direction and has off-times between the current pulses at which the IP voltages are measured. A typical time-domain signature is shown in Figure (\ref{fig:potentials}). In that figure, $\phi_\sigma$ is the potential that is measured in the absence of chargeability effects. This is the instantaneous� value of the potential measured when the current is turned on. In mathematical terms this potential is related to the electrical conductivity \textbf{$\sigma$} by:
+
+\begin{equation}
+\Phi_\sigma = \mathcal{F}_{dc}[\sigma]
+\end{equation}
+\vspace{0.1 in}
+
+where forward mapping operator $ \mathcal{F}_{dc}$ is defined by equation (\ref{eq:DC}) 
+
+\begin{equation}
+\label{eq:DC}
+\bigtriangledown\cdot(\sigma\bigtriangledown \phi_\sigma)=-I\delta(r-r_s) 
+\end{equation}
+\vspace{0.1 in}
+
+and appropriate  boundary  conditions.	In equation (\ref{eq:DC}) \textbf{$\sigma$} is  the  electrical  conductivity  in Siemens/metre (S/m), $\bigtriangledown$ is the gradient operator, \textit{\textbf{I}} is the strength of the input current in Amperes, and $r_s$ is the location of the current source.  For typical earth structures $\sigma$, while positive, can vary over many orders of magnitude. The potential in equation (\ref{eq:DC}) is the potential due to a single current. This is the value that would be measured in a pole-pole experiment. If potentials from pole-dipole or dipole-dipole surveys are to be generated then they can be obtained by using equation (\ref{eq:DC}) and the principle of superposition.
+\vspace{0.15in}
+
+When the earth material is chargeable the measured voltage will change with time and reach a limit value which is denoted by $\phi_\eta$ in Figure (\ref{fig:potentials}). There are a multitude of microscopic polarization phenomena which collaborate so that this final value is achieved but all of these effects can be consolidated into a single macroscopic parameter called chargeability�. We denote chargeability by the symbol $\eta$. Chargeability is dimensionless, positive, and confined to the region [0,1).
+\vspace{0.15in}
+
+To carry out forward modelling to compute $\phi_\eta$ we adopt Siegel's \cite[]{Siegel59} formulation which says  that  the effect of a chargeable ground is modelled by using the DC resistivity forward mapping $\mathcal{F}_{dc}$ but with the conductivity replaced by $\sigma=\sigma(1-\eta)$.Thus:
+
+\begin{equation}
+\label{eq:Phieta}
+\phi_\eta=\mathcal{F}_{dc}[\sigma(1-\eta)]
+\end{equation}
+\vspace{0.1 in}
+
+or
+
+\begin{equation}
+\label{eq:chargeability}
+\bigtriangledown\cdot(\sigma(1-\eta)\bigtriangledown\phi_\eta)=-I\delta(r-r_s)
+\end{equation}
+\vspace{0.1 in}
+
+\vspace{0.15in}
+The IP datum can be either the secondary potential or the apparent chargeability. The former is the difference of the forward modelled potentials with, and without, the IP effect:
+
+\begin{equation}
+\label{eq:potentialsdiff}
+\phi_s=\phi_\eta-\phi_\sigma=\mathcal{F}_{dc}[\sigma(1-\eta)]-\mathcal{F}_{dc}[\sigma]
+\end{equation}
+\vspace{0.1 in}
+
+The apparent chargeability is then given by the ratio:
+
+\begin{equation}
+\label{eq:potentialsfrac}
+\eta_a=\frac{\phi_s}{\phi_\eta}=\frac{\mathcal{F}_{dc}[\sigma(1-\eta)]-\mathcal{F}_{dc}[\sigma]}{\mathcal{F}_{dc}[\sigma(1-\eta)]}
+\end{equation}
+\vspace{0.1 in}
+
+In this definition, the apparent chargeability is dimensionless and, in the case of data acquired over an earth  having constant chargeability $\eta_0$, we have $\eta_a=\eta_0$. Equations  (\ref{eq:potentialsdiff}) and (\ref{eq:potentialsfrac}) show that the IP data can be computed by carrying out two DC resistivity  forward modellings with conductivities $\sigma$ and $\sigma(1-\eta)$. The secondary potential is  the  more general form of IP data and the apparent chargeability is only defined when the linear (or polar) arrays are used along a line on the surface or in the same borehole. When the current and potential dipole-electrodes are arranged in 3-D space and so they are not aligned, the total potential can take on positive, zero, or negative values.  The cross-line experiments on the surface and cross-hole experiment on boreholes are examples of such situations.  Because of the zero-crossing in the total potentials, the commonly used apparent chargeability is undefined. In these cases, the appropriate data to measure the IP effect is the secondary potential. Therefore, we will use secondary potential as the basic IP datum except in the case of linear arrays.
+\vspace{0.15in}
+
+The field data from a DC/IP survey are a set of N potentials (ideally $\phi_\sigma$, but usually $\phi_\eta$	) and a set of N secondary potentials $\phi_s$ or a quantity that is related to $\phi_s$. The goal of the inversionist is to use these data to acquire quantitative information about the distribution of the two physical parameters of interest:  conductivity $\sigma(x,y,z)$ and chargeability $\eta(x,y,z)$.
+\vspace{0.15in}
+
+The distribution of conductivity and chargeability in the earth can be extremely complicated. Both quantities vary as functions of position in 3-D space. In addition, there is often large topographic relief. In this program library, the 3-D nature of the physical properties and surface topography are fully incorporated. The Earth model is divided into cuboidal cells each having a constant value of conductivity and chargeability. The surface topography is approximated by a piecewise constant surface.
+
+\subsection{Forward Modelling}
+\vspace{0.15in}
+
+The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method \cite[]{DeyMorrison79} and a pre-conditioned conjugate gradient technique to solve equation (\ref{eq:DC}). The program that performs these calculations is DCIPoctreeFwd. The DC modelling is performed by a single solution  of equation (\ref{eq:DC}), and the IP modelling is performed by carrying out two DC forward modellings. The IP data are generated according to the operations indicated in equations (\ref{eq:potentialsdiff}) and (\ref{eq:potentialsfrac}). To illustrate the DC resistivity and IP forward modelling algorithm, we generate synthetic data that would  be  acquired over the 3-D conductivity structure shown in Figure (\ref{fig:7prisms}). The model consists of five rectangular blocks buried in a uniform halfspace. Three smaller blocks are placed on the surface while two larger blocks are at depth  to simulate the target of the survey.  The blocks S1, S2, and B2 are more conductive than the uniform halfspace; and blocks S3 and B1 are more resistive.  All five blocks are chargeable.  We have placed 7 east-west lines  spaced 100 m apart on the surface and there are four vertical boreholes. The surface experiment is carried out using pole-dipole data with a=50 m and n=1, 6, while the borehole experiment uses cross-hole  pole-dipole configuration with a 50 m potential dipole.
+
+\begin{figure}[ht]
+\center
+\includegraphics[height=4.in]{7prisms}
+\caption{The synthetic model consists of five rectangular blocks in a uniform halfspace.  The  blocks S1, S2, and B2 are more conductive than the uniform halfspace; and blocks S3 and B1 are more resistive. All five blocks are chargeable.  There are seven lines in east-west direction  and they are spaced 100 m apart. There are also four boreholes that extend to a depth of 400  m.}
+\label{fig:7prisms}
+\end{figure}
+
+\begin{figure}[ht]
+\center
+\includegraphics[height=3.in]{FWD_cond}
+\caption{Examples of the apparent conductivity pseudo-sections along three east-west traverses. The data are simulated for a pole-dipole array with a=50 m and n=1 to 6 and they have  been contaminated by independent Gaussian noise with a standard deviation equal to 2\% of  the accurate datum magnitude. The pseudo-sections are dominated by the surface responses, but there are some indications of the buried prisms. The grayscale shows the apparent conductivity  in  mS/m.}
+\label{fig:FWD_cond}
+\end{figure}
+
+\begin{figure}[ht]
+\center
+\includegraphics[height=3.in]{FWD_chg}
+\caption{Examples of the apparent chargeability pseudo-sections along three east-west traverses.  The data have been contaminated by independent Gaussian noise with a standard deviation equal to 2\% of the accurate datum magnitude plus a minimum of 0.001. The same masking effect of  near-surface prisms observed in apparent conductivity pseudo-sections is also present here. The grayscale shows the apparent chargeability multiplied by 100.}
+\label{fig:FWD_chg}
+\end{figure}
+\vspace{0.15in}
+
+Figure (\ref{fig:FWD_cond}) displays the DC resistivity data from three selected lines for the surface experiment. The data are displayed in pseudo-section format. Note the strong responses to the conductivity anomalies on the surface. They appear as pant-legs extending from small n-spacing all the way to the largest n-spacing.  The buried blocks are  hardly identifiable since their responses have low amplitudes and broad distributions and are masked by the surface anomalies. The apparent chargeability pseudo-sections from the same lines are shown in Figure (\ref{fig:FWD_chg}) (note that the apparent chargeability is well-defined in this case).  The masking effect of the surface blocks are also evident in the IP data. Thus inversion is required.
+\vspace{0.15in}
+
+Since we intend to invert these data, we have added independent Gaussian noise. The standard deviation of the noise is equal to 2\% of the datum magnitude plus a small threshold to deal with near zero data. The effect of the added noise can be seen in Figures (\ref{fig:FWD_cond}) and (\ref{fig:FWD_chg}).
+
+\pagebreak
+\subsection{General Methodology for Inverting DC and IP data}
+\vspace{0.15in}
+
+The computer programs outlined in this manual solve two inverse problems.  In the first we invert the DC  potentials $\phi_\sigma$ (or equivalently the data in figure \ref{fig:FWD_cond}) to recover the electrical conductivity $\sigma(x,y,z)$. This  is a nonlinear inverse problem that requires linearization of the data equations and subsequent iteration. Next we invert the IP data in figure (\ref{fig:FWD_chg}) to recover the chargeability $\eta(x,y,z)$. Because chargeabilities are usually small quantities ($\eta<0.3$) it is possible to linearize equations (\ref{eq:potentialsdiff}) and (\ref{eq:potentialsfrac}) and derive a linear system of equations to be solved. Irrespective of which data set is being inverted however, we basically use the same methodology to carry out the inversions.
+\vspace{0.15in}
+
+To outline our methodology it is convenient to introduce a single notation for the data and for the model. We let $\textbf{d} = (d_1,d_2,...,d_N)$ denote the data, where	\textit{N} is the number of data. Do $d_i$ could be $i^{th}$ potential in a DC resistivity data set, or the $i^{th}$ secondary potential or apparent chargeability in an IP survey. Let the physical property of interest be denoted by the symbol \textit{m}. The quantity \textit{$m_i$} can denote the conductivity or chargeability for the $i^{th}$ cell. For the inversion we choose $m_i=ln(\sigma_i)$, when inverting for conductivities and $m_i=\eta_i$, when reconstructing the chargeability distribution.  
+\vspace{0.15in}
+
+The goal of  the  inversion is  to  recover a  model vector $\textbf{m} = (m_1,m_2,...,m_M)$, where \textit{M} is the number of model cells, that acceptably reproduces the \textit{N} observations \textbf{$d^{obs}$} = $(d_1^{obs},d_2^{obs},...,d_N^{obs})$. Importantly, the data are noise contaminated so we don’t want to fit them precisely.  To do so would ensure that we do not have the correct earth model.  Some features observed in the constructed model would assuredly be artifacts of the noise. Alternatively, if we fit the data too poorly then information about the conductivity that is coded in the data will not have been recovered. Our objective therefore is neither to underfit nor overfit the data. Rather, we want to find a model that reproduces the data only to within an amount that is justified by the estimated uncertainty in the data. To accomplish this we introduce a global misfit criterion:
+
+\begin{equation}
+\label{eq:globalmisfit}
+\Phi_d = \left\| \textbf{W}_d(\textbf{d}-\textbf{d}^{obs})\right\|^2_2
+\end{equation}
+\vspace{0.1 in}
+
+where $\textbf{W}_d$ is a datum weighting matrix. In this work we shall assume that the noise contaminating the $j^{th}$ observation is an uncorrelated Gaussian random variable having zero mean and  standard  deviation $\epsilon_j$. As  such, an appropriate form for the \textit{N}x\textit{N} matrix is $\textbf{W}_d=\textit{diag}(\frac{1}{\epsilon_1},...,\frac{1}{\epsilon_N})$. With this choice $\phi_d$ is the random variable distributed as chi-squared with \textit{N} degrees of freedom. Its expected value is approximately equal to \textit{N} and accordingly $\phi_d^{*}$, the target misfit for the inversion, should be about this value.
+\vspace{0.15in}
+
+Earth conductivity distributions are complex. To allow maximum flexibility to produce a model of arbitrary shape it is important that \textit{M}, the number of cells, representing the model is large. In our inversions \textit{M} will almost always be greater than \textit{N}, the number of data. The inverse problem therefore reduces to finding a set of \textit{M}	parameters using only \textit{N}	data constraints under the condition that $\textit{M}>\textit{N}$. Clearly the solution is nonunique and this nonuniqueness represents the principle  obstacle for obtaining unambiguous information about earth structure from the observations. 
+\vspace{0.15in}
+
+Any inversion algorithm (if it works) will produce a model which reproduces the data. But there are  infinitely many possible models. So which one does the algorithm produce? It is not good practice to let the program make a random selection. Rather, a responsible approach is to direct the inversion algorithm to produce a model that is geologically reasonable and is constrained by additional information if that information is available.This can be implemented by formulating a “model objective function” which, when minimized,  produces a model with desirable characteristics. The critical aspect of the inversion is therefore to form the  model objective function which we characterize by $\phi_m$. To do this, the inversionist must ask the question “what type of model is desired?”. Should the model be smooth, should it be blocky? Is there a reference or background model that the constructed model should emulate? If there is a reference model, is it better known in some places than others so that the constructed model should be close to the reference model in certain locations but can it depart from our preconceived ideas in other areas? Whatever the answer to these questions, a guiding philosophy should always be to find a model which (in some sense) is “as simple as possible”. The nonuniqueness inherent in the inversion generally means that we can generate models which are arbitrarily complicated. We cannot  however, make models that are arbitrarily simple. For example a halfspace will generally not reproduce data  acquired from a geophysical survey.
+\vspace{0.15in}
+
+In the inversion algorithms in DCIP3D for octree meshes our choice for the objective function $\phi_m$ is guided by a desire to find a model which has minimum structure in the vertical and horizontal directions and at the same  time  is close to a reference model $m_0$. To accomplish this we minimize a discretized approximation to
+
+\begin{eqnarray}
+\label{eq:modobjf}
+\Phi_m =  &&\alpha_s\int\int\ w_s(m-m_0)^2dv + \alpha_x\int\int w_x\left(\frac{\partial{(m-m_0)}}{\partial x}\right)^2dv+ \nonumber \\
+&&\alpha_y\int\int w_y\left(\frac{\partial{(m-m_0)}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{(m-m_0)}}{\partial z}\right)^2dv,
+\end{eqnarray}
+\vspace{0.1in}
+
+In equation (\ref{eq:modobjf}) the functions $w_s, w_x, w_y, w_z$ are specified by the user and the constant $\alpha_s$ controls the importance of closeness of the constructed model to the reference model $m_0$. $\alpha_x, \alpha_y, \alpha_z$ control the roughness of the model in the three directions. We can define a length scale in
+each direction as $\textit{L}_x=\sqrt{\frac{\alpha_x}{\alpha_s}}$, $\textit{L}_y=\sqrt{\frac{\alpha_y}{\alpha_s}}$, $\textit{L}_z=\sqrt{\frac{\alpha_z}{\alpha_s}}$. The greater the length scale in each direction, the smoother is the model. Varying these scales allows the construction of models that are smoother, but more elongated, in either x-, y- or z-direction. To obtain a reasonably smooth model, the length scale should be no less than two cell widths. Given that we always work with a finite model domain, the length scales should be smaller than the respective dimension of the model region.
+\vspace{0.15in}
+
+The discrete form of equation (\ref{eq:modobjf}) is
+
+\begin{eqnarray}
+\label{eq:modobjdiscr}
+\phi_m = &&(m-m_0)^T\left \{ \alpha_s W_s^TW_s+\alpha_x W_x^TW_x+\alpha_y W_y^TW_y+\alpha_z W_z^TW_z \right \}(m-m_0) \nonumber\\
+&&\equiv(m-m_0)^TW_m^TW_m(m-m_0)
+\end{eqnarray}
+\vspace{0.1in} 
+
+The matrices $\textbf{W}_s$, $\textbf{W}_x$, $\textbf{W}_y$ and $\textbf{W}_z$ are formed by finite difference approximation of the integrals in equation (\ref{eq:modobjf}). 
+\vspace{0.15in}
+
+The inverse problem is now properly formulated as an optimization problem
+
+\begin{eqnarray}
+\label{eq:optimization}
+minimize \hspace{0.07in} \phi_d+\beta\phi_m \nonumber \\
+subject \hspace{0.045in}to \hspace{0.07in} \phi_d=\phi_d^{*}
+\end{eqnarray}
+\vspace{0.1in}
+
+Appropriate  techniques can  be employed to  carry out the minimization and the minimizer yields the model we are seeking. For DC resistivity and IP inversions we use different minimization  techniques that will be discussed in the following sections.
+
+\subsection{Inversion of DC resistivity data}
+\vspace{0.15in}
+
+The program library DCIP3D for octree meshes provides a DC resistivity inversion program, DCoctreeInv. It is based upon a Gauss-Newton method of minimization, which requires the linearization of the data equations and the minimization is carried out iteratively. 
+
+\subsubsection{Gauss-Newton method}
+\vspace{0.15in}
+
+The inversion of DC resistivity data formulated as the minimization in equation (\ref{eq:optimization}) is nonlinear since the data do not depend linearly upon the conductivity model. We tackle this problem using a Gauss-Newton approach in which the objective function is linearized about a current model, $m^{(n)}$ and a model perturbation is solved for and used to update the current model. Substituting $m^{(n+1)}=m^{(n)}+\delta m$ into the objective function in equation (\ref{eq:optimization}):
+
+\begin{eqnarray}
+\label{eq:HOT}
+\phi(m+\delta m)=\left \| \textbf{W}_d(d^{(n)}+\textbf{J}\delta m-d^{obs}) \right \|^2+\beta\left \| \textbf{W}_m(m+\delta m- m_0) \right \|^2+H.O.T
+\end{eqnarray}
+\vspace{0.1in}
+
+where \textbf{J} is the sensitivity matrix and the element $J_{ij}$ quantifies the influence of the model change in j-th cell on the i-th datum,
+
+\begin{equation}
+\label{sensitivity}
+J_{ij}=\frac{\partial d_i}{\partial m_j}=\frac{\partial \phi_i}{\partial ln(\sigma_i)}
+\end{equation}
+\vspace{0.1in}
+
+Neglecting the higher order terms (H.O.T.) and setting to zero the derivative with respect to $\delta m$ yields,
+
+\begin{eqnarray}
+\label{eq:solution}
+(\textbf{J}^T\textbf{J}+\beta \textbf{W}_m^T\textbf{W}_m)\delta m = -\textbf{J}^T(d^{(n)}-d^{(obs)})-\beta \textbf{W}_m^T\textbf{W}_m(m^{(n)}-m_0)
+\end{eqnarray}
+\vspace{0.1in}
+
+Here we assume that the matrix $\textbf{W}_d$ has been absorbed into the sensitivity matrix and data vectors This is the basic equation that is solved to obtain the model perturbation. The new model is then generated by:
+
+\begin{equation}
+\label{eq:perturbation}
+m^{(n+1)}=m^{(n)} + \alpha \delta m,
+\end{equation}
+\vspace{0.15in}
+
+where	$\alpha \in (0,1]$ limits the step size and is chosen to ensure that the total objective function is reduced.
+\vspace{0.15in}
+
+The major computational effort in this approach includes the calculation of the sensitivity matrix, solution of the basic linearized equation (\ref{eq:solution}), and the choice of regularization parameter $\beta$. The sensitivity is computed using the standard adjoint equation approach. The equation (\ref{eq:solution}) is solved using a pre-conditioned conjugate gradient (CG) technique. 
+
+\subsubsection{Regularization parameter for Gauss-Newton inversion}
+\vspace{0.15in}
+
+The choice of the regularization parameter $\beta$ in the DC resistivity inversion ultimately depends  upon the magnitude of the error associated with the data. The inversion of noisier data requires heavier regularization, thus a greater value of $\beta$ is required. Since the inversion of DC resistivity data is nonlinear, we also need to avoid the possibility of getting trapped in some local minimum. We have developed a strategy to accomplish this in the program library DCIP3D for octree meshes. This strategy is further discussed in this section.
+\vspace{0.15in}
+
+If the standard deviation associated with each datum is known, then the data misfit defined by equation (\ref{eq:globalmisfit}) has a known expected value $\phi_d^{*}$, which is equal to the number of data, when the errors are assumed to be independent Gaussian noise with zero mean. The value of $\beta$ should be such that the expected misfit is  achieved. This entails a line search based on the misfit curve as a function of $\beta$. Because of the computational expense associated with the inversion, we generally cannot afford to perform the line search by carrying out complete solutions for a series of $\beta$'s. Instead, we start with a sufficiently large value of $\beta$, that  reduces the initial misfit by a small fraction. We then reduce $\beta$ by a fixed factor and perform one or two Gauss-Newton updates for each value in the decreasing sequence. Since the sequence  starts with a large $\beta$, that leads to stronger regularization, the Gauss-Newton steps bring the model close to the final solution for that $\beta$. Since the regularization parameter is decreased slowly, it is reasonable to assume that the subsequent models produced by performing one or two Gauss-Newton iterations at the reduced value of $\beta$ would also be close to the corresponding solution. This sequence helps determine the range of the optimum value of $\beta$. Once the range is established, full minimizations are performed to convergence for a few different values of $\beta$ to determine the optimal value. For each value of $\beta$ in this final stage, the conductivity model from a nearby value is used as initial model so the computational expense is greatly reduced. This strategy is implemented in DCINV3D for octree meshes as the first method for choosing the regularization parameter. The user needs to specify the target misfit value. The flowchart of the inversion algorithm implemented in DCoctreeInv is shown in Figure (\ref{fig:chart}).
+\vspace{0.15in}
+
+\begin{figure}[h!]
+\center
+\includegraphics[height=7.6 in]{chart}
+\caption{Flow-chart of DC/IP inversion algorithm}
+\label{fig:chart}
+\end{figure}
+
+\subsubsection{Inversion of IP data}
+\vspace{0.15in}
+
+To invert the IP data in Figure (\ref{fig:FWD_chg}b) we first linearize equation (\ref{eq:potentialsdiff}). Let $\eta_i$ and $\sigma_i$	denote the chargeability and electrical conductivity of the \textit{$i^{th}$} cell. Linearizing the potential $\phi_\eta$ about the conductivity model $\sigma$ yields:
+
+\begin{equation}
+\label{eq:potentialin}
+\phi_\eta=\phi(\sigma-\eta \sigma)=\phi(\sigma)-\sum_{j=1}^{M}\frac{\partial  \phi}{\partial \sigma_j}\eta_j\sigma_i+H.O.T
+\end{equation}
+\vspace{0.15in}
+
+Substituting into equation (\ref{eq:potentialsdiff}) yields:
+
+\begin{equation}
+\label{eq:potentialsubs}
+\phi_s=\phi_\eta-\phi_\sigma=-\sum_{j=1}^{M}\frac{\partial  \phi}{\partial \sigma_j}\eta_j\sigma_i+H.O.T
+\end{equation}
+\vspace{0.15in}
+
+This can be approximately written as:
+
+\begin{equation}
+\label{eq:potentialsums}
+\phi_s=-\sum_{j}\sigma_j\frac{\partial  \phi_i}{\partial \sigma_j}\eta_j =-\sum_{j}\sigma_j\frac{\partial \phi}{\partial ln(\sigma_j)}\eta_j
+\end{equation}
+\vspace{0.15in}
+
+When apparent chargeability is used as the IP data, substituting the above equation into equation (\ref{eq:potentialsfrac}), yields:
+
+\begin{equation}
+\label{eq:etaa}
+\eta_a=-\sum_{j}\frac{\sigma_j}{\phi_i}\frac{\partial  \phi_i}{\partial \sigma_j}\eta_j =-\sum_{j}\sigma_j\frac{\partial ln(\phi)}{\partial ln(\sigma_j)}\eta_j
+\end{equation}
+\vspace{0.15in}
+
+Thus the \textit{$i^{th}$} datum (either secondary potential or apparent chargeability) is exposed as:
+
+\begin{equation}
+\label{eq:sum}
+d_i=\sum_{j=1}^{M}J_{ij}\eta_{ij}
+\end{equation}
+\vspace{0.15in}
+
+where
+
+\begin{eqnarray}
+\label{eq:Jij}
+\left\{ \begin{array}{cl}
+\frac{\partial \phi_i \left[ \sigma \right]}{\partial ln\sigma_j}, &d=\phi_s\\
+\\
+\frac{\partial ln\phi_i\left [ \sigma \right ]}{\partial ln\sigma_j},& d=\eta_a
+\end{array}\right\}
+\end{eqnarray}
+\vspace{0.15in}
+
+is the sensitivity matrix. Our inverse problem is formulated as:
+
+\begin{eqnarray}
+\label{eq:inversion}
+minimize \hspace{0.07in} \phi_m=\left \| \textbf{W}_m(\eta-\eta_0) \right \|^2 \nonumber \\
+subject \hspace{0.045in}to \hspace{0.07in} \left \| \textbf{W}_d (\textbf{J}\eta-d) \right \|^2=\phi_d^{*}, \\ \nonumber
+\eta\geq 0
+\end{eqnarray}
+\vspace{0.1in}
+
+where $\phi_d^{*}$ is a target misfit. Again, for ease of future notation we incorporate the diagonal weighting matrix  into \textbf{J} and	\textit{d}. In practice the true conductivity $\sigma$ is not known and so we must  use the conductivity found from the inversion of the DC resistivity data to construct the sensitivity matrix elements in equation (\ref{eq:Jij}).
+
+\subsubsection{Regularization parameter in IP inversion}
+\vspace{0.15in}
+
+The choice of the regularization parameter $\beta$ ultimately depends upon the magnitude of the error associated with the data. The inversion of noisier data requires heavier regularization, thus a greater value of	is $\beta$ is required. In this section, we discuss the various implementations for the choice of  $\beta$ in the program IPoctreeInv.
+\vspace{0.15in}
+
+If the standard deviation associated with each datum is known, then the data misfit defined by equation(\ref{eq:globalmisfit}) has a known expected value $\phi_d^{*}$, which is equal to the number of data when the errors are assumed to be independent Gaussian noise with zero mean. The value of $\beta$	should be such that the expected misfit is achieved. This entails a line search based on the misfit curve as a function of $\beta$. The flowchart of the IPoctreeInv algorithm is remarkably similar to that of the DCoctreeInv. The main difference is that in case with DC inversion we need to factor the forward modeling matrix every time, when the conductivity model is updated, while in the IP case, only one (initial) factorization is required. The line search based on known target value of data misfit is used. 
+
+\section{Elements of the program library DCIP3D for octree meshes (Version 1.0)}
+\vspace{0.15in}
+
+\subsection{General Files for the program library DCIP3D for octree meshes}
+\vspace{0.15in}
+
+There are 8 general file formats which are either used or created by components of the DCIP3D library. These are:
+
+\begin{enumerate}
+\item \textbf{data\_dc.txt} Contains the observations
+\item \textbf{octree\_mesh.txt} Contains the octree mesh for the 3D modelling and inversions
+\item \textbf{topo.dat} Contains the topographic data of the earth's surface
+\item \textbf{model.con} Contains the cell values for the conductivity model
+\item \textbf{model.chg} Contains the cell values for the chargeability model
+\item \textbf{bounds.dat} Contains upper and lower bounds to put additional constraints on the recovered model
+\item \textbf{w.dat} Contains special weightings that affect the type of model produced in the inversions
+\end{enumerate}
+
+\noindent\textbf{obs3d.dat}
+\vspace{0.1in}
+
+This file contains the observed data. Both DC resistivity data and IP data are stored in this format. For example, this will be the format of all the data files that are output from \underline{DCIPoctreeFwd.exe}, or are input to \underline{DCoctreeInv.exe}, and \underline{IPoctreeInv.exe}. For convenience, there are two slightly different file formats:  The two data formats cannot be mixed in one file.
+\vspace{0.15in}
+
+\textbf{Surface data format} - specifies the location of an electrode only by its easting and  northing. The vertical position is assumed to coincide with the earth's surface and, therefore, it will be placed at a cell surface nearest the real topography.
+\vspace{0.15in}
+
+\textbf{General data format} - specifies the location of an electrode in 3-D by its easting, northing and elevation. This format must be used for data sets that contain borehole data.
+\vspace{0.15in}
+
+The DCIP3D for octree meshes library can handle arbitrary electrode configurations, and a mixture of different survey configurations can be present in the data file. This is accomplished by specifying the locations of four electrodes for each datum. Whenever the two current electrodes, or two potential electrodes, are given the identical location, that particular pair is considered to be a single pole with the negative electrode being at infinity.
+\vspace{0.15in}
+
+The following is the file structure of \textbf{data\_dc.txt}: (Note: when the Z columns are absent, the file is in the
+Surface data format, otherwise it is in the General data format.)
+
+\vspace{0.2in}
+\ttfamily
+%\hline
+\vspace{0.15in}
+\textcolor{brown}{!Title \\
+!Comments \\
+IPTYPE=int \\
+XA1  & YA1  & [ZA1]  & XB1  & YB1  & [ZB1]  & n1\\
+XM1  & YM1  & [ZM1]  & XN1  & YN1  & [ZN1]  & VAL1 & STN1 \\
+XM2  & YM2  & [ZM2]  & XN2  & YN2  & [ZN2]  & VAL2 & STN2 \\
+: \\
+XA2  & YA2  & [ZA2]  & XB2  & YB2  & [ZB2]  & n2\\
+: \\
+: \\}
+\vspace{0.15in}
+%\hline
+\normalfont
+
+\begin{itemize}
+\item[\textit{!TITLE}]A line that begins with an exclamation mark (!) on the first column is a comment and can be placed anywhere in the file. Typically, it is advisable to have a header comment to identify the data set.
+\item[\textit{IPTYPE=}]Special directive that indicates the IP data type. This directive is only required in the IP data file. The \textit{IPTYPE} enables the IP inversion programs to distinguish the apparent chargeability and other similar IP
+data from the basic secondary potential data.
+\item[=1:]any commonly used IP data for which an \"apparent chargeability\" is well defined. These include the dimensionless apparent chargeability, integrated chargeability, PFE, or phase data acquired using electrode configurations that do not produce zero crossings in the measured total potential. The following are some examples of this type of geometry:
+
+\begin{itemize}
+\item any pole-pole array (surface or borehole).
+\item surface pole-dipole or dipole-dipole array along the same traverse.
+\item gradient arrays where the potential electrodes are parallel to the current electrodes.
+\item borehole pole-dipole or dipole-dipole array with all active electrodes in the same borehole.
+\end{itemize}
+
+\item[=2:]IP data measured in secondary 
+ from any electrode geometry. This is typically used when cross-line surface data or cross-hole borehole data are inverted. For these array geometries, the apparent chargeability cannot be defined since the total potential can be zero.
+\end{itemize}
+
+The dimensionless apparent chargeabilities (\textit{IPTYPE=1}) and the secondary potentials (\textit{IPTYPE=2}) can be mixed in the same file. Thus an IP data file can have several occurrences of IPTYPE. All the data are treated as the same type following an IPTYPE directive until a new line changes the type.
+
+\begin{itemize}
+\item[\textit{XAi, YAi, [ZAi]}]The easting, northing, and elevation of the current electrode A.
+\item[\textit{XBi, YBi, [ZBi]}]The easting, northing, and elevation of the current electrode B. When surface data are inverted, the vertical locations can be omitted from the data file. This electrode is considered to be at infinity when its location is identical to that of the A-electrode.
+\item[\textit{$n_i$}]Number of data acquired using this current-electrode location.
+\item[\textit{XMi, YMi, [ZMi]}]The easting, northing, and elevation of the positive potential electrode M. When surface data are inverted, the vertical locations can be omitted from the data file and the inversion program will automatically place the electrodes on the discretized topographic surface according the data supplied in \textbf{topo.dat}.
+\item[\textit{XNi, YNi, [ZNi]}]The easting, northing, and elevation of the negative potential electrode N. When surface data are inverted, the vertical locations can be omitted from the data file. This electrode is considered to be at infinity when its location is identical to that of textit{M}\-electrode.
+\item[\textit{VALi}]value of the data. The DC data should be the potential normalized by the current strength and have the units of Volts/A. The apparent chargeability can have any dimension as given by the particular type. When the secondary potential is specified by \textit{IPTYPE=2}, it must also be in Volts/A.
+\item[\textit{STNi}]Standard deviation of the datum textit{VALi}. This is an absolute value and should not be specified as a percentage. This value should always be positive.
+\end{itemize}
+
+NOTE: Special care needs to be taken when mixed IP data are present. Only the dimensionless apparent chargeability can be mixed with the secondary potential data. In this case, the recovered chargeability will be the dimensionless quantity. Any other chargeability data (e.g., PFE or phase) must be first converted to dimensionless apparent chargeability. If no conversion is possible, then the data must be inverted as a single data type (\textit{IPTYPE}). In that case, the recovered chargeability model has the same units as the data.
+\vspace{0.15in}
+
+Example of \textbf{data\_dc.txt} file: The following two examples illustrate the two different formats of \textbf{data\_dc.txt} files. Note that the vertical location of the electrodes are absent in the surface format. 
+\vspace{0.15in}
+
+\noindent\textbf{Surface format}
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{IPTYPE=1\\
+%0.00 & 100.00 & 0.00 & 100.00 &	6\\
+%50.00	&  100.00 & 100.00	& 100.00	&	-5.72998E-04	&	5.00012E-03\\
+%100.00	&	100.00	&	150.00	& 100.00 &	-9.99526E-03	&	5.00041E-03\\
+%150.00	&	100.00	&	200.00	&	100.00	&	-1.23266E-03	&	5.00083E-03\\
+%200.00	&	100.00	&	250.00	&	100.00	&	3.53100E-03	&	5.00116E-03\\
+%250.00	&	100.00	&	300.00	&	100.00	&	-1.91704E-03	&	5.00129E-03\\
+%300.00	&	100.00	&	350.00	&	100.00	&	-6.31114E-03	&	5.00038E-03\\
+%\vspace{0.1in}
+%50.00	& 100.00	&	50.00	& 100.00	& 6\\
+%100.00	&	100.00	&	150.00	&	100.00	&	5.75265E-03	&	5.00014E-03\\
+%150.00	&	100.00	&	200.00	&	100.00	&	2.28981E-04	&	5.00052E-03\\
+%200.00	&	100.00	&	250.00	&	100.00	&	2.14355E-03	&	5.00075E-03\\
+%250.00	&	100.00	&	300.00	&	100.00	&	-4.12922E-03	&	5.00129E-03\\
+%300.00	&	100.00	&	350.00	&	100.00	&	-3.93082E-03	&	5.00057E-03\\
+%350.00	&	100.00	&	400.00	&	100.00	&	8.30425E-03	&	5.00117E-03\\
+%:\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\noindent\textbf{General format}
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{IPTYPE=2 \\
+%500.0 & 200.0 &	0.0 & 500.0 & 200.0 &	0.0 &	45\\
+%500.0 & 800.0 &	0.0 & 500.0 & 800.0 &	-50.0 & -3.18948E-05 & 1.113E-05\\
+%500.0 & 800.0 &	-25.0 & 500.0 & 800.0 &	-75.0 & -6.511E-05 & 1.215E-05\\
+%500.0 & 800.0 &	-50.0 & 500.0 & 800.0 & -100.0 & -6.198E-05 & 1.266E-05\\
+%500.0 & 800.0 &	-75.0 & 500.0 & 800.0 & -125.0 & -3.357E-05 & 1.248E-05\\
+%500.0 & 800.0 & -100.0 & 500.0 & 800.0 & -150.0 & -1.701E-05 & 1.195E-05\\
+%500.0 & 800.0 & -125.0 & 500.0 & 800.0 & -175.0 & -2.955E-05 & 1.133E-05\\
+%500.0 & 800.0 & -150.0 & 500.0 & 800.0 & -200.0 & -2.266E-05 & 1.082E-05\\
+%500.0 & 800.0 & -175.0 & 500.0 & 800.0 & -225.0 &	3.665E-06 & 1.049E-05\\
+%500.0 & 800.0 & -200.0 & 500.0 & 800.0 & -250.0 & -2.053E-06 & 1.036E-05\\
+%:\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\noindent\textbf{FILE: octree\_mesh.txt}
+\vspace{0.15in}
+
+This file contains the 3D octree mesh. The octree mesh is used for 3D forward modelling and inversion. Each octree mesh is defined by the underlying (base) mesh, coordinates of the southwest top corner, smallest cell size and the actual number of cells in the mesh (dependent on the degree of octree refinement, always smaller or equal to the number of cells in the base mesh).
+\vspace{0.15 in}
+
+\textbf{octree\_mesh.txt} has the following structure:
+\vspace{0.15in}
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{NE & NN & NV\\
+%$E_0$ & $N_0$ & $Z_0$\\
+%$\Delta X$ & $\Delta Y$ & $\Delta Z$\\
+%$N_{cell}$\\
+%$i_1$ & $j_1$ & $k_1$ & $NM_1$\\
+%$i_2$ & $j_2$ & $k_2$ & $NM_2$\\
+%:\\
+%$i_N$ & $j_N$ & $k_N$ & $NM_N$\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\begin{enumerate}
+\item[\textit{NE}] Number of underlying mesh cells in the East direction. 
+\item[\textit{NN}] Number of underlying mesh cells in the North direction
+\item[\textit{NV}] Number of underlying mesh cells in the vertical direction
+\item[\textit{$E_0$ $N_0$ $V_0$}] Coordinates, in metres, of the southwest top corner, specified in (Easting, Northing, Elevation). The elevation can be relative to a reference elevation other than the sea level, but it needs to be consistent with the elevation used to specify the observation location in \textbf{obs3d.dat} and in \textbf{topo.dat} (see the relevant file format descriptions).
+\item[\textit{$N_{cell}$}] Actual number of discrete cells after merging of base mesh cells into octree mesh. $N_{cell}$ defines how many cells participate in modeling. $N_{cell}$ is always smaller or equal to the number of cells in the base mesh. 
+\item[\textit{$i_n$}] Physical address (number, defined on the base mesh) of merged cell in Easting direction (ranges from 1 to NE), n equals to $N_{cell}$.
+\item[\textit{$j_n$}] Physical address (number, defined on the base mesh) of merged cell in Northing direction n equals to $N_{cell}$.
+\item[\textit{$k_n$}] Physical address (number, defined on the base mesh) of merged cell in vertical direction n equals to $N_{cell}$.
+\item[\textit{$NM_n$}] Total number of base mesh cells (in each direction) merged together forming octree cell. For example if "`4"' is entered, then a total 4x4x4=64 base mesh cells were merged together forming the octree cell, defined in this line. "`n"' equals to $N_{cell}$.
+\end{enumerate}
+\vspace{0.15in}
+
+The mesh should be designed by considering it to consist of a core portion, representing the region of interest, and a padding zone, which ensures that the boundary conditions in the modelling are handled correctly. In the core portion, the size of the smallest cell in the mesh is only controlled by the data grid on the surface, the locations of the boreholes and the topography. The selection of the smallest cell for the underlying (base) mesh is handled automatically by \textbf{create\_octree\_mesh.exe} utility, which will be discussed in detail further in the document.
+\vspace{0.15in}
+
+In the presence of surface topography, the top of the octree mesh corresponds to the highest point on the surface (see also the description of \textbf{topo.dat}). If data are only located on the surface of the earth, the base mesh merging will be suggested so that vertical mesh has thicknesses that generally increase with depth.
+\vspace{0.15in}
+
+Once the core mesh is designed, a set of padding cells is required to extend the mesh in all directions. For octree meshes the user has to define the extent of padding distance in each direction.
+\vspace{0.15in}
+
+\noindent\textbf{Example of \textbf{octree\_mesh.txt} file:}
+\vspace{0.15in}
+
+This example shows a mesh that consists of 26 cells in both horizontal directions and 23 cells in the vertical direction. The cells in the core portion of the mesh are all 50 m by 50 m by 25 m. There are three cells in the padding zone (this is a minimum number).
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{128 & 128 & 64\\
+%-1.064500E+03 & -1.089500E+03 & 2.000000E+02\\
+%25 & 25 & 15\\
+%46533\\
+%1 & 1 & 1 & 8\\
+%9 & 1 & 1 & 8\\
+%17 & 1 & 1 & 8\\
+%:\\
+%113 & 1 & 1 & 8\\
+%121 & 1 & 1 & 8\\
+%1 & 9 & 1 & 8\\
+%9 & 9 & 1 & 8\\
+%:\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\noindent\textbf{FILE: topo.dat}
+\vspace{0.15in}
+
+This optional file defines the surface topography in the area of the DC/IP survey by specifying the elevations of selected points. This file is used when the octree mesh is being created. The utility \textbf{create\_octree\_mesh.exe} will consider the topographic features and mark those mesh cells, located above the topography as "`inactive". This is discussed in greater detail below in the document. It is important that \textbf{topo.dat} coordinates are in meters and consistent with coordinate system used in \textbf{octree\_mesh.txt} and \textbf{obs3d.dat} files. The file structure of \textbf{topo.dat} is as follows:
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{!comment\\
+%n\\
+%$E_1$ & $N_1$ & $ELEV_1$\\
+%$E_2$ & $N_2$ & $ELEV_2$\\
+%: & : & :\\
+%$E_n$ & $N_n$ & $ELEV_n$\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\begin{itemize}
+\item[\textit{!}] Top lines starting with ! are comments.
+\item[\textit{n}] Number of points defining the topographic surface.
+\item[\textit{$E_i$}] Easting of the $i^{th}$  point on the surface. 
+\item[\textit{$N_j$}] Northing of the $j^{th}$  point on the surface. 
+\item[\textit{$ELEV_n$}] Elevation of the $n^{th}$ point on the profile.
+\end{itemize}
+\vspace{0.15in}
+
+\noindent\textbf{Example of \textbf{topo.dat} file:}
+\vspace{0.15in}
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{2007\\
+%12300.00 & 9000.00 & 0.109411E+04\\
+%12300.00 & 9025.00 & 0.109545E+04\\
+%12300.00 & 9050.00 & 0.109805E+04\\
+%12300.00 & 9075.00 & 0.110147E+04\\
+%12300.00 & 9100.00 & 0.110555E+04\\
+%12300.00 & 9125.00 & 0.111011E+04\\
+%12300.00 & 9150.00 & 0.111490E+04\\
+%12300.00 & 9175.00 & 0.111971E+04\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\noindent\textbf{FILES: model.con and model.chg}
+\vspace{0.15in}
+
+This format is used in all "model" files defining conductivity or chargeability models. That is, starting models, reference models, final models in either the DC resistivity or IP forward modelling or inversion have the same structure. Each file contains the cell values of the model. The number of cells participating in the modeling and their characteristics are defined in \textbf{octree\_mesh.txt} and is equal to the number of elements in the "model" file.
+\vspace{0.15in}
+
+The extension \textbf{$'.con'$} identifies a conductivity model and \textbf{$'.chg'$} identifies a chargeability model. Although these extensions are not mandatory for input files, the inversion programs attach them to the final model file. The file structure for \textbf{model.con} or \textbf{model.chg} is as follows:
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{$val_{1}$\\
+%$val_{2}$\\
+%:\\
+%$val_{Ncells}$\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\begin{itemize}
+\item[\textit{$val_i$}] Conductivity or chargeability in cell [i], as defined in the corresponding \textbf{octree\_mesh.txt} file. The conductivity is always in units of S/m. The chargeability is dimensionless and ranges between [0,1). However, when inverting IP data such as integrated chargeability, PFE, or phase, the recovered chargeability model will have the same units as the input data.
+\end{itemize}
+
+\noindent\textbf{FILE: bounds.dat}
+\vspace{0.15in}
+
+This format is used in all "boundary" files defining upper and lower bounds of each cell participating in the inversion. It is therefore matching the length of the corresponding model and mesh files, however consists of two columns, instead of one, as in case with \textbf{model.con} and \textbf{model.chg}. This file is needed to confine each value in each cell to be constrained by the upper and lower bounds of the property described in \textbf{bounds.dat}. The upper and lower bounds units must be consistent with the units in the corresponding model file. The following describes the file structure for \textbf{bounds.dat}:
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{$BL_{1}$ & $BU_1$\\
+%$BL_{2}$ & $BU_2$\\
+%:\\
+%$BL_{Ncells}$ & $BU_{Ncells}$\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\noindent\textbf{FILE: weights.txt} User supplied weighting function. The following is the file structure for \textbf{weights.txt}:
+\vspace{0.15in}
+
+%\vspace{0.2in}
+%\ttfamily
+%\hline
+%\vspace{0.15in}
+%\textcolor{brown}{$W.S_1$\\
+%:\\
+%$W.S_n$\\}
+%\vspace{0.15in}
+%\hline
+%\normalfont
+%\vspace{0.15in}
+
+\begin{itemize}
+\item[\textit{$W.S_{i}$}] Cell weights for the smallest model (i is compatible to the corresponding octree mesh element).
+\end{itemize}
+
+The values are ordered in the same way as in \textbf{model.con}, each weight is assigned to each octree mesh element and equals "`1"' by default. If values smaller than 1 are assigned, this corresponds to higher level of confidence in property values of the octree mesh cells, if higher value are assigned, this means that such cells contribute less to the calculation of the model norm and therefore their values are less important in terms of calculating the model norm.
+\vspace{0.15in}
+
+
+
+\section{Executing the elements of program library DCIP3D for octree meshes (Version 1.0)}
+\vspace{0.15in}
+
+\subsection{Introduction}
+\vspace{0.15 in}
+
+All programs in the package can be executed under Windows or Linux environments. They can be run by either typing the program name by itself, or followed by a control file in the "command prompt" (Windows) or "Terminal" (Linux). They can be executed directly on the command line or in a shell script or batch file. When a program is executed without any arguments, it will either print a simple message describing the usage or otherwise search for a proper control file name in the working directory (this is the case, when the control file name is hard coded). If this is the case, then the name of the corresponding control file if changed by user will result in termination of the executable, followed by an error message. Some executables require more than one argument for functioning properly.
+
+\subsubsection{Execution on a single computer}
+
+The command format and the control file format are described below.
+\vspace{0.15 in}
+
+%\underline{Command format}
+%\noindent\textbf{\textcolor{brown}{\ttfamily{PROGRAM arg_\1 \hspace{0.1 in} $(arg\_{2} ... arg\_{i})$}}}
+%\end{ttfamily}
+%\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{PROGRAM}] The name of the executable
+\item[\textit{arg\_1}] A command line argument, which can be a name of corresponding control file or a \textbf{"-inp"} function, which serves as \textbf{"help"}. Some executables do not require control files and should be followed by multiple arguments instead. This will be discussed in more detail below
+\end{itemize}
+
+\underline{Control file format}
+vspace{0.15 in}
+Each control file contains a formatted list of arguments, parameters and filenames in a combination and sequence specific for the executable, which requires this control file. Different control file formats will be explained further in the document for each executable.
+
+\subsubsection{Execution on a local network or commodity cluster}
+
+The DCIP3D program library main programs (\underline{DCIPoctreeFwd.exe}; \underline{DCoctreeInv.exe} and \underline{IPoctreeInv.exe}) have been parallelized with Message Pass Interface (MPI). This allows running these codes on more than one computer in parallel. MPI installation package can be downloaded from \url{http://www.mcs.anl.gov/research/projects/mpich2/}. The following are the requirements for running an MPI job on a local network or cluster
+
+\begin{itemize}
+\item An identical version of MPI must be installed on all participating machines
+\item The user must create an identical network account with matching "username" and "password" on every machine
+\item Both the executable folder and the working directory should be "`shared"' and visible on every participating computer
+\item Before the MPI job is executed, the firewall should be turned off on every participating computer
+\item Path should be defined to the executable directory
+\end{itemize}
+\vspace{0.15 in}
+
+The following is an example of a command line executing an MPI process:
+\vspace{0.125 in} 
+
+%\textcolor{brown}{\ttfamily{C:\textbackslash Program Files\textbackslash MPICH2\textbackslash bin\textbackslash mpiexec.exe -machinefile machine.txt 32 -priority 0  DCIPoctreeFwd}}
+%\end{ttfamily}
+%\vspace{0.15 in}
+
+The following is the explanation of the arguments used in this command line:
+\begin{itemize}
+\item[\textit{PATH}] Properly defined path to the mpiexec.exe
+\item[\textit{-machinefile}] The list of participating machines will be read from a "machinefile".
+\item[\textit{machine.txt}] Name of the machine file. This file lists the network names of the participating machines and number of processors to be allocated for the MPI job for each machine. The following is an example of a machinefile:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{machine01 & 16\\
+%machine02 & 16\\}
+%\vspace{0.15 in}
+%\hline
+%\normalfont
+%\vspace{0.15 in} 
+
+This means, that there are two participating machines, each is required to allocate 16 processors for the MPI job.
+
+\item[\textit{32}] The total number of allocated processors. This number should be equal to the sum of all processors listed for all machines in the "machinefile"
+\item[\textit{-priority 1}] Sets the priority of the process. Grades from -1 (lowest) to 4 (highest) Higher priority means that RAM and processing resources will be primarily allocated for this process, at expense of lower priority processes. Generally, a large job should be assigned a lower priority, as selective resource allocation may slow down other important processes on the computer, including those needed for stable functioning of the operating system
+\item[\textit{DCovtreeInv.exe}] The name of the executable. In our case it is assumed that there is an existing path to the executable directory, otherwise proper path should be provided
+\end{itemize}  
+
+\subsection{DCIPoctreeFwd.exe}
+\vspace{0.15 in}
+
+This program performs 3D forward modelling of DC resistivity and IP data over octree meshes. As a command line argument, it requires an input file containing all parameters and files needed to carry out the modelling calculations. This control file must be located in the working directory, from which \underline{DCIPoctreeFwd.exe} is executed. The name of the control file must be \textbf{DCIP\_octree\_fwd.inp} and it can not be changed. The following is the control file format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{ DC & \textbar & IP & \textbar IPL\\
+%octree mesh file\\
+%LOC\_XY & \textbar & LOC\_XYZ & locations file\\
+%conductivity model\\
+%chargeability model\\
+%active cell file & \textbar & ALL\_ACTIVE\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.15 in} 
+
+\underline{Control parameters and input files}
+\vspace{0.15 in}
+
+NOTE: Formats of the files listed in this control file are explained in "`ELEMENTS"' section of this document.
+
+\begin{itemize}
+\item[\textit{DC\textbar IP\textbar IPL}] Enter  "DC" to perform only DC forward modelling, or enter  "`IP"'to perform both DC and IP modelling. Entering "`IPL"' calculates the IP data by multiplying the sensitivity matrix by chargeability. When "`DC"' is chosen, the "`chargeability model"' line is ignored
+\item[\textit{mesh file}] File, containing octree mesh
+\item[\textit{LOC\_XY(Z)}] LOC\_XY specifies that the electrode location file only has surface reference (no Z coordinate is provided). LOC\_XYZ indicated that Z values are assigned for each current and potential electrode in the file. This is followed by the user-defined name of the file, which contains electrode location coordinates
+\item[\textit{model.con}] File containing the cell values of a conductivity model in S/m.
+\item[\textit{model.chg}] File containing the cell values of a chargeability model. Required only if "`IP"' or "`IPL"' mode is selected in the first line. Must be provided in dimensionless units (ranging 0 to 1).
+\item[\textit{active cells}] If there is topography file involved in creation of the octree mesh, then the utility \textbf{create\_octree\_mesh.exe} will generate a file named \textbf{active\_cells.txt} along with the mesh file. This file has exact same format as the model file. It is a single column with number of elements equal to number of cells in the octree mesh. The column is populated by "`0"'(inactive cell) ot "`1" (active cell)'. Inactive cells do not participate in the forward modeling or inversion.
+\end{itemize} 
+
+\underline{Output files}    
+
+\begin{itemize}
+\item[\textit{data\_dc.txt}] The DC potential data
+\item[\textit{data\_ip.txt}] The IP data (only if "`IP"' or "`IPL"' mode was selected in line 1 of the control file.
+\end{itemize} 
+\vspace{0.15 in}
+
+\noindent\textbf{Example of DCIP\_octree\_fwd.inp file}
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{IP & ! Output data type\\
+%octree\_mesh.txt & ! Octree mesh file \\
+%LOC\_XYZ & obs\_3d.loc & ! 3D (XYZ) electrode location file\\
+%model.con & ! Conductivity model\\
+%model.chg & ! Chargeability model\\
+%ALL\_ACTIVE & ! No topography\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.15 in} 
+
+
+\subsection{DCoctreeInv.exe}
+\vspace{0.15 in}
+
+\underline{DCoctreeInv.exe} performs the inversion of the DC resistivity data, given the file \textbf{data\_dc.txt}. The program does not require entry of any additional arguments in the command line, however it will be looking for a control file with specific name (\textbf{dc\_octree\_inv.inp}), which must not be renamed by user. This file contains the control parameters and the names of input files for the inversion. As input, the program requires the \textbf{mesh file}, potential (observation) \textbf{data file}, \textbf{initial and reference models}. These are the essential elements to run the code. In addition, \underline{DCoctreeInv.exe} requires a user-defined model objective function coefficients ($\alpha$'s), which have control over the type of model, as well as over it's some spatial characteristics (length scales).
+\vspace{0.15 in} 
+
+In addition to the essentials, there are a few optional components, which can be added or modified. Some of these advanced tools are helpful to incorporate a-priori information, such as topography, which can me incorporated via \textbf{active cells file}; drill data, which can be added to the inversion via bound constraints and even some property estimates, which can be incorporated into a weighting file (\textbf{w.dat}). The effect of weighting file on the inversion results can be engineered, based on the degree of confidence in particular a-priori assumptions. Other editable parameters in \textbf{dc\_octree\_inv.inp} can be edited to fine-tune the numerical "`machinery"' of the inversion. The control file has the following format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{octree mesh file\\
+%LOC\_XY & \textbar & LOC\_XYZ & data file\\
+%initial model\\
+%reference model\\
+%active cell file & \textbar & ALL\_ACTIVE\\
+%weighting file & \textbar & NO\_WEIGHT\\
+%LOC\_XY & \textbar & LOC\_XYZ & locations file\\
+%model.con\\
+%active cell file & \textbar & ALL\_ACTIVE\\
+%DEFAULT & \textbar & beta\_max & beta\_min & beta\_factor\\
+%alpha\_s & alpha\_x & alpha\_y & alpha\_z\\
+%chifact\\
+%tol\_nl & mindm & iter\_per\_beta\\
+%tol\_ipcg & max\_iter\_ipcg\\
+%CHANGE\_MREF & \textbar & NOT\_CHANGE\_MREF\\
+%BOUNDS\_NONE & \textbar & BOUNDS\_CONST bl bu &\textbar & BOUNDS\_FILE file\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.15 in} 
+
+\underline{Control parameters and input files}
+\vspace{0.15 in}
+ 
+\begin{itemize}
+\item[\textit{octree mesh}] Name of octree mesh file.
+\item[\textit{LOC\_XY(Z) file}] Name of 2D or 3D data file in any format of \textbf{data\_dc.txt} (see "`Elements"' section for details).
+\item[\textit{init.model}] The starting conductivity model can be defined as "`\textit{VALUE}"', followed by a "\textit{`constant}"' or as "`\textit{filename}"' for non-uniform starting model. The latter is especially useful when a previously terminated inversion has to be restarted.
+\item[\textit{ref.model}] The reference conductivity model can be defined as "`\textsl{VALUE}"', followed by a constant or by "`\textit{filename}"' for non-uniform reference models. 
+\item[\textit{active cells}] Active cells are used to simulate topography, it has the same format as model file and should be completely compatible with the mesh file. If no topography is considered for the inversion then \textit{ALL\_ACTIVE} should be selected.
+\item[\textit{beta}] This line controls the selection of initial regularization parameter (beta\_max), as well as its cooling step (beta\_factor) and smallest value (beta\_min). These values can be determined in automatic mode if \textit{DEFAULT} option is selected, however if previously terminated inversion has to be restarted it is convenient to quickly resume the job at its last step by assigning these parameters manually
+\item[\textit{alphas}] These coefficients are used to scale the global and directional components of the model objective function (see "`Theoretical background"' for details). The relationships between the global and directional coefficients can be presented in terms of length scales. A good recommended values of length scales would be two to five minimum cell width in the corresponding direction.
+\item[\textit{chifact}] Chi-factor can be used to scale the data fit tolerance. By default a chifact=1 should be used. Increasing or decreasing the "`\textit{chifact}"' is equivalent to scaling the assigned standard deviations, increased "`\textit{chifact}"' corresponds to increased error values, therefore results in easier data fit.
+\item[\textit{tol, mindm, iter}] The first parameter defines the tolerance for the norm of the gradient at IPCG iteration steps (see "`Theoretical background"' for details); "`\textit{mindm}"' is the smallest allowable model perturbation tolerance (if the $\Delta$ m recovered as a result of IPCG iteration is smaller than mindm, then the regularization parameter is further cooled down, before reaching the maximum number, defined by "`\textit{iter\_per\_beta}"'.
+\item[\textit{intol, linit}] The fit tolerance for the IPCG iterations (defines how well the Ax=b system is solved); max\_linit defines the maximum number of IPCG iterations per beta step.
+\item[\textit{CHANGE\_MREF}] This is optional capability to change the reference model with each \textit{beta\_step}. If CHANGE\_MREF option is selected, then reference model is updated every time the regularization parameter changes and is set to the last recovered model from previous iteration. This may result in quicker convergence. If NOT\_CHANGE\_MREF option is used, then the same reference model, as originally defined in line 4 is used throughout the inversion.
+\item[\textit{BOUNDS}] There are three options regarding the bound selection. \textit{BOUNDS\_NONE} lifts any boundary constraints and releases the sought parameter range to infinity, \textsl{BOUNDS\_CONST bl bu} should be used in cases, when there are some generalized restrictions on recovered properties (such as in case with chargeability, which can not produce negative values). A more advanced option is to use the "`\textsl{BOUNDS\_FILE}"' option. It allows to enforce individual bound condition on each cell of the model, which is very helpful, when there is strong a-priori information available regarding some property values. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding estimated property values of some known geological formations.
+\end{itemize}
+
+\underline{Output files}
+\vspace{0.15 in}  
+
+\underline{DCctreeInv.exe} saves a model after each iteration. The models are ordered: \textbf{inv\_01.con}, \textbf{inv\_02.con}, \textbf{inv\_03.con}, etc. Similarly, the predicted data is being written at each iteration into predicted data files: \textbf{dpred\_01.txt}, \textbf{dpred\_02.txt}, \textbf{dpred\_03.txt}, etc.
+Following is the list of all files created by the program \underline{DCctreeInv.exe}.
+
+ 
+\begin{itemize}
+\item[\textit{inv.con}] Conductivity model from the latest iteration. The model is stored in "`\textbf{model.con}"' format. The file is overwritten at the end of each iteration. 
+\item[\textit{DC\_octree\_inv.log}] All important information about the flow of the inversion is being stored in this file, including the starting inversion parameters, mesh information, details regarding the computation (CPU time, number of processors, etc), information about each step of the iteration, including data misfit, model norm, total objective function, norm gradient and relative residuals at each IPCG iterations.
+\item[\textit{dpred.txt}] Predicted data from the inverted model in the latest iteration. The predicted data is in the format of \textbf{data\_dc.txt} with the column corresponding to data error omitted. Instead of the errors, this last column contains the predicted apparent conductivity. 
+\item[\textit{DC\_octree\_inv.out}] This file is overwritten at the end of each iteration and has 7 columns, which are as following: \textit{beta} (value of regularization parameter); \textit{iter} (number of IPCG iteration in a beta loop); \textit{misfit} (data misfit * 2); \textit{phi\_d} (data misfit); \textit{phi\_m} (model norm); \textit{phi} (total objective function); \textit{norm g}(gradient equal to -RHS when solving Gauss-Newton) and \textit{g rel}(relative gradient equal to $g/g_0$). 
+\item[\textit{mumps.log}] This file is automatically created by the MUMPS solver, used in the code for parallelisation.
+\end{itemize} 
+
+Example of \textbf{DCOctreeInv.exe} control File: 
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{octree\_mesh.txt && ! mesh file\\
+%LOC\_XYZ & data.dat && ! data file \\
+%VALUE & 0.001 && ! initial conductivity model\\
+%VALUE & 0.001 && ! reference conductivity model\\
+%active\_cells.txt && !active cells file\\
+%w.dat && ! weighting file\\
+%DEFAULT && ! beta\_max  beta\_min  beta\_factor\\
+%1.e-5 & 1. &  1. & 1. && ! alpha\_s  alpha\_x  alpha\_y  alpha\_z\\
+%1. && ! chifactor\\
+%1.e-2 & 1.e-3 & 2 && ! tol\_nl & mindm & nit\\
+%1.e-2 & 15 && ! intol & max\_linit\\
+%NOT\_CHANGE\_MREF && ! do not change reference model\\
+%BOUNDS\_CONST && 0.0001 & 1 ! bounds\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in} 
+
+In this file, \textbf{line 1} defines the octree mesh to be used for the inversion; \textbf{line 2} refers to the DC data file; \textbf{line 3} defines the initial conductivity model to be constant everywhere on the mesh, equal to 0.001 S/m (1000 Ohm m); \textbf{line 4} defines the reference model to be the same as the initial conductivity model (1000 Ohm m); \textbf{line 5} is defining the file, which contains active cells. This file is compatible with the octree mesh file and contains "`1"' marking the active cells in the mesh and "`0"', marking inactive cells in the mesh; \textbf{line 6} describes the weighting file, which can be used to engineer the "`model objective function"', in particular, the elements of the weighting file have control over the directional interactions between neighbouring cells, as well as put emphasis (weight) on particular elements of the model; \textbf{line 7} sets the trade-off parameter initial value and beta step to default; \textbf{line 8} defines that a "`chifactor"' of 1 should be used; the parameters set up in \textbf{line 9} are defining the $\alpha$ coefficients as following: $\alpha_{s}$ = $10^{-5}$, $\alpha_{x}$ = 1, $\alpha_{y}$ = 1 and $\alpha_{z}$ = 1; parameters in \textbf{line 10} are set to default values, which have been found to work well in most cases, it is recommended not to change these parameters; \textbf{line 11} sets IPCG fit tolerance to $1*10^{-2}$ and limits maximum number of beta iterations to 15; \textbf{line 12} is set to mode to not allow changing the reference model after each beta iteration and \textbf{line 13} constraints the recovered conductivity to be between 0.0001 and 1 S/m (1 Ohm m to 10,000 Ohm m). 
+\vspace{0.15 in}
+
+\textbf{NOTE-1:} A sample input file can be obtained by executing: \textcolor{brown}{\ttfamily{DCoctreeInv -inp}} in the command prompt.
+\vspace{0.15 in}
+
+\textbf{NOTE-2:} \underline{DCoctreeInv.exe} will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved and if the model norm has plateaued. However, if the program exits when the maximum iteration is reached, the file \textbf{DC\_octree\_inv.log} or \textbf{DC\_octree\_inv.out} should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If either of these conditions has not been met then the program should be restarted.
+
+\subsection{IPoctreeInv.exe}
+\vspace{0.15in}
+
+\underline{IPoctreeInv.exe} performs the inversion of the IP data, given the file \textbf{data\_ip.txt}. The program does not require entry of any additional arguments in the command line, however it will be looking for a control file with specific name (\textbf{ip\_octree\_inv.inp}), which must not be renamed by user. This file contains the control parameters and the names of input files for the inversion. As input, the program requires the \textbf{mesh file}, observation \textbf{data file}, conductivity file, \textbf{initial and reference chargeability models}. These are the essential elements to run the code. In addition, \underline{IPoctreeInv.exe} requires a user-defined model objective function coefficients ($\alpha$'s), which have control over the type of model, as well as over it's some spatial characteristics (length scales).
+\vspace{0.15 in} 
+
+In addition to the essentials, there are a few optional components, which can be added or modified. Some of these advanced tools are helpful to incorporate a-priori information, such as topography, which can me incorporated via \textbf{active cells file}; drill data, which can be added to the inversion via bound constraints and even some property estimates, which can be incorporated into a weighting file (\textbf{w.dat}). The effect of weighting file on the inversion results can be engineered, based on the degree of confidence in particular a-priori assumptions. Other editable parameters in \textbf{ip\_octree\_inv.inp} can be edited to fine-tune the numerical "`machinery"' of the inversion. The control file has the following format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{octree mesh file\\
+%LOC\_XY & \textbar & LOC\_XYZ & data file\\
+%initial model\\
+%reference model\\
+%conductivity file\\
+%active cell file & \textbar & ALL\_ACTIVE\\
+%weighting file & \textbar & NO\_WEIGHT\\
+%LOC\_XY & \textbar & LOC\_XYZ & locations file\\
+%model.chg\\
+%active cell file & \textbar & ALL\_ACTIVE\\
+%DEFAULT & \textbar & beta\_max & beta\_min & beta\_factor\\
+%alpha\_s & alpha\_x & alpha\_y & alpha\_z\\
+%chifact\\
+%tol\_nl & mindm & iter\_per\_beta\\
+%tol\_ipcg & max\_iter\_ipcg\\
+%CHANGE\_MREF & \textbar & NOT\_CHANGE\_MREF\\
+%BOUNDS\_NONE & \textbar & BOUNDS\_CONST bl bu &\textbar & BOUNDS\_FILE file\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.15 in} 
+
+\underline{Control parameters and input files}
+\vspace{0.15 in}
+ 
+\begin{itemize}
+\item[\textit{octree mesh}] Name of octree mesh file.
+\item[\textit{LOC\_XY(Z) file}] Name of 2D or 3D data file in any format of \textbf{data\_ip.txt} (see "`Elements"' section for details).
+\item[\textit{init. model}] The starting chargeability model can be defined as "`\textit{VALUE}"', followed by a "\textit{`constant}"' or as "`\textit{filename}"' for non-uniform starting model. The latter is especially useful when a previously terminated inversion has to be restarted.
+\item[\textit{ref. model}] The reference chargeability model can be defined as "`\textsl{VALUE}"', followed by a constant or by "`\textit{filename}"' for non-uniform reference models. 
+\item[\textit{active cells}] Active cells are used to simulate topography, it has the same format as model file and should be completely compatible with the mesh file. If no topography is considered for the inversion then \textit{ALL\_ACTIVE} should be selected.
+\item[\textit{beta}] This line controls the selection of initial regularization parameter (beta\_max), as well as its cooling step (beta\_factor) and smallest value (beta\_min). These values can be determined in automatic mode if \textit{DEFAULT} option is selected, however if previously terminated inversion has to be restarted it is convenient to quickly resume the job at its last step by assigning these parameters manually
+\item[\textit{alphas}] These coefficients are used to scale the global and directional components of the model objective function (see "`Theoretical background"' for details). The relationships between the global and directional coefficients can be presented in terms of length scales. A good recommended values of length scales would be two to five minimum cell width in the corresponding direction.
+\item[\textit{chifact}] Chi-factor can be used to scale the data fit tolerance. By default a chifact=1 should be used. Increasing or decreasing the "`\textit{chifact}"' is equivalent to scaling the assigned standard deviations, increased "`\textit{chifact}"' corresponds to increased error values, therefore results in easier data fit.
+\item[\textit{tol, mindm, iter}] The first parameter defines the tolerance for the norm of the gradient at IPCG iteration steps (see "`Theoretical background"' for details); "`\textit{mindm}"' is the smallest allowable model perturbation tolerance (if the $\Delta$ m recovered as a result of IPCG iteration is smaller than mindm, then the regularization parameter is further cooled down, before reaching the maximum number, defined by "`\textit{iter\_per\_beta}"'.
+\item[\textit{intol, linit}] The fit tolerance for the IPCG iterations (defines how well the Ax=b system is solved); max\_linit defines the maximum number of IPCG iterations per beta step.
+\item[\textit{CHANGE\_MREF}] This is optional capability to change the reference model with each \textit{beta\_step}. If CHANGE\_MREF option is selected, then reference model is updated every time the regularization parameter changes and is set to the last recovered model from previous iteration. This may result in quicker convergence. If NOT\_CHANGE\_MREF option is used, then the same reference model, as originally defined in line 4 is used throughout the inversion.
+\item[\textit{BOUNDS}] There are three options regarding the bounds selection. \textit{BOUNDS\_NONE} lifts any boundary constraints and releases the sought parameter range to infinity, \textsl{BOUNDS\_CONST bl bu} should be used in cases, when there are some generalized restrictions on recovered properties (such as in case with chargeability, which can not produce negative values). A more advanced option is to use the "`\textsl{BOUNDS\_FILE}"' option. It allows to enforce individual bound condition on each cell of the model, which is very helpful, when there is strong a-priori information available regarding some property values. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding estimated property values of some known geological formations.
+\end{itemize} 
+
+\underline{Output files}
+\vspace{0.15 in}  
+
+\underline{IPctreeInv.exe} saves a model after each iteration. The models are ordered: \textbf{inv\_01.chg}, \textbf{inv\_02.chg}, \textbf{inv\_03.chg}, etc. Similarly, the predicted data is being written at each iteration into predicted data files: \textbf{dpred\_01.txt}, \textbf{dpred\_02.txt}, \textbf{dpred\_03.txt}, etc.
+Following is the list of all files created by the program \underline{IPctreeInv.exe}.
+
+ 
+\begin{itemize}
+\item[\textit{inv.chg}] Chargeability model from the latest iteration. The model is stored in "`\textbf{model.chg}"' format. The file is overwritten at the end of each iteration. 
+\item[\textit{IP\_octree\_inv.log}] All important information about the flow of the inversion is being stored in this file, including the starting inversion parameters, mesh information, details regarding the computation (CPU time, number of processors, etc), information about each step of the iteration, including data misfit, model norm, total objective function, norm gradient and relative residuals at each IPCG iterations.
+\item[\textit{dpred.txt}] Predicted data from the inverted model in the latest iteration. The predicted data is in the format of \textbf{data\_ip.txt} with the column corresponding to data error omitted.
+\item[\textit{IP\_octree\_inv.out}] This file is overwritten at the end of each iteration and has 7 columns, which are as following: \textit{beta} (value of regularization parameter); \textit{iter} (number of IPCG iteration in a beta loop); \textit{misfit} (data misfit * 2); \textit{phi\_d} (data misfit); \textit{phi\_m} (model norm); \textit{phi} (total objective function); \textit{norm g}(gradient equal to -RHS when solving Gauss-Newton) and \textit{g rel}(relative gradient equal to $g/g_0$). 
+\item[\textit{mumps.log}] This file is automatically created by the MUMPS solver, used in the code for parallelisation.
+\end{itemize}
+
+Example of \textbf{IPOctreeInv.exe} control File: 
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{octree\_mesh.txt && ! mesh file\\
+%LOC\_XYZ & data.dat && ! data file \\
+%VALUE & 0 && ! initial chargeability model\\
+%VALUE & 0 && ! reference chargeability model\\
+%inv.con && ! conductivity file\\
+%active\_cells.txt && !active cells file\\
+%w.dat && ! weighting file\\
+%DEFAULT && ! beta\_max  beta\_min  beta\_factor\\
+%1.e-5 & 1. &  1. & 1. && ! alpha\_s  alpha\_x  alpha\_y  alpha\_z\\
+%1. && ! chifactor\\
+%1.e-2 & 1.e-3 & 2 && ! tol\_nl & mindm & nit\\
+%1.e-2 & 15 && ! intol & max\_linit\\
+%NOT\_CHANGE\_MREF && ! do not change reference model\\
+%BOUNDS\_CONST && 0 & 1 ! bounds\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in} 
+
+In this file, \textbf{line 1} defines the octree mesh to be used for the inversion; \textbf{line 2} refers to the DC data file; \textbf{line 3} defines the initial chargeability model to be constant everywhere on the mesh, equal to 0; \textbf{line 4} defines the reference model to be the same as the initial chargeability model \textbf{line 5} is defining the file, which contains active cells. This file is compatible with the octree mesh file and contains "`1"' marking the active cells in the mesh and "`0"',marking inactive cells in the mesh; 
+\textbf{line 6} refers to conductivity file, \textbf{line 7} describes the weighting file, which can be used to engineer the "`model objective function"', in particular, the elements of the weighting file have control over the directional interactions between neighbouring cells, as well as put emphasis (weight) on particular elements of the model; \textbf{line 8} sets the trade-off parameter initial value and beta step to default; \textbf{line 9} defines that a "`chifactor"' of 1 should be used; the parameters set up in \textbf{line 10} are defining the $\alpha$ coefficients as following: $\alpha_s$ = $10^{-5}$, $\alpha_x$ = 1, $\alpha_y$ = 1 and $\alpha_z$ = 1; parameters in \textbf{line 11} are set to default values, which have been found to work well in most cases, it is recommended not to change these parameters; \textbf{line 12} sets IPCG fit tolerance to $1*10^{-2}$ and limits maximum number of beta iterations to 15; \textbf{line 13} is set to mode to not allow changing the reference model after each beta iteration and \textbf{line 14} enforces positivity (should be done in all cases with IP inversions). 
+\vspace{0.15 in}
+
+
+\subsection{create\_octree\_mesh.exe}
+\vspace{0.15 in}
+
+This utility creates octree mesh from electrode locations and optionally using a topography file.
+\vspace{0.15 in}
+
+\underline{command line usage}
+\vspace{0.15 in}
+
+textcolor{brown}{\ttfamily{create\_octree\_mesh.exe}}
+\vspace{0.15 in}
+
+This utility requires a control file "`\textbf{create\_mesh.inp}"' to exist in the working directory. The control file name is not to be changed by the user. The following is the control file format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{min\_dx && min\_dy && min\_dz\\
+%total\_expansion\_x && total\_expansion\_y && total\_expansion\_z\\
+%LOC\_XY & \textbar LOC\_XYZ & electrode location file\\
+%NO\_TOPO & \textbar & topography file\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in} 
+
+\underline{control parameters}
+\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{min\_dx(dy,dz)}] The size of base mesh cell (smallest possible cell) in meters
+\item[\textit{expansion}] Defines the padding distance in meters outside of the survey area in each direction
+\item[\textit{loc. file}] Electrode location file (either defined in 3D or in XY plane only). It is needed for assigning the extent and the depth of the core region based on the electrode geometry. The extent is consistent with the extent of the survey and the depth is assigned as 1/2 of the maximum Tx - Rx distance.
+\item[\textit{topo.dat}] Topography file. If no topography is available then NO\_TOPO option should be selected.
+\end{itemize}
+\vspace{0.15 in}
+
+\underline{Output files}
+\vspace{0.15 in}
+
+\textbf{octree\_mesh\_n.txt} The original \textbf{underlaying mesh} is defined by the smallest cell size, the user is further given 40 options as per how to refine the mesh. The options contain various suggestions, ranging from extremely coarse to nearly as fine as the underlaying mesh. The selected number will be reflected in the name of the produced octree mesh.\\
+\vspace{0.15 in}
+
+\textbf{active\_cells.txt} The active cells file (Only is produced if topography file is provided)\\
+\vspace{0.15 in}
+
+\textbf{3D\_mesh\_core.txt} Standard 3D mesh for only the core region of the survey\\
+\vspace{0.15 in}
+
+\textbf{3D\_mesh.txt} Standard 3D mesh for only the core region of the survey\\
+\vspace{0.15 in}
+
+\textbf{data\_z.txt} Contains the data file with electrodes placed on the surface. If LOC\_XYZ is specified, electrodes above the surface will be moved to the surface, and electrode locations below the surface will be unchanged. This file is only output when there is topography specified.
+\vspace{0.15 in}
+
+\subsection{refine\_octree.exe}
+\vspace{0.15 in}
+
+This utility is designed to refine previously created octree mesh at intermediate iteration step, given the conductivity or chargeability model defined on a mesh, subject to be refined. The idea is that there should be maintained a balance between the accuracy of the forward model and the computational speed. It is therefore expected that on the first run, the data will be fit to an increased \textbf{chifact} on a rather coarse mesh, then the mesh should be refined and the data shall be at each refinement fit to a progressively decreasing chifact, which will eventually become 1.
+\vspace{0.15 in}
+
+Unlike the initial mesh discretization suggestions, which only uses electrode locations and topography as criteria for mesh discretization, this utility will perform refinement, based on the curvature of the model. Regions with more abrupt property variations will be discretized to greater degree, however the cells will never be smaller than the initial underlaying (base) mesh.
+\vspace{0.15 in}
+
+\underline{command line usage}
+textcolor{brown}{\ttfamily{refine\_mesh.exe}}
+\vspace{0.15 in}
+
+This utility requires a control file \textbf{create\_mesh.inp} to exist in the working directory. The control file name is not to be changed by the user. The following is the control file format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{LOG\_MODEL & \textbar & LIN\_MODEL\\
+%octree mesh file\\
+%input model\\
+%output octree mesh file\\
+%output model file\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in}
+
+\underline{control parameters}
+\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{LOG/LIN)}] LOG model to be used for DC; LIN model to be used for IP
+\item[\textit{mesh in}] Defines input (initial) octree mesh
+\item[\textit{model in}] Defines input model
+\item[\textit{mesh out}] Defines the output octree mesh
+\item[\textit{model out}] Defines the output model
+\end{itemize}
+\vspace{0.15 in}
+
+\underline{Output files}
+\vspace{0.15 in}
+
+\textbf{refine\_mesh.log} Log file\\
+\vspace{0,15 in}
+\textbf{octree\_mesh\_n.txt} Refined new octree mesh file\\
+\vspace{0.15 in}
+\textbf{model.con(chg)} Remeshed conductivity (chargeability) model\\
+\vspace{0.15 in}
+
+\subsection{remesh\_octree\_model.exe} 
+\vspace{0.15 in}
+
+This utility is used to translate a previously created 3D model from one existing octree mesh to another existing octree mesh.
+\vspace{0.15 in}
+
+%\underline{Command line usage}\\
+%\vspace{0.15 in}
+%\textcolor{brown}{\ttfamily{remesh\_octree\_model.exe & mesh1\_in & model1\_in & mesh2\_in & model2\_out}}
+%\vspace{0.15 in}
+
+\underline{Input files}
+\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{mesh1\_in}] Input mesh
+\item[\textit{model1\_in}] Input model
+\item[\textit{mesh2\_in}] Mesh to be used for remeshing
+\item[\textit{model\_out}] Output model, defined on mesh2\_out
+\end{itemize} 
+\vspace{0.15 in}
+
+\underline{Output files}
+\vspace{0.15 in}
+
+\textbf{model\_out.con(chg)} New model file
+\vspace{0,15 in}
+
+\subsection{octreeTo3D.exe}
+\vspace{0.15 in}
+
+This utility is designed to convert an existing octree model defined over an existing octree mesh into a non-octree model defined over an existing non-octree mesh
+\vspace{0.15 in}
+
+\underline{Command line usage}
+\vspace{0.15 in}
+\textcolor{brown}{\ttfamily{octreeTo3D octreemesh\_in octreemodel\_in 3Dmesh\_out 3Dmodel\_out}}
+
+\begin{itemize}
+\item[\textit{octmesh\_in)}] Input mesh
+\item[\textit{octmodel\_in}] Input model
+\item[\textit{3Dmesh\_in}] 3D mesh
+\item[\textit{model\_out}] Output model, defined on 3D mesh
+\end{itemize} 
+
+\subsection{3Dmodel2Octree.exe} 
+\vspace{0.15 in}
+
+This utility is designed to convert an existing non-octree model, defined over an existing non-octree mesh into a new octree model defined over an existing octree mesh. 
+\vspace{0.15 in}
+
+\underline{Command line usage}
+\vspace{0.15 in}
+\textcolor{brown}{\ttfamily{3Dmodel2octree control\_file.inp}}
+\vspace{0.15 in}
+
+This utility works with arbitrary control file name (user-defined). The following is the control file format:
+
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{LOG\_MODEL & \textbar & LIN\_MODEL\\
+%input octree mesh file\\
+%input 3D mesh file\\
+%input 3D model\\
+%output octree mesh file & \textbar & USE\_INPUT\_MESH\\
+%output octree model\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in} 
+
+\underline{Input files}
+\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{mesh1\_in)}] Input mesh
+\item[\textit{model3D\_in}] Input 3D model
+\end{itemize} 
+\vspace{0.15 in}
+
+
+\underline{Output files}
+\vspace{0.15 in}
+\begin{itemize}
+\item[\textit{mesh\_out}] Output octree mesh file
+\item[\textit{model3D\_out}] Output 3D model
+\end{itemize}
+
+\subsection{surface\_electrodes.exe} 
+\vspace{0.15 in}
+
+This utility designed to drape the existing 2D (XY) survey geometry onto a user-provided 3D topographic surface.
+\vspace{0.15 in}
+
+%\underline{Command line usage}\\
+%\vspace{0.15 in}
+%\textcolor{brown}{\ttfamily{surface\_electrodes & surface\_electrodes.inp}}
+%\vspace{0.15 in}
+
+\underline{Input files}
+\vspace{0.15 in}
+
+\begin{itemize}
+\item[\textit{mesh\_in)}] Input octree mesh
+\item[\textit{active\_cell}] Input active cell file for topography
+\item[\textit{LOC\_XY(Z)}] Electrode location file
+\end{itemize} 
+\vspace{0.15 in} 
+
+\underline{Output files}
+\vspace{0.15 in}
+
+Contains the data file with electrodes placed on the surface. If LOC\_XYZ is specified, electrodes above the surface will be moved to the surface, and electrode locations below the surface will be unchanged.
+
+\subsection{create\_weight\_file.exe}
+\vspace{0.15 in} 
+
+This utility is designed to build a weighting file "`\textbf{weights.txt}"'.\\
+\vspace{0.15 in}
+
+%\underline{Command line usage}\\
+%\vspace{0.15 in}
+%\textcolor{brown}{\ttfamily{create\_weight\_file & weight.inp}}
+%\vspace{0.15 in}
+
+The following is the format for the input file ised to create \textbf{weight.txt}:
+%\vspace{0.2 in}
+%\ttfamily
+%\hline
+%\vspace{0.07 in}
+%\textcolor{brown}{input octree mesh file\\
+%input active cell file for topography& \ textbar& ALL\_ACTIVE\\
+%n && Number of surface layers\\
+%10 & 5 & 25 && ! surface weight values\\
+%w.dat && ! output weight file\\}
+%\vspace{0.07 in}
+%\hline
+%\normalfont
+%\vspace{0.3 in} 
+
+\underline{Output files}
+\vspace{0.15 in}
+
+\textbf{w.dat} Output weight file
+
+
+
+
+\section{Examples}
+\vspace{0.15in}
+
+\subsection{5 Prism example}
+\vspace{0.15 in}
+
+The first model is comprised of five anomalous rectangular prisms embedded in a uniform halfspace of 1 mS/m. There are three surface prisms simulating near-surface distortions, and two buried prisms simulating deeper targets Figure (\ref{fig:FWD_cond}). 
+\vspace{0.15 in}
+
+The five prisms from Figure (\ref{fig:FWD_cond}) were assigned conductive and chargeable properties in accordance with table \ref{tabl:properties}.
+\vspace{0.15 in}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+ID & Conductivity (mS/m) & Chargeability (\%) \\
+\hline
+S$_1$ & 10 & 5 \\
+\hline
+S$_2$ & 5 & 5 \\
+\hline
+S$_3$ & 0.5 & 5 \\
+\hline
+B$_1$ & 0.5 & 15 \\
+\hline
+B$_2$ & 10 & 15 \\
+\hline
+\end{tabular}
+\caption{Electrical conductivity and chargeability, assigned to the elements of the synthetic model.}
+\label{tabl:properties}
+\end{table}
+\vspace{0.15 in}
+
+DC resistivity and IP data from both surface and cross-hole experiments have been computed. For the forward modelling and inversion, we have used an octree base (underlaying) mesh, which was constructed from 128x128x64 cells with smallest cell equal to 30x30x15 m. This base mesh was further coarsened to accommodate 159,772 cells, which was used for all following inversion examples. 
+
+The DC and IP data were simulated in three different configurations: 
+
+\begin{enumerate}
+\item Surface data only configuration
+\item Borehole data only configuration
+\item Combined data set (surface and borehole)
+\end{enumerate}
+\vspace{0.15 in}
+
+Gaussian noise (5\%) was added to the simulated data sets.
+
+\subsubsection{Example of DC resistivity inversion of surface data over an octree mesh} 
+\vspace{0.15 in}
+
+The inversion of the apparent conductivity data including those shown in Figure (\ref{fig:FWD_cond}) are carried out using the program DCoctreeInv. The data were simulated using pole-dipole arrays with a(smallest potential electrode spacing)=50 m and n (potential electrode position)=1 to 6. A total of 1,089 observations were inverted produced by a total of 209 transmitters. The conductivity values in 159,772 cells were recovered so that the potential data were adequately fit. Since there was white noise added the data, the known values of the standard deviations were used in the inversion. The appropriate value for the expected  data  misfit is $\phi_d^{*}=1,386$. The inversion was operated with chifact=1.
+\vspace{0.15in}
+
+The expression of the model objective function is given in equation(\ref{eq:modobjf}).The reference model was assigned a constant conductivity value of 1 mS/m, and the coefficients were set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_z=1.0$. This corresponds to a length scale of approximately 316.23 m in all three directions. The initial model was set equal to the reference model. 
+\vspace{0.15in}
+
+The inversion took 17 iterations to converge. The recovered model is shown in two plan sections and one cross-section in Figure (\ref{fig:InvDC}). The recovered model compares favourably with the true model. The surface blocks are well resolved, and there is little excessive structure away from the these blocks. The buried conductive prism is clearly visible and is placed at the correct location. There is also indication of the presence of the buried resistive prism, but it appears to be smoothed out to a greater degree. The decrease in resolution at depth is anticipated, since we only have data of limited array separation measured at surface.
+\vspace{0.15in}
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvDC}
+\caption{The conductivity model recovered from inversion of surface data using a Gauss-Newton method. The model is shown in one cross-section and two plan-sections. The positions of the true prisms are indicated by the dark contour lines.}
+\label{fig:InvDC}
+\end{figure}
+
+\subsubsection{Example of IP inversion of surface data over an octree mesh}
+\vspace{0.15in}
+
+We now show an example of IP inversion using the surface data from the same example inverted by IPoctreeInv. Three of the pseudo-sections are shown in Figure (\ref{fig:InvIP}). The pseudo-sections are  dominated by  the responses produced by the  near-surface chargeabilities, and there are only subtle indications of the presence of the buried chargeable bodies. As in the DC resistivity inversion, there are a total of 1,089 observations from pole-dipole arrays, and the same mesh (159,772 cells) as in DC example was used. When using the known values of the standard deviations in the inversion, the appropriate value for the expected data misfit is $\phi_d^{*}=1,386$. Thus we have run the program IPoctreeInv using chifact=1. Positivity condition was enforced onto the model via bound constraints.
+\vspace{0.15in}
+
+The model objective function is similar to that used in the DC resistivity inversion, in which the coefficients are set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_x=1.0$. We have used a 0.0001 (near-zero) value for reference chargeability model. The sensitivity was calculated using the conductivity model, shown in Figure (\ref{fig:InvDC}).
+\vspace{0.15in}
+
+It is recommended that positivity is enforced for all IP inversions, since the chargeability values can not be negative. This can be done using the bounds constraint. For this inversion constant values were set for upper and lower bounds in the input file \textcolor{brown}{BOUNDS\_CONST 0 1} setting the lower bound to zero and upper bound to 1.
+\vspace{0.15 in} 
+
+The inversion took 6 iterations to converge. The recovered model is shown in two plan-sections and one cross-section in figure (\ref{fig:InvIP}). The recovered  model offers a good representation of the true chargeability distribution. The surface blocks are well resolved, and there are no significant chargeabilities away from the initial chargeable prisms. The buried chargeable prisms are visible. However, the separation between them are not well resolved and the model appears to be diffused at depth in general. Again, this seems to be the limitation of surface data arrays in general.
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvIP}
+\caption{The chargeability model recovered from inversion of surface data.  The conductivity from the 3D DC inversion is used to calculate sensitivities. The position of the true prisms are indicated by the red contour lines.}
+\label{fig:InvIP}
+\end{figure}
+
+\subsubsection{Example of DC inversion of borehole data over an octree mesh}
+\vspace{0.15in}
+
+In this example the synthetic DC data set was referenced to the 4 borehole locations Figure (\ref{fig:7prisms}). The boreholes were positioned in accordance with table \ref{tabl:BHloc}.
+\vspace{0.15 in}
+
+\begin{table}[ht]
+
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+ID & Easting (m) & Northing (m) \\
+\hline
+A & 200 & 500 \\
+\hline
+B & 500 & 200 \\
+\hline
+C & 800 & 500 \\
+\hline
+D & 500 & 800 \\
+\hline
+\end{tabular}
+\caption{Locations of the synthetic boreholes.}
+\label{tabl:BHloc}
+\end{table}
+\vspace{0.15 in}
+
+The data were simulated using borehole array configuration with current electrode moved down each of 4 boreholes with 25 meter step to the depth of 350 m. A total of 51 transmitter locations were hence sampled. For each of the transmitter locations, the potential electrode array, with 50m spread was placed in each of the remaining three boreholes and moved down to the depth of 350m at 25m pace. A total of 1,530 observations were inverted. The conductivity values in 159,772 mesh cells were recovered so that the potential data were adequately fit. Since there was white noise added the data, the known values of the standard deviations were used in the inversion. The appropriate value for the expected data misfit was $\phi_d^{*}=1,386$. The inversion was operated with chifact=1.
+\vspace{0.15in}
+
+The reference model was set to 1 mS/m, the coefficients were set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_z=1.0$. The initial model was set equal to the reference model.
+\vspace{0.15in}
+
+The inversion took 15 iterations to converge. The recovered model is shown in two plan sections and one cross-section in Figure (\ref{fig:InvDC_BH}). The recovered model compares favourably with the true model. The main difference from the surface data inversion is that the near-surface resolution is lost due to the survey geometry.
+\vspace{0.15in}
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvDC_BH}
+\caption{The electrical conductivity model recovered from inversion of borehole DC data. The position of the true prisms are indicated by the black contour lines.}
+\label{fig:InvDC_BH}
+\end{figure}
+
+\subsubsection{Example of IP inversion of borehole data over an octree mesh}
+\vspace{0.15in}
+
+This IP inversion was carried out over the same survey geometry as in case with DC borehole data configuration. As in case with the DC borehole resistivity inversion, there are a total of 1,530 observations from borehole arrays of the same geometry, which were inverted over the same 159,772 cells mesh. The chifact was set to 1, based on our good knowledge of the noise present in the data. Positivity condition was enforced onto the model via bound constraints.
+\vspace{0.15in}
+
+The model objective function is similar to that used in the DC resistivity inversion, in which the coefficients are set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_x=1.0$. We have used a 0.0001 (near-zero) value for reference chargeability model. The sensitivity was calculated using the conductivity model, shown in Figure (\ref{fig:InvDC_BH}). Upper and lower bounds were set to 0 and 1 respectively to enforce the positivity condition on recovered chargeability.
+\vspace{0.15in}
+
+This inversion took 27 iterations to converge. The recovered model is shown in two plan-sections and one cross-section in Figure (\ref{fig:InvIP_BH}). The recovered  model offers a good representation of the true chargeability distribution at depth. The depth resolution has been significantly increased compared to surface data configuration, however this was done at the expense of the near surface resolution. 
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvIP_BH}
+\caption{The chargeability model recovered from inversion of borehole IP data. The conductivity from the 3D DC inversion is used to calculate sensitivities. The position of the true prisms are indicated by the red contour lines.}
+\label{fig:InvIP_BH}
+\end{figure}
+
+\subsubsection{Example of DC resistivity inversion of joint surface and borehole data sets over an octree mesh} 
+\vspace{0.15 in}
+
+In the next example a combined data set was produced featuring a total of 2,619 data produced by 260 transmitters. The reference model was assigned a constant conductivity value of 1 mS/m, and the coefficients were set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_z=1.0$. The initial model was set equal to the reference model. 
+\vspace{0.15in}
+
+The inversion converged in 24 iterations. The recovered model is shown in two plan sections and one cross-section in Figure (\ref{fig:InvDC_JN}). The recovered model is the best matching with the original. The combination of surface and borehole data sets allowed increasing the resolution at depth as well as keep high nearsurface resolution. As it can be seen from Figure (\ref{fig:InvDC_JN}), the buried prisms B\_1 and B\_2 are both resolved and it is clear from the image that there are in fact two objects at this depth.
+\vspace{0.15in}
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvDC_JN}
+\caption{The conductivity model recovered from inversion of combined surface and borehole data set. The model is shown in one cross-section and two plan-sections. The positions of the true prisms are indicated by the dark contour lines.}
+\label{fig:InvDC_JN}
+\end{figure}
+
+\subsubsection{Example of IP inversion of joint surface and borehole data sets over an octree mesh} 
+\vspace{0.15 in}
+
+This IP inversion was carried out over the same survey geometry as in case with DC combined data configuration. As in case with the DC inversion, there are a total of 2,619 observations from borehole and surface arrays, which were inverted over the same 159,772 cells mesh. The chifact was set to 1.
+\vspace{0.15in}
+
+The model objective function is also similar to that used in the DC resistivity inversion, in which the coefficients are set to $\alpha_s=0.00001$ and $\alpha_x=\alpha_y=\alpha_x=1.0$. We have used a 0.0001 (near-zero) value for reference chargeability model. The sensitivity was calculated using the conductivity model, shown in Figure (\ref{fig:InvDC_JN}). Upper and lower bounds were set to 0 and 1 respectively to enforce the positivity condition on recovered chargeability.
+\vspace{0.15in}
+
+This IP inversion has reached convergence in 27 iterations. The recovered model is shown in two plan sections and one cross-section in Figure (\ref{fig:InvIP_JN}). The recovered model is the best matching with the original. The combination of surface and borehole data sets allowed increasing the resolution at depth as well as keep high nearsurface resolution. As it can be seen from Figure (\ref{fig:InvIP_JN}), the buried prisms B\_1 and B\_2 are both resolved and it is clear from the image that there are in fact two objects at this depth.
+
+\newpage
+\begin{figure}[!h]
+\center
+\includegraphics[height=7.4 in]{InvIP_JN}
+\caption{The chargeability model recovered from inversion of combined borehole and surface IP data. The conductivity from the 3D DC inversion is used to calculate sensitivities. The position of the true prisms are indicated by the red contour lines.}
+\label{fig:InvIP_JN}
+\end{figure}
+
+
+\bibliographystyle{seg}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,21 @@
+\subsubsection{Weights file}
+This file supplies the user-based weights that act upon the model objective function. The following is the file structure is for the weights file:
+
+\begin{fileExample}
+\begin{tabular}{|ccc|}
+\hline
+W.S$_{1}$ & & \\
+$\vdots$ & & \\
+W.S$_{M}$ & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+Parameter definitions:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{W.S$_{i}$}] Cell weight for the $i^th$ cell of the model. This weight is used within the smallest model component of the model objective function.
+\end{description}
+
+Within each part, the values are ordered in the same way as in \fileName{model file}, however, they can be all on one line, or broken up over several lines.
+
+If the surface \fileName{topography file} is supplied, the cell weights above the surface will be ignored. It is recommended that these weights be assigned a value of \codeName{$-1.0$} to avoid confusion. If \codeName{NO\_WEIGHTS} is entered instead of a weights file, then all of the cell weights will be set equal (\codeName{$1.0$}).

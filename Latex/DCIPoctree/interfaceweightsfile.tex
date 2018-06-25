@@ -1,0 +1,38 @@
+\subsubsection{Interface weights file}
+This file supplies the user-based interface weights that act upon the model objective function. The following is the file structure is for the weights file:
+
+\begin{fileExample}
+\begin{tabular}{|c|}
+\hline
+W.E$_{1}$ \\
+$\vdots$ \\
+W.E$_{i}$ \\
+$\vdots$ \\
+W.E$_{NIE}$ \\
+W.N$_{1}$ \\
+$\vdots$ \\
+W.N$_{i}$ \\
+$\vdots$ \\
+W.N$_{NIN}$ \\
+W.Z$_{1}$ \\
+$\vdots$ \\
+W.Z$_{i}$ \\
+$\vdots$ \\
+W.Z$_{NIZ}$ \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+Parameter definitions:
+\begin{description}[leftmargin=5cm, style=sameline, align=left]
+\item[\codeName{W.E$_{i}$}] Cell weight for the $i^th$ interface perpendicular to the easting direction.
+\item[\codeName{W.N$_{i}$}] Cell weight for the $i^th$ interface perpendicular to the northing direction.
+\item[\codeName{W.Z$_{i}$}] Cell weight for the $i^th$ interface perpendicular to the vertical direction.
+\item[\codeName{NIE}] The number if cell interfaces perpendicular to the easting direction.
+\item[\codeName{NIN}] The number if cell interfaces perpendicular to the northing direction.
+\item[\codeName{NIZ}] The number if cell interfaces perpendicular to the vertical direction.
+\end{description}
+
+Within each part, the values are ordered in the same way as in \fileName{model} file. Since these weights for the derivative terms of the model objective function are applied to the interface/boundary between cells, each weighting vector has a length equal to the number of interfaces in that direction(\codeName{NIE},\codeName{NIN}, or \codeName{NIZ}).
+
+If the surface \fileName{topography file} is supplied, the cell weights above the surface will be ignored. It is recommended that these weights be assigned a value of \codeName{$-1.0$} to avoid confusion. If \codeName{NO\_FACE\_WEIGHT} is entered instead of the weights file, then all of the cell weights will be set equal (\codeName{$1.0$}).

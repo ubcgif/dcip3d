@@ -1,0 +1,77 @@
+\contentsline {section}{\numberline {1}\uppercase {DCIP3D Octree}\ v1.0: Package overview}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}New capabilities}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Array types and Earth models}{1}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.3}Program library contents}{2}{subsection.1.3}
+\contentsline {section}{\numberline {2}Theoretical background for \uppercase {DCIP3D Octree}}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}Introduction}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Forward Modelling}{7}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}General inversion methodology}{7}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Inversion of DC resistivity data}{12}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Inversion of IP data}{14}{subsection.2.5}
+\contentsline {section}{\numberline {3}Elements of the program \uppercase {DCIP3D Octree}}{17}{section.3}
+\contentsline {subsection}{\numberline {3.1}Introduction}{17}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}General files for \uppercase {DCIP3D Octree}\ v1.0\nobreakspace {}programs}{17}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}Octree mesh file}{18}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Standard 3D Mesh file}{20}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Topography file}{22}{subsubsection.3.2.3}
+\contentsline {subsubsection}{\numberline {3.2.4}Locations file}{23}{subsubsection.3.2.4}
+\contentsline {subsubsection}{\numberline {3.2.5}Observations file}{25}{subsubsection.3.2.5}
+\contentsline {subsubsection}{\numberline {3.2.6}Model file}{28}{subsubsection.3.2.6}
+\contentsline {subsubsection}{\numberline {3.2.7}Weights file}{29}{subsubsection.3.2.7}
+\contentsline {subsubsection}{\numberline {3.2.8}Interface weights file}{30}{subsubsection.3.2.8}
+\contentsline {subsubsection}{\numberline {3.2.9}Bounds file}{31}{subsubsection.3.2.9}
+\contentsline {subsubsection}{\numberline {3.2.10}Active cells file}{31}{subsubsection.3.2.10}
+\contentsline {section}{\numberline {4}Running the programs}{33}{section.4}
+\contentsline {subsection}{\numberline {4.1}Introduction}{33}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Execution on a single computer}{34}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}Execution on a local network or cluster}{35}{subsubsection.4.1.2}
+\contentsline {subsection}{\numberline {4.2}DCIPoctreeFwd}{36}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Control parameters and input files}{36}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Output files}{37}{subsubsection.4.2.2}
+\contentsline {subsection}{\numberline {4.3}DCoctreeInv}{38}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Control parameters and input files}{38}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Output files:}{41}{subsubsection.4.3.2}
+\contentsline {subsection}{\numberline {4.4}IPoctreeInv}{42}{subsection.4.4}
+\contentsline {subsubsection}{\numberline {4.4.1}Control parameters and input files}{43}{subsubsection.4.4.1}
+\contentsline {subsubsection}{\numberline {4.4.2}Output files}{46}{subsubsection.4.4.2}
+\contentsline {subsection}{\numberline {4.5}create\_octree\_mesh}{47}{subsection.4.5}
+\contentsline {subsubsection}{\numberline {4.5.1}Command line usage}{47}{subsubsection.4.5.1}
+\contentsline {subsubsection}{\numberline {4.5.2}Input files}{47}{subsubsection.4.5.2}
+\contentsline {subsubsection}{\numberline {4.5.3}Output files}{48}{subsubsection.4.5.3}
+\contentsline {subsection}{\numberline {4.6}refine\_octree}{48}{subsection.4.6}
+\contentsline {subsubsection}{\numberline {4.6.1}Command line usage}{49}{subsubsection.4.6.1}
+\contentsline {subsubsection}{\numberline {4.6.2}Input files}{49}{subsubsection.4.6.2}
+\contentsline {subsubsection}{\numberline {4.6.3}Output files}{49}{subsubsection.4.6.3}
+\contentsline {subsection}{\numberline {4.7}remesh\_octree\_model}{50}{subsection.4.7}
+\contentsline {subsubsection}{\numberline {4.7.1}Command line usage}{50}{subsubsection.4.7.1}
+\contentsline {subsubsection}{\numberline {4.7.2}Input files}{50}{subsubsection.4.7.2}
+\contentsline {subsubsection}{\numberline {4.7.3}Output files}{50}{subsubsection.4.7.3}
+\contentsline {subsection}{\numberline {4.8}octreeTo3D}{50}{subsection.4.8}
+\contentsline {subsubsection}{\numberline {4.8.1}Command line usage}{50}{subsubsection.4.8.1}
+\contentsline {subsubsection}{\numberline {4.8.2}Input files}{50}{subsubsection.4.8.2}
+\contentsline {subsubsection}{\numberline {4.8.3}Output files}{50}{subsubsection.4.8.3}
+\contentsline {subsection}{\numberline {4.9}3Dmodel2Octree}{51}{subsection.4.9}
+\contentsline {subsubsection}{\numberline {4.9.1}Command line usage}{51}{subsubsection.4.9.1}
+\contentsline {subsubsection}{\numberline {4.9.2}Input files}{51}{subsubsection.4.9.2}
+\contentsline {subsubsection}{\numberline {4.9.3}Output files}{51}{subsubsection.4.9.3}
+\contentsline {subsection}{\numberline {4.10}surface\_electrodes}{52}{subsection.4.10}
+\contentsline {subsubsection}{\numberline {4.10.1}Command line usage}{52}{subsubsection.4.10.1}
+\contentsline {subsubsection}{\numberline {4.10.2}Input files}{52}{subsubsection.4.10.2}
+\contentsline {subsubsection}{\numberline {4.10.3}Output files}{53}{subsubsection.4.10.3}
+\contentsline {subsection}{\numberline {4.11}create\_weight\_file}{53}{subsection.4.11}
+\contentsline {subsubsection}{\numberline {4.11.1}Command line usage}{53}{subsubsection.4.11.1}
+\contentsline {subsubsection}{\numberline {4.11.2}Input files}{53}{subsubsection.4.11.2}
+\contentsline {subsubsection}{\numberline {4.11.3}Output files}{54}{subsubsection.4.11.3}
+\contentsline {subsection}{\numberline {4.12}interface\_weights}{54}{subsection.4.12}
+\contentsline {subsubsection}{\numberline {4.12.1}Command line usage}{54}{subsubsection.4.12.1}
+\contentsline {subsubsection}{\numberline {4.12.2}Input files}{54}{subsubsection.4.12.2}
+\contentsline {subsubsection}{\numberline {4.12.3}Output files}{55}{subsubsection.4.12.3}
+\contentsline {section}{\numberline {5}Example}{57}{section.5}
+\contentsline {subsection}{\numberline {5.1}5 Prism example}{57}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}DC resistivity inversion of surface data over an octree mesh}{59}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}IP inversion of surface data over an octree mesh}{61}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}DC inversion of borehole data over an octree mesh}{63}{subsubsection.5.1.3}
+\contentsline {subsubsection}{\numberline {5.1.4}IP inversion of borehole data over an octree mesh}{65}{subsubsection.5.1.4}
+\contentsline {subsubsection}{\numberline {5.1.5}DC resistivity inversion of joint surface and borehole data sets over an octree mesh}{67}{subsubsection.5.1.5}
+\contentsline {subsubsection}{\numberline {5.1.6}IP inversion of joint surface and borehole data sets over an octree mesh}{69}{subsubsection.5.1.6}
+\contentsline {section}{\numberline {6}References}{73}{section.6}

@@ -1,0 +1,305 @@
+\section{Running the programs}
+
+The software package \programName includes three three core programs and nine utilities.
+Core Programs:
+\begin{enumerate}
+\item \codeName{DCIPoctreeFwd}: Forward model conductivity and optionally chargeability models
+to calculate data.
+\item \codeName{DCoctreeInv}: Invert 3D DC data to develop a conductivity model.
+\item \codeName{IPoctreeInv}: Invert 3D IP data to develop a chargeablility model.
+\end{enumerate}
+
+Utilities:
+\begin{enumerate}
+\item \codeName{create\_octree\_mesh}: Create an octree mesh file from electrode locations and optionally
+topography.
+\item \codeName{3DModel2Octree}: Convert from a 3D UBC-GIF model to an octree mesh/model.
+\item \codeName{octreeTo3D}: Convert from an octree model to a standard 3D UBC-GIF model.
+\item \codeName{refine\_octree}: Make an octree mesh finer based on the values of the input model.
+\item \codeName{remesh\_octree\_model}: Convert a model from one octree mesh to another.
+\item \codeName{surface\_electrodes}: Place the electrodes on the topographic surface.
+\item \codeName{octree\_cell\_centre}: Read in an octree mesh, and output a 3-columns file of cell centres.
+\item \codeName{face\_weights}: Create a weight file for the octree cell faces.
+\item \codeName{create\_weight\_file}: Create an octree surface weighting file.
+\end{enumerate}
+This section discusses the use of these codes individually.
+
+\subsection{Introduction}
+All programs in the package can be executed under Windows or Linux environments. They can be run by typing the program name followed by a control file in the ``command prompt'' (Windows) or ``terminal'' (Linux). They can be executed directly on the command line or in a shell script or batch file. When a program is executed without any arguments, it will print the usage to screen.
+
+\subsubsection{Execution on a single computer}
+The command format and the control file format on a single machine are described below. Within the command prompt or terminal, any of the programs can be called using:
+\begin{fileExample}
+program arg$_1$ [arg$_2$ $\cdots$ arg$_i$]
+\end{fileExample}
+%
+where:
+\begin{itemize}
+\item[\codeName{program}] is the name of the executable
+\item[\codeName{arg$_i$}] is a command line argument, which can be a name of corresponding required or optional file. Typing \codeName{-inp} as the control file, serves as a help function and returns an example input file. Some executables do not require control files and should be followed by multiple arguments instead. This will be discussed in more detail later in this section.
+\end{itemize}
+
+Each control file contains a formatted list of arguments, parameters and filenames in a combination and sequence specific for the executable, which requires this control file. Different control file formats will be explained further in the document for each executable.
+
+\subsubsection{Execution on a local network or commodity cluster}
+
+The \prog program library's main programs have been parallelized with Message Pass Interface (MPI). This allows running these codes on more than one computer in parallel. MPI installation package can be downloaded from \url{http://www.mcs.anl.gov/research/projects/mpich2/}. The following are the requirements for running an MPI job on a local network or cluster:
+\begin{itemize}
+\item An identical version of MPI must be installed on all participating machines
+\item The user must create an identical network account with matching ``username'' and ``password'' on every machine
+\item Both the executable folder and the working directory should be ``shared'' and visible on every participating computer
+\item Before the MPI job is executed, the firewall should be turned off on every participating computer
+\item The path should be defined to the executable directory
+\end{itemize}
+%
+The following is an example of a command line executing an MPI process:
+\begin{fileExample}	
+C:\textbackslash Program Files\textbackslash MPICH2\textbackslash bin\textbackslash mpiexec.exe -machinefile machine.txt nproc -priority 0 maginv3d
+\end{fileExample}
+
+An explanation of the arguments used in this command line are:
+\begin{itemize}
+\item[\codeName{PATH}] Properly defined path to the \codeName{mpiexec.exe}.
+\item[\codeName{-machinefile}] The list of participating machines will be read from a ``machine file.''
+\item[\codeName{machine.txt}] Name of the machine file. This file lists the network names of the participating machines and number of processors to be allocated for the MPI job for each machine. The following is an example of a machine file:
+
+\begin{fileExample}
+\begin{tabular}{|lc|}
+\hline
+machine01 & 16 \\
+machine02 & 16 \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+In this simple example, there are two participating machines (named \codeName{machine01} and \codeName{machine02} and each is required to allocate 16 processors for the MPI job.
+
+\item[\codeName{nproc}] The total number of allocated processors. This number should be equal to the sum of all processors listed for all machines in the machine file.
+\item[\codeName{-priority 0}] Sets the priority of the process. Integer grades from -1 (lowest) to 4 (highest) follow. Higher priority means that RAM and processing resources will be primarily allocated for this process, at expense of lower priority processes. Generally, a large job should be assigned a lower priority, as selective resource allocation may slow down other important processes on the computer, including those needed for stable functioning of the operating system.
+\item[\codeName{maginv3d.exe}] The name of the executable. In our case it is assumed that there is an existing path to the executable directory, otherwise proper path should be provided.
+\end{itemize}
+
+\subsection{MAGFOR3D}
+
+This program performs forward modelling. Command line usage:
+
+\begin{fileExample}
+magfor3d mesh.msh obs.loc model.sus [topo.dat]
+\end{fileExample}
+and will create a \fileName{magfor3d.mag} file.
+
+\subsubsection{Input files}
+All files are in ASCII text format - they can be read with any text editor. Input files can have any name the user specifies. Details for the format of each file can be found in Section \ref{Elements}. The files associated with \codeName{magfor3d} are:
+\begin{itemize}
+\item[\fileName{mesh.msh}] The 3D mesh.
+\item[\fileName{obs.loc}] The inducing field parameters, anomaly type and observation locations.
+\item[\fileName{model.sus}] The susceptibility model.
+\item[\fileName{topo.dat}] Surface topography (optional). If omitted, the surface will be treated as being flat.
+\end{itemize}
+
+\subsubsection{Output file}
+The file created by \codeName{MAGFOR3D} is \fileName{magfor3d.mag}. The file format is that of the data file without the associated standard deviations.
+\begin{itemize}
+\item[\fileName{magfor3d.mag}] The computed magnetic anomaly data. Since the data in this file are accurate, the column of the standard deviations for the error is not included.
+\end{itemize}
+
+\subsection{MAGSEN3D}
+This program performs the sensitivity and depth weighting function calculations. Command line usage:
+\begin{fileExample}
+magsen3d magsen3d.inp
+\end{fileExample}
+
+For a sample input file type: \codeName{magsen3d -inp}
+
+\subsubsection{Input files}
+Format of the control file \fileName{magsen3d.inp}:
+%
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+mesh.msh & ! mesh file \\
+obs.mag & ! observations file \\
+topo.dat & ! topography file | null \\
+iwt & ! weighting type\\
+alpha, znot & ! weighting parameters | null \\
+wvlt & ! wavelet type | null\\
+itol, eps & ! wavelet parameters | null \\
+\hline
+\end{tabular}
+\end{fileExample}
+%
+The input parameters for the control file are:
+\begin{itemize}
+\item[\fileName{mesh.msh}] Name of 3D mesh file.
+\item[\fileName{obs.mag}] The data file that contains the inducing field parameters, anomaly type, observation locations, and the observed magnetic anomalies with estimated standard deviation.
+\item[\fileName{topo.dat}] Surface topography (optional). If \codeName{null} is entered, the surface will be treated as being flat.
+\item[\fileName{iwt}] An integer identifying the type of generalized depth weighting to use in the inversion. \\
+=1 for depth weighting (only for surface data); \\
+=2 for distance weighting (surface and/or borehole).
+\item[\fileName{alpha,znot}] Parameters defining the depth weighting function.
+When \fileName{iwt=1}, \fileName{alpha} and \fileName{znot} are used as $\alpha$ and $z_0$ to define the \textit{depth} weighting according to equation \ref{eq:depthw}.\\
+When \fileName{iwt=2}, \fileName{alpha} and \fileName{znot} are used as $\alpha$ and $(R_o)$ to define the \textit{distance} weighting according to equation \ref{eq:distw}. \\
+If \fileName{null} is entered on this line (line 5), then the program sets \texttt{alpha=3} and calculates the value of $z_o$ based upon the mesh and data location. This is true for \fileName{iwt=1} or \fileName{iwt=2}. \\
+For most inversions, however, setting this input line to \fileName{null} is recommended. The option for inputing $\alpha$ and $z_o$ is provided for experienced users who would like to investigate the effect of the generalized depth weighting for special purposes. The value of $\alpha$ should normally be close to 3.0. Smaller values of give rise to weaker weighting as distance increases from the observation locations.
+\item[\fileName{wvlt}] A five-character string identifying the type of wavelet used to compress the sensitivity matrix. The types of wavelets available are Daubechies wavelet with 1 to 6 vanishing moments (\fileName{daub1, daub2}, and so on) and Symmlets with 4 to 6 vanishing moments (\fileName{symm4, symm5, symm6}). Note that \fileName{daub1} is the Haar wavelet and \fileName{daub2} is the Daubechies-4 wavelet. The Daubechies-4
+wavelet is suitable for most inversions, while the others are provided for users' experimentation. If \fileName{null} is entered, the program uses the default wavelet compression (\fileName{daub2}).
+\item[\fileName{itol,eps}] An integer and a real number that specify how the wavelet threshold level is to be determined.\\
+\fileName{itol=1}: program calculates the relative threshold and \fileName{eps} is the relative reconstruction error of the sensitivity. A reconstruction error of 0.05 is usually adequate.\\
+\fileName{itol=2}: the user defines the threshold level and \fileName{eps} is the relative threshold to be used. If \fileName{null} is entered on this line, a default relative reconstruction error of 0.05 (e.g. 5\%) is used and the relative threshold level is calculated (i.e., \fileName{itol=1}, \fileName{eps=0.05}).\\
+The detailed explanation of threshold level and reconstruction error can be found in Section \ref{wavelet} of this manual.
+\end{itemize}
+
+\subsubsection*{Example of magsen3d.inp control file}
+
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+mesh.msh & ! mesh file\\
+obs$\_$noise.mag & ! data file\\
+null & ! topography | null \\
+2 & ! iwt=1 depth, =2 distance\\
+null & ! alpha, znot | null\\
+daub2 & ! wavelet type \\
+1.0 0.05 & ! itol, eps | null\\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\subsubsection{Output files}
+The program \codeName{magsen3d} outputs three files. They are:
+\begin{enumerate}
+\item \fileName{maginv3d.mtx} The sensitivity matrix file to be used in the inversion. This file contains the sensitivity matrix, generalized depth weighting function, mesh, and discretized surface topography. It is produced by the program and it's name is not adjustable. It is very large and may be deleted once the work is completed.
+\item \fileName{sensitivity.txt} Output after running \codeName{magsen3d}. It contains the average sensitivity for each cell. This file can be used for depth of investigation analysis or for use in designing special model objective function weighting.
+\item \fileName{dist\_weighting.txt} A file in the \fileName{model.sus} format, which contains weights for each cell, based on equations \ref{eq:depthw} and \ref{eq:distw}.
+\end{enumerate}
+
+\subsection{MAGINV3D}
+This program performs 3D magnetic inversion. Command line usage is:
+\begin{fileExample}
+maginv3d maginv3d.inp
+\end{fileExample}
+
+For a sample input file type: \codeName{maginv3d -inp}
+
+\subsubsection{Input files}
+Input files can be any file name. If there are spaces in the path or file name, you MUST use quotes around the entire path (including the filename).
+
+\begin{enumerate}
+\item \fileName{obs.mag} Mandatory observations file.
+\item \fileName{mag3d.mtx} Mandatory sensitivity matrix from \codeName{magsen3d}.
+\item \fileName{ini.sus} Optional initial model file; can be substituted by a value \fileName{maginv3d.inp} control file. Mandatory if and existing inversion is restarted after termination
+\item \fileName{ref.sus} Optional reference model file; can be substituted by a value in the \fileName{maginv3d.inp} control file.
+\item \fileName{active.txt} Optional active model file
+\item \fileName{bounds.sus} Optional bounds file
+\item \fileName{w.dat} Optional weighting files
+\item \fileName{maginv3d.inp} The control file used by \codeName{maginv3d}.
+\end{enumerate}
+
+Format of the control file \fileName{maginv3d.inp} has been changed since previous version. It has been modified as follows:
+
+\begin{fileExample}
+\begin{tabular}{|lll|}
+\hline
+mode & & \\
+par,tolc & & \\
+obs.mag & & \\
+maginv3d.mtx & & \\
+ini.sus & | [number] &| null \\
+ref.sus & | [number] &| null \\
+active.txt & | null & \\
+bounds.sus & | b$^l$ b$^u$ &| null \\
+$\alpha_s, \alpha_x, \alpha_y, \alpha_z$ &| Le Ln Lz &\\
+SMOOTH\_MOD\_DIF &| SMOOTH\_MOD &\\
+w.dat & & \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+The parameters within the control file are:
+\begin{itemize}
+\item[\fileName{mode}] An integer specifying one of three choices for determining the trade-off parameter.\\
+\begin{enumerate}
+\item \fileName{mode=1}: the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (where $1=N$).
+\item \fileName{mode=2}: the user inputs the trade off parameter.
+\item \fileName{mode=3}: the program calculates the trade off parameter by applying the GCV analysis to the inversion without positivity.
+\end{enumerate}
+\item[\fileName{par,tolc}] Two real numbers that are dependent upon the value of mode.
+\begin{enumerate}
+\item \fileName{mode=1}: the target misfit value is given by the product of \texttt{par} and the number of data \fileName{N}, i.e.,. The second parameter, \texttt{tolc}, is the misfit tolerance. The target misfit is considered to be achieved when the relative difference between the true and target misfits is less than \fileName{tolc}. Normally, the value of \fileName{par} should be \fileName{1.0} if the correct standard deviation of error is assigned to each datum. When \fileName{tolc=0}, the program assumes a default value of \fileName{tolc=0.02}.
+\item \fileName{mode=2}: \fileName{par} is the user-input value of trade off parameter. In this case, \fileName{tolc} is not used by the program.
+\item \fileName{mode=3}: none of the two input values are used by the program. However, this line of input still needs to be there.
+\end{enumerate}
+
+\textbf{NOTE:} When \fileName{mode=1} both \texttt{par} and \texttt{tolc} are used. When \fileName{mode=2} only \texttt{par} is used. When \texttt{mode=3}, neither \fileName{par} nor \texttt{tolc} are used. However, the third line should always have two values. \\
+\item [\fileName{obs.mag}] Input data file. The file must specify the standard deviations of the error. By definition these values are greater than zero.
+\item[\fileName{mag3d.mtx}] The binary file created by \texttt{MAGSEN3D}.
+\item[\fileName{ini.sus}] The initial susceptibility model can be defined as a value (for uniform models), or by a filename.
+\item[\fileName{ref.sus}] The reference susceptibility model can be defined as a value (for uniform models), or by a filename (for non-uniform reference models).
+\item[\fileName{active.txt}] The file containing which cells in the model are be defined as active (\codeName{1}) or inactive (\fileName{brown}{0}). This file must be fully compatible with the \fileName{mesh.msh} and \fileName{ref.sus}. Use the \fileName{null} option for all cells being active.
+\item[\fileName{bounds.sus}] There are three options regarding the bounds selection:
+\begin{enumerate}
+\item Have 2 values (\codeName{$b_l$} and \codeName{$b_u$}), defining the lower and upper bounds, as a constraint for the entire recovered model.
+\item Provide the file \fileName{bounds.sus} containing individual \codeName{b$_l$} and \codeName{b$_u$} values for each cell or
+\item \fileName{null}, defining ``no bounds'' option.
+\end{enumerate}
+
+\item [\fileName{$\alpha_s, \alpha_x, \alpha_y, \alpha_z$}] Coefficients for the each model component. $\alpha$'s is the smallest model component. Coefficient for the derivative in the easting direction. $\alpha_y$ is the coefficient for the derivative in the northing direction. The coefficient $\alpha_z$ is for the derivative in the vertical direction.
+
+If \fileName{null} is entered on this line, then the above four parameters take the following default values: \fileName{$\alpha_s=0.0001, \alpha_x=\alpha_y=\alpha_z = 1.0$}. None of the alpha's can be negative and they cannot be all equal to zero at the same time.
+
+\textbf{NOTE:} The four coefficients \fileName{$\alpha_s$, $\alpha_x$, $\alpha_y$} and \fileName{$\alpha_z$} in line 9 of the control file can be substituted for three corresponding length scales \fileName{$L_x$, $L_y$} and \fileName{$L_z$}. To understand the meaning of the length scales, consider the ratios $\alpha_x/\alpha_s$, $\alpha_y/\alpha_s$ and $\alpha_z/\alpha_s$. They generally define smoothness of the recovered model in each direction. Larger ratios result in smoother models, smaller ratios result in blockier models. The conversion from $\alpha$'s to length scales can be done by:
+\begin{equation}
+\label{eq:lengths}
+L_x = \sqrt{\frac{\alpha_x}{\alpha_s}} ; ~L_y = \sqrt{\frac{\alpha_y}{\alpha_s}} ; ~L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}
+\end{equation}
+where length scales are defined in meters. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
+
+\item [\fileName{SMOOTH\_MOD}] This option was not available in previous versions of the code and can be used to define the reference model in and out of the derivative terms. The options are: \fileName{SMOOTH\_MOD\_DIF} (reference model is defined in the derivative terms) and \fileName{SMOOTH\_MOD} (reference model is defined in only the smallest term)
+\item[\fileName{w.dat}] Name of the file containing weighting matrix. If \fileName{null} is entered, default values of unity are used.
+\end{itemize}
+
+\subsubsection*{Example of maginv3d.inp control file}
+Below is an example of a control file with comments:
+\begin{fileExample}
+\begin{tabular}{|ll|}
+\hline
+1  & ! mode \\
+1.0 0.0 & ! par, tolc \\
+obs\_noise.mag & ! observation file \\
+maginv3d.mtx & ! sensitivity matrix file \\
+1.E-07 & ! initial model\\
+1.E-07 & ! reference model\\
+NULL & ! active cells file\\
+0.0 0.08 & ! lower and upper bounds \\
+null & ! $\alpha_s, \alpha_x, \alpha_y, \alpha_z$ \\
+SMOOTH\_MOD\_DIF & ! reference model in the derivative terms \\
+null & ! weighting matrix \\
+\hline
+\end{tabular}
+\end{fileExample}
+
+\subsubsection{Output files}
+Five output files are created by the program \texttt{maginv3d}. They are:
+\begin{enumerate}
+\item \fileName{maginv3d.log} The log file containing more detailed information for each iteration and summary of the inversion.
+\item \fileName{maginv3d\_iter.sus} Susceptibility files output after each iteration (\fileName{iter} defines the iteration step).
+\item \fileName{maginv3d\_iter.pre} Predicted data files output after each iteration (\fileName{iter} defines the iteration step).
+\item \fileName{maginv3d.sus} Final magnetic susceptibility model.
+\item \fileName{maginv3d.pre} Final predicted data file.
+\end{enumerate}
+
+\subsection{MAGPRE3D}
+This utility multiplies a model by the stored sensitivity matrix in \fileName{maginv3d.mtx} to produce predicted data. This program is included so that users who are not familiar with the wavelet transform and the structure of \fileName{maginv3d.mtx} could utilize the available sensitivity matrix to carry out modelling exercises. The command line usage is:
+\begin{fileExample}
+magpre3d maginv3d.mtx obs.loc model.sus
+\end{fileExample}
+
+\subsubsection{Input files}
+\begin{enumerate}
+\item \fileName{maginv3d.mtx} The sensitivity matrix file from \codeName{MAGSEN3D}.
+\item \fileName{obs.loc} The inducing field parameters, anomaly type and observation locations.
+\item \fileName{model.sus} The magnetic susceptibility model
+\end{enumerate}
+
+\subsubsection{Output file}
+The output file is in the same form as the observation file without the standard deviation and called \fileName{magpre3d.mag}, which is the predicted data file.
