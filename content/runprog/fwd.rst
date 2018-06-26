@@ -3,12 +3,21 @@
 DCIPF3D
 =============
 
-This program performs the 3D forward modelling of DC resistivity and IP data over octree meshes. The parameters and files are the same for ``DCIPF3D``.
+This program performs forward modelling of DC and IP data. Command line usage:
+
+.. code-block:: rst
+
+        dcipf3d fwd.inp [nThread]
+
+where nThread is an optional integer argument to specify the number of OpenMP threads to use
+for the parallelization. If this value is missing, DCIPF3D will use the maximum number of threads
+based on the processor. The input file, ``fwd.inp`` is described below.
+
 
 Control parameters and input files
 ----------------------------------
 
-As a command line argument, ``DCIPF3D`` requires an input file containing all parameters and files needed to carry out the forward modelling calculations. This input control file is generally named **DCIP_octree_fwd.inp** and needs to be located in the working directory, from which ``DCIPF3D`` is executed.
+As a command line argument, ``DCIPF3D`` requires an input file containing all parameters and files needed to carry out the forward modelling calculations. This input control file is generally named **fwd.inp** and needs to be located in the working directory, from which ``DCIPF3D`` is executed.
 
 The following is the input control file format:
 

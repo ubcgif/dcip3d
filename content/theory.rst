@@ -252,3 +252,90 @@ is the sensitivity matrix. Our inverse problem is formulated as:
         :label: inversion
 
 where :math:`\phi_d^{*}` is a target misfit. Again, for ease of future notation we incorporate the diagonal weighting matrix (:math:`\mathbf{W}_d`)  into :math:`\mathbf{J}` and :math:`\mathbf{d}`. In practice the true conductivity :math:`\sigma` is not known and so we must  use the conductivity found from the inversion of the DC resistivity data to construct the sensitivity matrix elements in Equation :eq:`Jij`.
+
+Wavelet Compression of Sensitivity Matrix
+-----------------------------------------
+
+When storing the sensitivity matrix during the linearized step of the DC problem, the two major
+obstacles to the solution of the Gauss-Newton problem are the large amount of memory required
+for storing the sensitivity matrix and the CPU time required for the application of the sensitivity
+matrix to model vectors. These are also points of concern for the general inversion of IP data. The
+DCIP3D v5.0 program library overcomes these diculties by forming a sparse representation of the
+sensitivity matrix using a wavelet transform based on compactly supported, orthonormal wavelets.
+For more details, the users are referred to Li and Oldenburg (2003, 2010). In the following, we give
+a brief description of the method necessary for the use of the DCIP3D v5.0 library.
+Each row of the sensitivity matrix in a 3D DC resistivity or IP inversion can be treated as a 3D
+image and a 3D wavelet transform can be applied to it. By the properties of the wavelet transform,
+most transform coecients are nearly or identically zero. When coecients of small magnitudes
+are discarded (the process of thresholding), the remaining coecients still contain much of the
+necessary information to reconstruct the sensitivity accurately. These retained coecients form
+a sparse representation of the sensitivity in the wavelet domain. The need to store only these
+large coecients means that the memory requirement is reduced. Further, the multiplication of
+the sensitivity with a vector can be carried out by a sparse multiplication in the wavelet domain.
+This greatly reduces the CPU time. Since the matrix-vector multiplication constitutes the core
+computation of the inversion, the CPU time for the inverse solution is reduced accordingly. The
+use of this approach increases the size of solvable problems by nearly two orders of magnitude.
+Werst denote W as the symbolic matrix-representation of the 3D wavelet transform. Then
+applying the transform to each row of J and forming a new matrix consisting of rows of transformed
+sensitivity is equivalent to the following operation:
+eJ
+= JWT ; (26)
+where eJ
+is the transformed matrix. The thresholding is applied to individual rows of J by the
+following rule to form the sparse representation eJ
+S,
+e Js
+ij =
+8<
+:
+e Jij if
+
+e Jij
+
+ i
+0 if
+
+e Jij
+
+< i
+; i = 1; : : : ;N; (27)
+where i is the threshold level, and e Jij and e Js
+ij are the elements of eJ
+and eJ
+S, respectively. The
+threshold level i are determined according to the allowable error of the reconstructed sensitivity,
+which is measured by the ratio of norm of the error in each row to the norm of that row, ri(i). It
+can be evaluated directly in the wavelet domain by the following expression:
+ri(i) =
+vuuuuut
+P
+j e Jij j<i
+e J2
+ij
+P
+j
+e J2
+ij
+; i = 1; : : : ;N; (28)
+13
+Here the numerator is the norm of the discarded coecients and the denominator is the norm of
+all coecients. The threshold level io is calculated on a representative row, io. This threshold is
+then used to dene a relative threshold  = io=max
+j
+
+e Jij
+
+. The absolute threshold level for each row
+is obtained by
+i = max
+j
+
+e Jij
+
+; i = 1; : : : ;N: (29)
+The program that implements this compression procedure is DCINV3D. The user is asked to
+specify the relative error r and the program will determine the relative threshold level i. Usually
+a value of a few percent is appropriate for r. When both surface and borehole data are present,
+two dierent relative threshold levels are calculated by choosing a representative row for surface
+data and another for borehole data. For experienced users, the program also allows the direct input
+of the relative threshold level.
