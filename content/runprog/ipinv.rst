@@ -1,82 +1,73 @@
 .. _ipinv:
 
-IPoctreeInv
+IPInv3D
 ===========
 
-``IPoctreeInv`` performs the inversion of the IP data over octree meshes. 
+This program performs the inversion of induced polarization data. Command line usage:
+
+.. code-block:: rst
+        ipinv3d ipinv.inp
+
+For the control file ``ipinv.inp`` described below.
 
 Control parameters and input files
 ----------------------------------
 
-As a command line argument, ``IPoctreeInv`` requires an input file containing all parameters and files needed to carry out the inversion. The following shows the required format:
+The bounds for version 5.0 have NOT been added for IP data inversion. Positivity is enforced through the log-barrier method. The format for the main IP inversion input file is:
 
 .. figure:: ../../images/ipinv.PNG
         :figwidth: 75%
         :align: center
 
-octree mesh
-        Name of the octree mesh file.
+irest
+        An integer specifying how to start the inversion. There are two choices:
 
-LOC_XY | LOC_XYZ
-        LOC_XY specifies that the electrode location file only has surface electrodes (no Z coordinate is provided), while LOC_XYZ indicates there may be a mix of surface and subsurface electrodes requiring Z locations to be assigned for each current and potential electrode in the file. This is followed by the user-defined name of the file, which contains electrode location coordinates.
+        1. irest=0 Begins the inversion from scratch
 
-initial model file | VALUE v
-        The starting chargeability model can be degined as VALUE, followed by a constant "v" or as a :ref:`model file <modelfile>` for a non-uniform starting model. The latter is especially useful when a previously terminated inversion has to be restarted.
+        2. irest=1 Restarts the inversion from a previous iteration. The files ``ipinv3d.aux`` and ``ipinv3d.eta`` must be present for this option.
 
-reference model file | VALUE v
-        The reference chargeability model can be defined as VALUE, followed by a constant "v" or as a :ref:`model file <modelfile>` for a non-uniform reference model.
+mode,par
+        An integer specifying one of the two choices for determining the trade-off parameter (a real value):
 
-conductivity model
-        A conductivity model is required for IP inversion since it is needed to compute sensitivities. In most circumstances, DC data is collected along with IP data, allowing the user to first inver the DC data and then use the recovered conductivity model as input for the IP inversion.
+                1. mode=1: the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (e.g.,  :math:`\phi_d= N`). the target misfit value is given by the product of par and the number of data, N. Normally, the value of par should be 1.0 if the correct standard deviation of error is assigned to each datum.
 
-topography active cells | ALL_ACTIVE
-        If there is a topography file involved in creation of the octree mesh, then the utility :ref:`create_octree_mesh <createoctreemesh>` will generate a file named active_cells.txt along with the mesh file. If there is no topography, ALL_ACTIVE can be used to indicate all cells in the model are active. 
-     
-model active cell | ALL_ACTIVE
-        An :ref:`active cell file <activeFile>` which controls which model cells are included in the inversion. Inactive cells in the recovered model are set to the corresponding physical property value from the reference model. If you wish to solve for all model cells, then ALL_ACTIVE should be selected. 
+                2. mode=2: the user inputs the trade off parameter as defined by par.
 
-cell weighting | NO_WEIGHT
-        :ref:`File <weightsFile>` containing the cell weighting vector. If NO_WEIGHT is entered, default values of 1 are used.
+                3. mode=3: the program calculates the trade-off parameter using generalized cross validation (GCV) and par is ignored
 
-interface weighting | NO_FACE_WEIGHT
-        :ref:`File <weightsFile>` containing information for cell interface weighting (i.e., one weighting value for each cell interface). The utility :ref:`interface_weights <interfaceweights>` can be used to create the file. If NO_FACE_WEIGHT is entered, default values of 1 are used.
+data
+        The DC observation locations (with standard deviations).
 
-beta_max beta_min beta_factor | DEFAULT
-        This line controls the selection of the initial regularization parameter (beta_max), as well as its cooling step (beta_factor) and the minimum beta value (beta_min). These values are computed automatically if the DEFAULT option is provided. However, if a previously terminated inversion has to be restarted, it is convenient to quickly resume the job as its last step by assigning these parameters manually.
+mtx
+        A matrix file (.mtx) file from ``IPSEN3D``.
 
-alpha_s alpha_x alpha_y alpha_z
-        Coefficients for each model component in the model objective function (Equation :eq:`mof1`): alpha_s is the smallest model component, alpha_x is the coefficient for the derivative in the easting direction, alpha_y is the coefficient for the derivative in the northing direction, and alpha_z is the coefficient for the derivative in the vertical direction. Some reasonable starting values might be: alpha_s=0.0001, alpha_x = alpha_y = alpha_z = 1.0. The alpha value cannot be negative and they cannot be all set equal to zero.
+ini
+        A chargeability model file or null to set the initial model to 0.05 if IPTYPE=1 or 0.01 ifIPTYPE=2. **The initial model must be non-zero.**
 
-        NOTE: The four alpha coefficients can be of in terms of three corresponding length scales (L_x, L_y, and L_z). To understand the meaning of the length scales, consider the ratios alpha_x/alpha_s, alpha_y/alpha_s and alpha_z/alpha_s. They generally define the smoothness of the recovered model in each direction. Larger ratios result in smoother models, while smaller ratios result in blockier models. The conversion from alpha value to length scales can be done by: :math:`L_x = \sqrt{\frac{\alpha_x}{\alpha_s}}`; :math:`L_y = \sqrt{\frac{\alpha_y}{\alpha_s}}`; :math:`L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}`, where length scales are defined in metres. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
+ref
+       chargeability model file or null to set the reference model to 0.
 
-chifact
-        The chi-factor can be used to scale the data misfit tolerance. By default, a chifact=1 should be used. Increasing or decreasing the chifact is equivalent to sclaning the assigned standard deviations. An increased chifact corresponds to increased error values, which allows for a larger data misfit at convergence.
+lengths
+        Coefficients for the each model component for the model objective function from equation 12. :math:`\alpha_s` is the smallest model component. :math:`\alpha_x` Coefficient for the derivative in the easting direction. :math:`\alpha_y` is the coefficient for the derivative in the northing direction. The coefficient :math:`\alpha_z` is for the derivative in the vertical direction.
+        If null is entered on this line, then the above four parameters take the following default values: :math:`\alpha_s` = 0:0001; :math:`\alpha_x` = :math:`\alpha_y` = :math:`\alpha_z` = 1:0. None of the alpha's can be negative and they cannot be all equal to zero at the same time.
+        NOTE: The four coefficients :math:`\alpha_s`, :math:`\alpha_x`, :math:`\alpha_y` and :math:`\alpha_z` can be substituted for three corresponding length scales Lx, Ly and Lz. To understand the meaning of the length scales, consider the ratios :math:`L_x = \sqrt{\frac{\alpha_x}{\alpha_s}}`; :math:`L_y = \sqrt{\frac{\alpha_y}{\alpha_s}}`; :math:`L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}`. They generally define smoothness of the recovered model in each direction. Larger ratios result in smoother models, smaller ratios result in blockier models. The conversion from 's to length scales can be done by:
 
-tol_nl mindm iter_per_beta
-        The first parameter tol_nl defines a tolerance for the relative gradient at each :math:`\beta` step: tol_nl math:`= ||g|| / ||g_o||`, where :math:`g` is the current gradient and :math:`g_o` is the gradient at the start of the current :math:`\beta` step iteration. If the relative gradient is less than tol_nl, then the code exits the current :math:`\beta` iteration and decreases :math:`\beta` by the beta_factor.
+        .. math::
+                L_x = \sqrt{\frac{\alpha_x}{\alpha_s}}; L_y = \sqrt{\frac{\alpha_y}{\alpha_s}}; L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}
+                :label: length_scale
 
-        mindm defines the smallest allowable model perturbation (if the model perturbation :math:`\Delta m` recovered as a result of IPCH iteration is smaller than mindm, then the current :math:`\beta` iteration is terminated and :math:`\beta` is reduced by beta_factor before the next beta step.
+        where length scales are defined in meters. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
 
-        iter_per_beta sets the maximum number of times that the model can be updated within a given beta iteration.
+weight
+        Name of the file containing weighting matrix. If null is entered, the default value of one is used for no extra weighting.
 
-tol_ipcg max_iter_ipcg
-        tol_ipcg is the tolerance to which the IPCG iteration needs to solve the model perturbation. This defines how well the system :math:`J^T J + \beta W_m^T W_m` is solved.
+idisk
+        Integer flag of zero or one to write the sensitivities to disk
 
-        max_iter_ipcg defines the maximum number of IPCG iterations allowed per :math:`\beta` step to solve for the model perturbation.
+                1. idisk=0: Store the entire sensitivity matrix in memory. This option will be desired in almost all cases.
 
-CHANGE_MREF | NOT_CHANGE_MREF
-        This parameter provides the optional capability to change the reference model at each beta step. If the CHANGE_MREF option is selected, then the reference model is updated every time the regularization parameter changes and is set to the last recovered model from the previous iteration. This may result in quicker convergence. If the NOT_CHANGE_MREF option is used, then the same reference model, as originally defined in line 4 is used throughout the inversion.
+                2. idisk=1: Access the sensitivity matrix from memory when needed
 
-SMOOTH_MOD | SMOOTH_MOD_DIF
-        This option is used to define the reference model in and out of the derivative terms of the model objective function (Equations :eq:`mof1` and :eq:`mof2`). The options are: SMOOTH_MOD_DIF (reference model is defined in the derivative terms of the model objective function) and SMOOTH_MOD (reference model is defined only the smallest model term of the objective function).
-
-BOUNDS_NONE | BOUNDS CONST bl bu | BOUNDS_FILE file
-        There are three options regarding the bound selection. BOUNDS_NONE lifts any boundary constraints and releases the sought parameter range to infinity. 
-        
-        BOUNDS_CONST followed by a lower bound (bl) and an upper bound (bu) is used in cases where there are some generalized restrictions on the recovered model properties (as is the case with chargeability, which must be fall within the range [0,1)). 
-        
-        BOUNDS_FILE is a more advanced option, which is followed by the name of the bounds file. This option allows the user to enforce individual bound constraints on each model cell, which can be very useful when there is reliable a priori physical property information available. This can be used as a technique to incorporate borehole measurements into the inversion or to impose more generalized estimates regarding the physical property values of known geological formations.
-        
 
 **NOTE**: Formats of the files listed in this control file are explained :ref:`here <fileformats>`.
 
@@ -84,55 +75,45 @@ BOUNDS_NONE | BOUNDS CONST bl bu | BOUNDS_FILE file
 
 .. code-block:: rst
 
-        IPoctreeInv -inp
+        ipinv3d -inp
 
-**NOTE**: ``IPoctreeInv`` will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved or if the model norm has plateaued. However, if the program is terminated by the maximum iteration limit, the file IP_octree_inv_log and IP_octree_inv.out should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If neither of these conditions have been met, then the inversion should be reevaluated.
+**NOTE**: ``IPInv3D`` will terminate before the specified maximum number of iterations is reached if the expected data misfit is achieved or if the model norm has plateaued. However, if the program is terminated by the maximum iteration limit, the file IP_octree_inv_log and IP_octree_inv.out should be checked to see if the desired misfit (equal to chifact times the number of data) has been reached and if the model norm is no longer changing. If neither of these conditions have been met, then the inversion should be reevaluated.
 
 Output files
 ------------
 
-``IPoctreeInv`` saves a model after each iteration. The models are ordered: inv_01.con, inv_02.con, etc. Similarly, the predicted data is output at each iteration into a predicated data file: dpred_01.txt, dpred_02.txt, etc. The following is a list of all output files created by the program ``IPoctreeInv``:
+``IPInv3D`` saves a model after each iteration. The models are ordered: inv_01.con, inv_02.con, etc. Similarly, the predicted data is output at each iteration into a predicated data file: dpred_01.txt, dpred_02.txt, etc. The following is a list of all output files created by the program ``IPInv3D``:
 
-inv.chg
-        Chargeability model from the latest inversion. The model is stored in :ref:`model format <modelfile>` and is overwritten at the end of each iteration.
+ipinv3d.log
+        The log file containing the minimum information for each iteration and summary of the inversion.
 
-IP_octree_inv.txt
-        A log file in which all of the important information regarding the flow of the inversion is stored, including the starting inversion parameters, mesh information, details regarding the computation (CPU time, number of processors, etc), and information about each iteration (i.e., data misfit, model norm components, model norm, total objective function, norm gradient, and relative residuals at each :math:`\beta` iteration).
 
-dpred.txt
-        Predicted data from the recovered model in the latest iteration. The predicted data is in the :ref:`observation file format <dcipfile>`, with the final column corresponding to apparent chargeability (instead of standard deviation).
+ipinv3d.aux
+        An auxiliary file to allow the program to restart (Required for restart).
 
-IP_octree_inv.out
-        This file is appended at the end of each iteration and has 7 columns: 
-        
-        beta (value of regularization parameter)
+ipinv3d.eta
+        Values of :math:`\eta` so that the program can restart (Required for restart).
 
-        iter (number of IPCG iteration in a beta loop)
+ipinv3d iter.sus
+        Chargeability files output after each iteration (iter defines the iteration step).
 
-        misfit (data misft * 2)
+ipinv3d iter.pre
+        Predicted data files output after each iteration (iter defines the iteration step).
 
-        phi_d (data misfit)
+ipinv3d.pre
+        Predicted data file that is updated after each iteration (will also be the "final" predicted data)
 
-        phi_m (model norm)
+ipinv3d.chg
+        Chargeability model that matches the predicted data file and is updated after each iteration (will also be the "final" recovered model)
 
-        phi (total objective function equal to phi_d + beta*phi_m)
-
-        norm g (gradient equal to -RHS when solving Gauss-Newton)
-
-        g rel (relative gradient equal to :math:`||g||/||g_o||`
-
-mumps.log
-        A diagnostic log file output by the MUMPS package.
 
 
 Example files
 -------------
 
-Example of a ``IPoctreeInv`` inversion input file:
+This example of an IP inversion input file starts the inversion from scratch and performs GCV to find the trade-off parameter. The sensitivity matrix file was renamed to ``diffTol.mtx`` so the use new that they had used a different tolerance (and so they could switch to the other matrix file without re-running ``IPSEN3D``). The initial model is set to null and depends upon the IP data type. The ref rence model was zero. Length scales were given to drive the recovered chargeabilities to more layered geometry. Additional weighting was applied through the file ``w.dat``, supplied by the user.
 
 .. figure:: ../../images/ipinvexample.PNG
         :figwidth: 75%
         :align: center
 
-
-        
