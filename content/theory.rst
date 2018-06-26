@@ -252,3 +252,42 @@ is the sensitivity matrix. Our inverse problem is formulated as:
         :label: inversion
 
 where :math:`\phi_d^{*}` is a target misfit. Again, for ease of future notation we incorporate the diagonal weighting matrix (:math:`\mathbf{W}_d`)  into :math:`\mathbf{J}` and :math:`\mathbf{d}`. In practice the true conductivity :math:`\sigma` is not known and so we must  use the conductivity found from the inversion of the DC resistivity data to construct the sensitivity matrix elements in Equation :eq:`Jij`.
+
+Wavelet Compression of Sensitivity Matrix
+-----------------------------------------
+
+When storing the sensitivity matrix during the linearized step of the DC problem, the two major obstacles to the solution of the Gauss-Newton problem are the large amount of memory required for storing the sensitivity matrix and the CPU time required for the application of the sensitivity matrix to model vectors. These are also points of concern for the general inversion of IP data. The DCIP3D v5.0 program library overcomes these difficulties by forming a sparse representation of th se sitivity matrix using a wavelet transform based on compactly supported, orthonormal wavelets For more details, the users are referred to Li and Oldenburg (2003, 2010). In the following, we give a brief description of the method necessary for the use of the DCIP3D v5.0 library.
+
+Each row of the sensitivity matrix in a 3D DC resistivity or IP inversion can be treated as a 3D image and a 3D wavelet transform can be applied to it. By the properties of the wavelet transform, most transform coefficients are nearly or identically zero. When coefficients of small magnitudes are discarded (the process of thresholding), the remaining coefficients still contain much of the necessary information to reconstruct the sensitivity accurately. These retained coefficients form a sparse representation of the sensitivity in the wavelet domain. The need to store only these large coefficients means that the memory requirement is reduced. Further, the multiplication of the sensitivity with a vector can be carried out by a sparse multiplication in the wavelet domain. This greatly reduces the CPU time. Since the matrix-vector multiplication constitutes the core computation of the inversion, the CPU time for the inverse solution is reduced accordingly. The use of this approach increases the size of solvable problems by nearly two orders of magnitude.
+
+We first denote :math:`\mathcal{W}` as the symbolic matrix-representation of the 3D wavelet transform. Then
+applying the transform to each row of :math:`\mathbf{J}` and forming a new matrix consisting of rows of transformed sensitivity is equivalent to the following operation:
+
+.. math::
+        \tilde{\mathbf{J}} = \mathbf{J} \mathcal{W}^T
+
+where :math:`\tilde{\mathbf{J}}` is the transformed matrix. The thresholding is applied to individual rows of :math:`\mathbf{J}` by the following rule to form the sparse representation :math:`\tilde{\mathbf{J}}^S`:
+
+.. math::
+        {\tilde{f{J}}_{ij}}^s =
+        \left\{ \begin{array}{cl}
+        {\tilde{{J}}_{ij}} \text{ if } |{\tilde{{J}}_{ij}}| \geq \delta_i
+        \\
+        0 \text{ if } |{\tilde{{J}}_{ij}}| \geq \delta_i
+        \end{array}\right\},
+        i=1..N
+        :label: Jij_S
+
+
+where :math:`\delta_i` is the threshold level, and  :math:`\tilde{{J}}_{ij}`: and  :math:`{\tilde{{J}}_{ij}}^s`: are the elements of :math:`\tilde{\mathbf{J}}_{ij}`: and  :math:`{\tilde{\mathbf{J}}_{ij}}^s`:, respectively. The threshold level :math:`\delta_i` are determined according to the allowable error of the reconstructed sensitivity, which is measured by the ratio of norm of the error in each row to the norm of that row, :math:`r_i (\delta_i)`. It can be evaluated directly in the wavelet domain by the following expression:
+
+.. math::
+        r_i (\delta_i) = \sqrt{\frac{\sum_{|{\tilde{{J}}_{ij}}|\leq \delta_i} \tilde{{J}}_{ij}^2}{\sum_j \tilde{{J}}_{ij}^2}}, i=1..N
+        :label: wavelet_r
+
+Here the numerator is the norm of the discarded coefficients and the denominator is the norm of all coefficients. The threshold level :math:`\delta_{i_0}` is calculated on a representative row, :math:`i_0`. This threshold is then used to define a relative threshold :math:`\epsilon = \delta_{i_0} / max_j | {\tilde{{J}}_{ij}}|`. The absolute threshold level for each row is obtained by
+
+.. math::
+        \delta_{i} = \epsilon max_j | {\tilde{{J}}_{ij}}|, i=1..N
+
+The program that implements this compression procedure is ``DCINV3D``. The user is asked to specify the relative error :math:`r^*` and the program will determine the relative threshold level :math:`\delta_i`. Usually a value of a few percent is appropriate for :math:`r^*`. When both surface and borehole data are present two different relative threshold levels are calculated by choosing a representative row  or surfac data and another for borehole data. For experienced users, the program also allows the direct input of the relative threshold level.

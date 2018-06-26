@@ -72,23 +72,19 @@ lower), or a file. Details of the structure of the input file and optional bound
 Historical changes from v1.0 to v2.1
 ------------------------------------
 
-Previously, major changes were made to improve upon version 1.0. The major changes were
+Previously, major changes were made to improve upon version 1.0. The major changes were:
+
 - Electrodes can be located anywhere and are not restricted to mesh node locations. This greatly enhances the usability of the code and allows for more uniform meshes with fewer cells to be used in the modeling.
 - A linearized forward modeling of IP data is available. The output is the sensitivity multiplied by the chargeability. In this case, "chargeability" data can be the true dimensionless chargeability, or any of the other chargeability units that are commonly used, eg. pfe, mV/V, mrad etc.
 - ``DCINV3D`` now saves the model after each iteration. This allows additional flexibility when selecting an inverted model that is best suited for interpretation purposes, or possibly choosing a starting model for a subsequent inversion.
 - ``IPINV3D`` saves intermediate models for each Lagrange multiplier.
-- The details of the model objective function can be controlled either with length scales or
-alpha parameters.-
-6. An initial check is now carried out to determine if some data have an incorrect sign. Data
-signs are not changed but suspect data are identified in a new file (see end of section 2.2).
-- In ``DCINV3D``, when the sensitivities are calculated, they are temporarily stored in memory
-rather than in the file dcinv3d.mtx. Hence the large .mtx file is not created. This results in
-a significant gain in performance.
+- The details of the model objective function can be controlled either with length scales or alpha parameters.
+- An initial check is now carried out to determine if some data have an incorrect sign. Data signs are not changed but suspect data are identified in a new file (see end of section 2.2).
+- In ``DCINV3D``, when the sensitivities are calculated, they are temporarily stored in memory rather than in the file dcinv3d.mtx. Hence the large .mtx file is not created. This results in a significant gain in performance.
 - ``DCINV3D`` and ``IPSEN3D`` output a file called sensitivity.txt that contains the average absolute value of the sensitivity matrix for each cell. This is useful to determine which portions of the model domain are sensitive to the survey.
 - Each cell in a model can be set as \active" or \inactive" in the inversion process. In ``DCINV3D``, inactive cells will be held at the value of the reference model. In the IP inversion, inactive cells will be set to zero.
 - An upgraded pre-conditioner is used for the CG (Conjugate Gradient) solver for the Gauss- Newton equations. This enhances the performance of the DC resistivity inversion and it has an even larger impact upon the IP inversion.
-- All floating-point arithmetic is now done in double precision. More accurate results are
-obtained.
+- All floating-point arithmetic is now done in double precision. More accurate results are obtained.
 - The code has been reorganized. Large working arrays are only allocated and used when needed. This results in reduced memory requirements.
 - When calculating the sensitivity matrix G (in programs ``DCINV3D``, ``IPINV3D``, ``DCIPF3D`` with the ip option), the number of times a forward system must be solved is equal to the number of transmitters plus the number of receivers. To speed up the process of calculating G, if the same electrode location appears more than once in the data file, it is solution is stored in memory for future use.
 

@@ -27,12 +27,11 @@ DC resistivity and IP data are forward modelled for both surface and cross-boreh
 
 3. Combined surface and borehole dataset: A combination of the above pole-dipole surface and borehole arrays, resulting in 260 current electrodes and 2619 total forward modelled observations.
 
-Prior to inversion, 5% Gaussian noise was added to the forward modelled data, and uncertainties were assigned to be 5% of the data value plus a small floor. 
+Prior to inversion, 5% Gaussian noise was added to the forward modelled data, and uncertainties were assigned to be 5% of the data value plus a small floor.
 
 The following pages describe the constant inversion parameters used and then the inversion of each dataset.
 
 .. toctree::
-        :numbered:
         :maxdepth: 2
 
         Inversion parameters <exe5prism/param>
