@@ -56,7 +56,11 @@ vec
 
 **NOTE**: Formats of the files listed in this control file are explained :ref:`here <fileformats>`.
 
+**NOTE**: A sample input file can be obtained by executing the following line in the command prompt:
 
+.. code-block:: rst
+
+        dcipf3d -inp
 
 Output files
 ------------

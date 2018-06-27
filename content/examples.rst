@@ -1,9 +1,22 @@
 .. _examples:
 
-Example using five prisms
-=========================
+Introduction
+============
 
-The example model is comprised of five anomalous rectangular prisms embedded in a uniform halfspace. There are three surface prisms simulating near-surface distortions, and two buried prisms simulating deeper targets, as shown in the figure below.
+In this section, we present forward modelling and inversion examples for both DC and IP data
+types. The examples are freely available for download 3 MB and can also be found on the DCIP3D
+website (without the exe files). The example is synthetic and is a 10
+-m (0.1 S/m) block in a 1000
+
+-m (0.001 S/m) half-space with a pyramid-shaped topography (Figure 5). For added complexity,
+surface data on a 25-m grid is simulated along with borehole data so that the general data format
+is required. The intrinsic chargeability of the block is 0.15 (Figure 6). The electrode locations are
+denoted by the white dots in both Figures. After forward modelling, 5% Gaussian noise is added to
+each data set to create the \observed" data sets. The uncertainties assigned are 5% of each datum
+with a 0.0001
+oor (for both DC and IP). The last section shows the differences between the old
+code and version 5.0 with respect to the nodal-based finite difference scheme (shown in Figure 3).
+The mesh used for the example is 26  26  23 and the file is given by
 
 .. figure:: ../images/example/5prisms.png
 	:align: center
