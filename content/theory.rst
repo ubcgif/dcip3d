@@ -63,50 +63,83 @@ The distribution of conductivity and chargeability in the earth can be extremely
 Forward modelling
 -----------------
 
-The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`DeyMorrison1979` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`, and the IP modelling is performed by carrying out two DC forward modellings. The IP data are generated according to the operations indicated in Equations :eq:`potentialsdiff` and :eq:`potentialsfrac`. To illustrate the DC resistivity and IP forward modelling algorithm, we generate synthetic data that would  be  acquired over the 3D conductivity structure shown in :numref:`5prisms`.
+The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`DeyMorrison1979` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
 
-.. figure:: ../images/5prisms.png
-        :name: 5prisms
-        :figwidth: 50%
-        :align: right
+.. math::
+        \mathbf{d_{ip}} = \mathbf{J}_{ip} \eta
+        :label: data_ip
 
-        The synthetic model consists of five rectangular blocs in a uniform halfspace. The  blocks S1, S2, and B2 are more conductive than the uniform halfspace; and blocks S3 and B1 are more resistive. All five blocks are chargeable.  There are seven lines in east-west direction which are spaced 100 m apart. There are also four boreholes that extend to a depth of 400 m.
+where :math:`\mathbf{d_{ip}}` is the IP data and :math:`\mathbf{J}_{ip}` is the sensitivity matrix for the IP problem, given DC data, :math:`\mathbf{d}_{dc}`. Forward modelling using equation :eq:`sensitivity_ip` is further explained in the section 2.5.
 
-The model consists of five rectangular blocks buried in a uniform halfspace. Three smaller blocks are placed on the surface while two larger blocks are at depth  to simulate the target of the survey.  The blocks S1, S2, and B2 are more conductive than the uniform halfspace; and blocks S3 and B1 are more resistive.  All five blocks are chargeable. Data from ten east-west lines surface lines with a line spacing of 100 m and four vertical boreholes are forward modelled. The surface experiment is carried out using pole-dipole data with a = 50 m and n = 1, 6, while the borehole experiments use a cross-hole  pole-dipole configuration with a 50 m potential dipole.
+.. math::
+        \mathbf{J}_{ip} = -\frac{\partial \ln \phi_{\eta}}{\partial \ln \sigma} = -\frac{1}{\sigma_{\eta}} \frac{\partial \phi_{\eta}}{\partial \ln \sigma} = -\frac{1}{\mathbf{d}_{dc}}\mathbf{J}_{dc}
+        :label: sensitivity_ip
 
-:numref:`FWD_cond` displays the DC resistivity data from three selected lines for the surface experiment. The data are displayed in pseudo-section format. Note the strong responses to the conductivity anomalies on the surface. They appear as pant-legs extending from small n-spacing all the way to the largest n-spacing.  The buried blocks are  hardly identifiable since their responses have low amplitudes and broad distributions and are masked by the surface anomalies. The apparent chargeability pseudo-sections from the same lines are shown in :numref:`FWD_chg` (note that the apparent chargeability is well-defined in this case).  The masking effects of the surface blocks are also evident in the IP data. Thus inversion is required.
-
-.. figure:: ../images/FWD_cond.png
-        :name: FWD_cond
-        :align: center
+.. figure:: ../images/mesh_design.png
+        :name: meshdesign
         :figwidth: 75%
-
-        Examples of the apparent conductivity pseudo-sections along three east-west traverses. The data are simulated for a pole-dipole array with a = 50 m and n = 1 to 6. The forward modelled data have  been contaminated by independent Gaussian noise with a standard deviation equal to 2% of the accurate datum magnitude and mean of zero. The pseudo-sections are dominated by the surface responses, but there are some indications of the buried prisms. The colormap shows the apparent conductivity in mS/m.
-
-.. figure:: ../images/FWD_chg.png
-        :name: FWD_chg
         :align: center
+
+        Mesh design with ``DCIP3D``. Current and potential electrodes are located on the solid lines. (a) Version 1.0 required electrodes be placed on cell nodes. (b) Update versions allow for the electrodes to be placed anywhere.
+
+The forward (and inversion) code uses a nodal-based finite volume technique in which the current is input on a node. This is an important change from the original version of DCIP3D and is illustrated in Figure 2. When inverting field data, the usual procedure is to generate a mesh whose nodes coincide with the location of the current electrodes. The difficulty with accomplishing this task is illustrated in Figure :numref:`meshdesign` a. The left panel is an attempt to design a mesh that  permits each  electrode to be on a node. The number of cells required to accomplish this is large and the aspect ratio are undesirable. High aspect ratios of cells reduces the numerical accuracy and also reduces the peed at which the forward modeling equations can be solved. This problem is greatly exacerbated when field surveys are carried out in regions of considerable topography. It would be preferable to have a uniform gridding in which the cell size is dictated by the resolving power of the data rather than by small details regarding exact placement of electrodes. A desired grid is shown in Figure :numref:`meshdesign` b.
+
+To handle a current electrode that is at an arbitrary position :math:`(x_s; y_s; z_s)` in the cell we made a modification to distribute any current amongst the 8 nodes of the cell. This approach is shown in Figure 3, where a current I is distributed onto nodes P1 through P8. Effectively, we write
+
+.. math::
+        \mathbf{I}\delta(r_s) \approx {\sum_{i=1}}^8 \mathbf{I} w_i(r_i, r_s) \delta(r_i)
+        :label: electrodes_relocation
+
+where :math:`r_s = (x_s; y_s; z_s)` is the position of the current electrode, :math:`r_i = (x_i; y_i; z_i)` is the position of the ith node, and :math:`w_i` is the linear-interpolation weighting for the ith node:
+
+.. math::
+        {\sum_{i=1}}^8 w_i = 1
+        :label: electrode_relocation_weight
+
+so that the total current distributed among the 8 nodes is equal to :math:`\mathbf{I}`. With the linear interpolation we note that if the source electrode is on one of the faces of the cell, then only 4 nodes will be activated. If the source electrode is along an edge then the current is distributed between two nodes, and if the source electrode is at a corner of the prism, then only one node is activated. If potential electrodes are not on the nodes then fields are linearly interpolated.
+
+.. figure:: ../images/finite_volume.png
+        :name: finitevolume
         :figwidth: 75%
+        :align: center
 
-        Examples of the apparent chargeability pseudo-sections along three east-west traverses.  The data have been contaminated by independent Gaussian noise with a standard deviation equal to 2% of the accurate datum magnitude plus a minimum of 0.001. The same masking effect of  near-surface prisms observed in apparent conductivity pseudo-sections is also present here. The colormap shows the apparent chargeability multiplied by 100.
+        Current electrode can be placed at an arbitrary position :math:`(x_s; y_s; z_s)` within a cell, or on a node. The currents are distributed to each node of the cell through linear interpolation.
 
-Since we intend to invert these data, we have added independent Gaussian noise. The standard deviation of the noise is equal to 2% of the datum magnitude plus a small threshold to deal with near zero data. The effect of the added noise can be seen in :numref:`FWD_cond` and :numref:`FWD_chg`.
+.. figure:: ../images/forward_model.png
+        :name: forwardmodel
+        :figwidth: 75%
+        :align: center
+
+        Forward modeled apparent resistivities of a halfspace showing differences between placing the current electrode at (a) cell centers versus (b) cell nodal points.
+
+As an example of the importance of the interpolation, a halfspace is modeled in which the cell
+size is 50 m and a current is injected at the surface in the center of the cell. Potentials are obtained on a 25-m grid. Apparent resistivities should equal 100 Ohm-m, which is the true halfspace value. The results are shown in Figure :numref:`forwardmodel` a. Errors up to 25% are observed at locations that are 25 m (1/2 cell) from each of the four corners where the distributed current is input. At distances 50 m (one cell width) the error has dropped to about 7%. These are expected results and are in accordance with testing using the first version of ``DCIP3D``. In Figure :numref:`forwardmodel` b the apparent resistivities for a current on a nodal location are plotted. At a distance of 50 m from the current, the error is less than 5% if with on a nodal discretization. The errors increase somewhat between distances of one and two cells. We conclude that for numerical accuracies of about 5% or less, the observation should be at least one cell width away from the location of a current electrode.
 
 General inversion methodology
 -----------------------------
 
+The computing programs outlined in this manual solve two inverse problems. In the first we invert the DC potentials :math:`\phi_{\sigma}` to recover the electrical conductivity :math:`\sigma(x; z)`. This is a non-linear inverse problem that requires linearization of the data equations and subsequent iteration steps. After DC data have been inverted, the conductivity model is used to invert the IP data to recover the chargeability :math:`\eta(x; z)`. Because chargeabilities are usually small quantities (:math:`\eta<0:3`) it is possible to linearize equation :eq:`potentialsfrac` and derive a linear system of equations to be solved. Irrespective of which data set is being inverted however, we basically use the same methodology to carry out the inversions. We outline this methodology here.
+
 The inverse problem is formulated as an optimization problem where an objective function of the model is minimized subject to the constraints in Equation :eq:`DC` for DC resistivity data or Equation :eq:`chargeability` for IP data. To outline our methodology, it is convenient to introduce a single notation for the data and for the model. We let :math:`\mathbf{d} = (d_1,d_2,...,d_N)^T` denote the data, where :math:`N` is the number of data. Using this notation, :math:`d_i` is either the :math:`i^{th}` potential in a DC resistivity data set, or the :math:`i^{th}` secondary potential/apparent chargeability in an IP survey. Let the physical property of interest be denoted by the generic symbol :math:`m` for the model element. The quantity :math:`m_i` denotes the conductivity or chargeability of the :math:`i^{th}` model cell. For the inversion, we choose :math:`m_i=\ln(\sigma_i)` when inverting for conductivities, and :math:`m_i=\eta_i` when reconstructing the chargeability distribution.
 
-Having defined a model, we next construct an objective function which, when minimized, produces a model that is geophysically interpretable and reproduces the data :math:`\mathbf{d}` to a justifiable level based on their associated uncertainties. The details of the objective function are problem dependent but generally we need the flexibility to be close to a reference model :math:`m_o` and also require that the recovered model be relatively smooth in all three spatial directions. Here we adopt a right-handed Cartesian coordinate system with :math:`y` positive north and and :math:`z` positive up. In defining the model objective function, the reference model will generally be included in the first component of the objective function but it can be removed, if desired, from the remaining derivative terms since we are often more confident in specifying the value of the model at a particular point than in supplying an estimate of the gradient. This leads to the following two distinct formulations of the model objective function.
+The goal of the inversion is to recover a model vector :math:`\mathbf{m} = (m_1,m_2,...,m_m)^T` , which acceptably reproduces the n observations of :math:`\mathbf{d}`. Importantly, the data are noise contaminated, therefore we don't want to fit them precisely. A perfect fit in our case would be indicative, that incorrect earth model is recovered, as some features observed in the constructed model would assuredly be artifacts of the noise. Therefore, the inverse problem is formulated as an optimization problem where a global objective function,  :math:`\Phi`, is minimized. The global objective functions consists of two components: a model objective function,  :math:`\Phi_m`, and a data misfit function, :math:`\Phi_d`, such that:
 
 .. math::
-        \Phi_m =  &&\alpha_s\int\int\ w_s(m-m_0)^2dv + \alpha_x\int\int w_x\left(\frac{\partial{(m-m_0)}}{\partial x}\right)^2dv+ \nonumber \\
-        &&\alpha_y\int\int w_y\left(\frac{\partial{(m-m_0)}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{(m-m_0)}}{\partial z}\right)^2dv,
+        \text{min} \Phi   =  \Phi_d(\mathbf{m}) + \beta \Phi_m(\mathbf{m}) \\
+        \text{s. t.} \mathbf{m}^l \leq \mathbf{m} \leq \mathbf{m}^u;
+
+where :math:`\beta` is a trade-off parameter that controls the relative importance of the model smoothness through the model objective function and data misfit function. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value  d and we will search for the value of :math:`\beta` via an L-curve criterion :cite:`Hansen2000` that produces the expected misfit at each linearized step (see section 2.4). Otherwise, a user-defined value is used. Bound are imposed through the projected gradient method so that the recovered model lies between imposed lower :math:`\mathbf{m}^l` and upper :math:`\mathbf{m}^u` bounds.
+
+The details of the objective function are problem dependent but generally we need the flexibility to be close to a reference model :math:`\mathbf{m}_o` and also require that the recovered model be relatively smooth in all three spatial directions. Here we adopt a right-handed Cartesian coordinate system with :math:`y` positive north and and :math:`z` positive up. In defining the model objective function, the reference model will generally be included in the first component of the objective function but it can be removed, if desired, from the remaining derivative terms since we are often more confident in specifying the value of the model at a particular point than in supplying an estimate of the gradient. This leads to the following two distinct formulations of the model objective function.
+
+.. math::
+        \Phi_m =  &&\alpha_s\int\int\ w_s(\mathbf{m}-\mathbf{m}_0)^2dv + \alpha_x\int\int w_x\left(\frac{\partial{(\mathbf{m}-\mathbf{m}_0)}}{\partial x}\right)^2dv+ \nonumber \\
+        &&\alpha_y\int\int w_y\left(\frac{\partial{(\mathbf{m}-\mathbf{m}_0)}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{(\mathbf{m}-\mathbf{m}_0)}}{\partial z}\right)^2dv,
         :label: mof1
 
 .. math::
-        \Phi_m =  &&\alpha_s\int\int\ w_s(m-m_0)^2dv + \alpha_x\int\int w_x\left(\frac{\partial{m}}{\partial x}\right)^2dv+ \nonumber \\
-        &&\alpha_y\int\int w_y\left(\frac{\partial{m}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{m}}{\partial z}\right)^2dv,
+        \Phi_\mathbf{m} =  &&\alpha_s\int\int\ w_s(\mathbf{m}-\mathbf{m}_0)^2dv + \alpha_x\int\int w_x\left(\frac{\partial{\mathbf{m}}}{\partial x}\right)^2dv+ \nonumber \\
+        &&\alpha_y\int\int w_y\left(\frac{\partial{\mathbf{m}}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{\mathbf{m}}}{\partial z}\right)^2dv,
         :label: mof2
 
 where the weighting functions :math:`w_s`, :math:`w_x`, :math:`w_y` and :math:`w_z` are spatially dependent, and :math:`\alpha_s`, :math:`\alpha_x`, :math:`\alpha_y` and :math:`\alpha_z` are coefficients which affect the relative importance of different components in the model objective function. The reference model :math:`m_o` may be a general background model that is estimated from previous investigations or it could be a zero model.
@@ -285,9 +318,9 @@ where :math:`\delta_i` is the threshold level, and  :math:`\tilde{{J}}_{ij}`: an
         r_i (\delta_i) = \sqrt{\frac{\sum_{|{\tilde{{J}}_{ij}}|\leq \delta_i} \tilde{{J}}_{ij}^2}{\sum_j \tilde{{J}}_{ij}^2}}, i=1..N
         :label: wavelet_r
 
-Here the numerator is the norm of the discarded coefficients and the denominator is the norm of all coefficients. The threshold level :math:`\delta_{i_0}` is calculated on a representative row, :math:`i_0`. This threshold is then used to define a relative threshold :math:`\epsilon = \delta_{i_0} / max_j | {\tilde{{J}}_{ij}}|`. The absolute threshold level for each row is obtained by
+Here the numerator is the norm of the discarded coefficients and the denominator is the norm of all coefficients. The threshold level :math:`\delta_{i_0}` is calculated on a representative row, :math:`i_0`. This threshold is then used to define a relative threshold :math:`\epsilon = \delta_{i_0} / \text{max}_j | {\tilde{{J}}_{ij}}|`. The absolute threshold level for each row is obtained by
 
 .. math::
-        \delta_{i} = \epsilon max_j | {\tilde{{J}}_{ij}}|, i=1..N
+        \delta_{i} = \epsilon \text{max}_j | {\tilde{{J}}_{ij}}|, i=1..N
 
 The program that implements this compression procedure is ``DCINV3D``. The user is asked to specify the relative error :math:`r^*` and the program will determine the relative threshold level :math:`\delta_i`. Usually a value of a few percent is appropriate for :math:`r^*`. When both surface and borehole data are present two different relative threshold levels are calculated by choosing a representative row  or surfac data and another for borehole data. For experienced users, the program also allows the direct input of the relative threshold level.

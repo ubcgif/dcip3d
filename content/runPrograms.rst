@@ -56,6 +56,4 @@ Programs
         DCInv3D <runprog/dcinv>
         IPSEN3D <runprog/ipsen>
         IPInv3D <runprog/ipinv>
-        MAKE_WDAT <runprog/interfaceweights>
-
-
+        MAKE_WDAT <runprog/weights>

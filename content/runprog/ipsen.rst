@@ -4,7 +4,7 @@ IPSEN3D
 This program calculates the sensitivity matrix for the inversion of IP data. Command line usage:
 
 .. code-block:: rst
-        ipsen3d ipsen.inp [nThread]
+    ipsen3d ipsen.inp [nThread]
 
 where nThread is an optional integer argument to specify the number of OpenMP threads to use for the parallelization. If this value is missing, IPSEN3D will use the maximum number of threads based on the processor. The input file, ipsen.inp is described below.
 
@@ -50,6 +50,14 @@ tol
 
 vec
     Specifies how solution vectors are to be stored in the computer's memory. Use -1 to store all vectors in memory.
+
+**NOTE**: Formats of the files listed in this control file are explained :ref:`here <fileformats>`.
+
+**NOTE**: A sample input file can be obtained by executing the following line in the command prompt:
+
+.. code-block:: rst
+
+        ipsen3d -inp
 
 Output Files
 ------------
