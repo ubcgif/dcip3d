@@ -4,6 +4,7 @@ IPSEN3D
 This program calculates the sensitivity matrix for the inversion of IP data. Command line usage:
 
 .. code-block:: rst
+
     ipsen3d ipsen.inp [nThread]
 
 where nThread is an optional integer argument to specify the number of OpenMP threads to use for the parallelization. If this value is missing, IPSEN3D will use the maximum number of threads based on the processor. The input file, ipsen.inp is described below.

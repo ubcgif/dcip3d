@@ -6,6 +6,7 @@ IPInv3D
 This program performs the inversion of induced polarization data. Command line usage:
 
 .. code-block:: rst
+
         ipinv3d ipinv.inp
 
 For the control file ``ipinv.inp`` described below.
@@ -54,7 +55,7 @@ lengths
 
         .. math::
                 L_x = \sqrt{\frac{\alpha_x}{\alpha_s}}; L_y = \sqrt{\frac{\alpha_y}{\alpha_s}}; L_z = \sqrt{\frac{\alpha_z}{\alpha_s}}
-                :label: length_scale
+                :label: length_scale_ip
 
         where length scales are defined in meters. When user-defined, it is preferable to have length scales exceed the corresponding cell dimensions.
 

@@ -77,6 +77,7 @@ itol,eps
                 1. itol=1: program calculates the relative threshold and eps is the relative reconstruction error of the sensitivity. A reconstruction error of 0.05 is usually adequate.
 
                 2. itol=2: the user defines the threshold level and eps is the relative threshold to be used. If null is entered on this line, a default relative reconstruction error of 0.05 (e.g. 5%) is used and the relative threshold level is calculated (i.e., itol=1, eps=0.05).
+
         The detailed explanation of threshold level and reconstruction error can be found in Section 2.6 of this manual.
 
 weight
