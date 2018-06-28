@@ -30,7 +30,7 @@ and appropriate  boundary  conditions.	In Equation :eq:`DC`, :math:`\sigma` is  
 
 When the earth material is chargeable, the measured voltage will change with time and reach a limit value which is denoted by :math:\phi_\eta: in :numref:`potentials`. There are a multitude of microscopic polarization phenomena which when combined produce this response but all of these effects can be consolidated into a single macroscopic parameter called chargeability. We denote chargeability by the symbol :math:`\eta`. Chargeability is dimensionless, positive, and confined to the region [0,1).
 
-To carry out forward modelling to compute :math:`\phi_{\eta}`, we adopt the formulation of :cite:`Siegel1959` which states that the effect of a chargeable ground is modelled by using the DC resistivity forward mapping :math:`\mathcal{F}_{dc}` but with the conductivity replaced by :math:`\sigma=\sigma(1-\eta)`. Thus:
+To carry out forward modelling to compute :math:`\phi_{\eta}`, we adopt the formulation of :cite:`seigel1959mathematical` which states that the effect of a chargeable ground is modelled by using the DC resistivity forward mapping :math:`\mathcal{F}_{dc}` but with the conductivity replaced by :math:`\sigma=\sigma(1-\eta)`. Thus:
 
 .. math::
         \phi_\eta=\mathcal{F}_{dc}[\sigma(1-\eta)]
@@ -63,7 +63,7 @@ The distribution of conductivity and chargeability in the earth can be extremely
 Forward modelling
 -----------------
 
-The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`DeyMorrison1979` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
+The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`dey1979resistivity` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
 
 .. math::
         \mathbf{d_{ip}} = \mathbf{J}_{ip} \eta
@@ -129,7 +129,7 @@ The goal of the inversion is to recover a model vector :math:`\mathbf{m} = (m_1,
         \mbox{s. t. } \Phi_{d}=\Phi_{d}^* \text{and optionally} ~ m^l\leq m\leq m^u, \nonumber
         :label: globphi
 
-where :math:`\beta` is a trade-off parameter that controls the relative importance of the model smoothness through the model objective function and data misfit function. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value  d and we will search for the value of :math:`\beta` via an L-curve criterion :cite:`Hansen2000` that produces the expected misfit at each linearized step (see section 2.4). Otherwise, a user-defined value is used. Bound are imposed through the projected gradient method so that the recovered model lies between imposed lower :math:`\mathbf{m}^l` and upper :math:`\mathbf{m}^u` bounds.
+where :math:`\beta` is a trade-off parameter that controls the relative importance of the model smoothness through the model objective function and data misfit function. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value  d and we will search for the value of :math:`\beta` via an L-curve criterion :cite:`hansen2000curve` that produces the expected misfit at each linearized step (see section 2.4). Otherwise, a user-defined value is used. Bound are imposed through the projected gradient method so that the recovered model lies between imposed lower :math:`\mathbf{m}^l` and upper :math:`\mathbf{m}^u` bounds.
 
 The details of the objective function are problem dependent but generally we need the flexibility to be close to a reference model :math:`\mathbf{m}_o` and also require that the recovered model be relatively smooth in all three spatial directions. Here we adopt a right-handed Cartesian coordinate system with :math:`y` positive north and and :math:`z` positive up. In defining the model objective function, the reference model will generally be included in the first component of the objective function but it can be removed, if desired, from the remaining derivative terms since we are often more confident in specifying the value of the model at a particular point than in supplying an estimate of the gradient. This leads to the following two distinct formulations of the model objective function.
 
@@ -176,7 +176,7 @@ Having chosen an appropriate model objective function the next step in setting u
 
 and assume that the contaminating noise in the data is independent and Gaussian with zero mean. Specifying :math:`\mathbf{W}_d` to be a diagonal datum weighting matrix whose :math:`i^{th}` element is :math:`1/\epsilon_i`, where :math:`\epsilon_i` is the standard deviation of the :math:`i^{th}` datum, makes :math:`\Phi_d` a chi-squared variable distributed with :math:`N` degrees of freedom. Accordingly :math:`E[\chi^2]=N` provides a target misfit for the inversion. We now have the components to solve the inversion as defined in equation :eq:`globphi`.
 
-To solve the optimization problem when constraints are imposed we use the projected gradients method (:cite:`Calamai1987`; :cite:`Vogel2002`). This technique forces the gradient in the Krylov sub-space minimization (in other words a step during the conjugate gradient process) to zero if the proposed step would make a model parameter exceed the bound constraints. The result is a model that reaches the bounds, but does not exceed them.
+To solve the optimization problem when constraints are imposed we use the projected gradients method (:cite:`calamai1987projected` ; :cite:`vogel2002computational` ). This technique forces the gradient in the Krylov sub-space minimization (in other words a step during the conjugate gradient process) to zero if the proposed step would make a model parameter exceed the bound constraints. The result is a model that reaches the bounds, but does not exceed them.
 
 
 Inversion of DC resistivity data
@@ -258,7 +258,7 @@ where
 
 is the sensitivity matrix.
 
-The general problem takes the form of d = Jm and can be solved as described in section 2.3. Bound constraints (e.g., positivity) for IP are imposed through projected gradients (:cite:`Calamai1987`; :cite:`Vogel2002`). The sensitivity matrix is dense and thus wavelets are used for compression.
+The general problem takes the form of d = Jm and can be solved as described in section 2.3. Bound constraints (e.g., positivity) for IP are imposed through projected gradients (:cite:`calamai1987projected` ; :cite:`vogel2002computational` ). The sensitivity matrix is dense and thus wavelets are used for compression.
 
 Wavelet Compression of Sensitivity Matrix
 -----------------------------------------
