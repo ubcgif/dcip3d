@@ -30,7 +30,7 @@ and appropriate  boundary  conditions.	In Equation :eq:`DC`, :math:`\sigma` is  
 
 When the earth material is chargeable, the measured voltage will change with time and reach a limit value which is denoted by :math:\phi_\eta: in :numref:`potentials`. There are a multitude of microscopic polarization phenomena which when combined produce this response but all of these effects can be consolidated into a single macroscopic parameter called chargeability. We denote chargeability by the symbol :math:`\eta`. Chargeability is dimensionless, positive, and confined to the region [0,1).
 
-To carry out forward modelling to compute :math:`\phi_{\eta}`, we adopt the formulation of :cite:`Siegel1959` which states that the effect of a chargeable ground is modelled by using the DC resistivity forward mapping :math:`\mathcal{F}_{dc}` but with the conductivity replaced by :math:`\sigma=\sigma(1-\eta)`. Thus:
+To carry out forward modelling to compute :math:`\phi_{\eta}`, we adopt the formulation of :cite:`seigel1959mathematical` which states that the effect of a chargeable ground is modelled by using the DC resistivity forward mapping :math:`\mathcal{F}_{dc}` but with the conductivity replaced by :math:`\sigma=\sigma(1-\eta)`. Thus:
 
 .. math::
         \phi_\eta=\mathcal{F}_{dc}[\sigma(1-\eta)]
@@ -63,7 +63,7 @@ The distribution of conductivity and chargeability in the earth can be extremely
 Forward modelling
 -----------------
 
-The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`DeyMorrison1979` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
+The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`dey1979resistivity` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
 
 .. math::
         \mathbf{d_{ip}} = \mathbf{J}_{ip} \eta
@@ -125,10 +125,11 @@ The inverse problem is formulated as an optimization problem where an objective 
 The goal of the inversion is to recover a model vector :math:`\mathbf{m} = (m_1,m_2,...,m_m)^T` , which acceptably reproduces the n observations of :math:`\mathbf{d}`. Importantly, the data are noise contaminated, therefore we don't want to fit them precisely. A perfect fit in our case would be indicative, that incorrect earth model is recovered, as some features observed in the constructed model would assuredly be artifacts of the noise. Therefore, the inverse problem is formulated as an optimization problem where a global objective function,  :math:`\Phi`, is minimized. The global objective functions consists of two components: a model objective function,  :math:`\Phi_m`, and a data misfit function, :math:`\Phi_d`, such that:
 
 .. math::
-        \text{min} \Phi   =  \Phi_d(\mathbf{m}) + \beta \Phi_m(\mathbf{m}) \\
-        \text{s. t.} \mathbf{m}^l \leq \mathbf{m} \leq \mathbf{m}^u;
+        \min \Phi = \Phi_d+\beta\Phi_m \\
+        \mbox{s. t. } \Phi_{d}=\Phi_{d}^* \text{and optionally} ~ m^l\leq m\leq m^u, \nonumber
+        :label: globphi
 
-where :math:`\beta` is a trade-off parameter that controls the relative importance of the model smoothness through the model objective function and data misfit function. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value  d and we will search for the value of :math:`\beta` via an L-curve criterion :cite:`Hansen2000` that produces the expected misfit at each linearized step (see section 2.4). Otherwise, a user-defined value is used. Bound are imposed through the projected gradient method so that the recovered model lies between imposed lower :math:`\mathbf{m}^l` and upper :math:`\mathbf{m}^u` bounds.
+where :math:`\beta` is a trade-off parameter that controls the relative importance of the model smoothness through the model objective function and data misfit function. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value  d and we will search for the value of :math:`\beta` via an L-curve criterion :cite:`hansen2000curve` that produces the expected misfit at each linearized step (see section 2.4). Otherwise, a user-defined value is used. Bound are imposed through the projected gradient method so that the recovered model lies between imposed lower :math:`\mathbf{m}^l` and upper :math:`\mathbf{m}^u` bounds.
 
 The details of the objective function are problem dependent but generally we need the flexibility to be close to a reference model :math:`\mathbf{m}_o` and also require that the recovered model be relatively smooth in all three spatial directions. Here we adopt a right-handed Cartesian coordinate system with :math:`y` positive north and and :math:`z` positive up. In defining the model objective function, the reference model will generally be included in the first component of the objective function but it can be removed, if desired, from the remaining derivative terms since we are often more confident in specifying the value of the model at a particular point than in supplying an estimate of the gradient. This leads to the following two distinct formulations of the model objective function.
 
@@ -142,9 +143,9 @@ The details of the objective function are problem dependent but generally we nee
         &&\alpha_y\int\int w_y\left(\frac{\partial{\mathbf{m}}}{\partial y}\right)^2 dv + \alpha_z\int\int\ w_z\left(\frac{\partial{\mathbf{m}}}{\partial z}\right)^2dv,
         :label: mof2
 
-where the weighting functions :math:`w_s`, :math:`w_x`, :math:`w_y` and :math:`w_z` are spatially dependent, and :math:`\alpha_s`, :math:`\alpha_x`, :math:`\alpha_y` and :math:`\alpha_z` are coefficients which affect the relative importance of different components in the model objective function. The reference model :math:`m_o` may be a general background model that is estimated from previous investigations or it could be a zero model.
+where the weighting functions :math:`w_s`, :math:`w_x`, :math:`w_y` and :math:`w_z` are spatially dependent, and :math:`\alpha_s`, :math:`\alpha_x`, :math:`\alpha_y` and :math:`\alpha_z` are coefficients which affect the relative importance of different components in the model objective function. The reference model :math:`m_o` may be a general background model that is estimated from previous investigations or it could be a zero model. The purpose of the generalized weighting functions are to place emphasis throughout the model to utilize prior information.
 
-The model objective function in Equation :eq:`mof1` is used when the ``SMOOTH_MOD_DIF`` option is selected in the inversion input control file while Equation :eq:`mof2` is used when the ``SMOOTH_MOD`` option is selected in the inversion input control file. The choice of whether or not to include :math:`m_o` in the derivative terms can have significant effect on the recovered model.
+The objective function in equations :eq:`mof1` and :eq:`mof2` has the flexibility to incorporate many types of prior knowledge into the inversion. The reference model may be a general background model (e.g., background conductivity) that is estimated from previous investigations or it will be a zero model (in terms of chargeability). The reference model would generally be included in the first component of the objective function but it can be removed if desired from the remaining terms; often we are more confident in specifying the value of the model at a particular point than in supplying an estimate of the gradient.
 
 The relative closeness of the final model to the reference model at any location is controlled by the function :math:`w_s`. For example, if the interpreter has high confidence in the reference model at a particular region, he can specify :math:`w_s` to have increased amplitude there compared to other regions of the model. The interface weighting functions :math:`w_x`, :math:`w_y`, and :math:`w_z` can be designed to enhance or attenuate structures in various regions in the model domain. If geology suggests a rapid transition zone in the model, then a decreased weighting for flatness can be put there and the constructed model will exhibit higher gradients provided that this feature does not contradict the data.
 
@@ -173,33 +174,10 @@ Having chosen an appropriate model objective function the next step in setting u
         \Phi_d = \left\| \textbf{W}_d(\textbf{d}-\textbf{d}^{obs})\right\|^2_2
         :label: phid
 
-and assume that the contaminating noise in the data is independent and Gaussian with zero mean. Specifying :math:`\mathbf{W}_d` to be a diagonal datum weighting matrix whose :math:`i^{th}` element is :math:`1/\epsilon_i`, where :math:`\epsilon_i` is the standard deviation of the :math:`i^{th}` datum, makes :math:`\Phi_d` a chi-squared variable distributed with :math:`N` degrees of freedom. Accordingly :math:`E[\chi^2]=N` provides a target misfit for the inversion.
+and assume that the contaminating noise in the data is independent and Gaussian with zero mean. Specifying :math:`\mathbf{W}_d` to be a diagonal datum weighting matrix whose :math:`i^{th}` element is :math:`1/\epsilon_i`, where :math:`\epsilon_i` is the standard deviation of the :math:`i^{th}` datum, makes :math:`\Phi_d` a chi-squared variable distributed with :math:`N` degrees of freedom. Accordingly :math:`E[\chi^2]=N` provides a target misfit for the inversion. We now have the components to solve the inversion as defined in equation :eq:`globphi`.
 
-The inverse problem is solved by finding a model m which minimizes :math:`\phi_m` and misfits the data by a pre-determined amount. Thus the solution is obtained by the following minimization problem of a global objective function :math:`\phi`,
+To solve the optimization problem when constraints are imposed we use the projected gradients method (:cite:`calamai1987projected` ; :cite:`vogel2002computational` ). This technique forces the gradient in the Krylov sub-space minimization (in other words a step during the conjugate gradient process) to zero if the proposed step would make a model parameter exceed the bound constraints. The result is a model that reaches the bounds, but does not exceed them.
 
-.. math::
-        \min \Phi = \Phi_d+\beta\Phi_m \\
-        \mbox{s. t. } \Phi_{d}=\Phi_{d}^* \text{and optionally} ~ m^l\leq m\leq m^u, \nonumber
-        :label: globphi
-
-where :math:`\beta` is a trade-off parameter that controls the relative importance of the model norm and data misfit. When the standard deviations of data errors are known, the acceptable misfit is given by the expected value :math:`\phi_{d}^*`. In general, each parameter in the recovered model (:math:`\mathbf{m}`) lies within its respective lower (:math:`\mathbf{m}^l`) and upper (:math:`\mathbf{m}^u`) bound. Chargeability is positive by definition so bounds are used in all IP inversions to implement the positivity constraint.
-
-The choice of the regularization parameter :math:`\beta` in the DC resistivity or IP inversion ultimately depends  upon the magnitude of the error associated with the data. The inversion of noisier data requires heavier regularization, thus a larger value of :math:`\beta` is required. Since the inversion of DC resistivity data is nonlinear, it is also important need to avoid the possibility of getting trapped in a local minima. The following strategy is implemented to determine an adequate :math:`\beta` in the program library DCIP3D.
-
-For known uncertainty distributions, the expected value of :math:`\phi_d` is easily calculated. For example, independent data with Gaussian noise of zero mean has an expected target misfit (:math:`\phi_{d}^*`) of :math:`N` number of data. The value of :math:`\beta` should be such that the expected misfit is  achieved.
-
-A line search based on the misfit curve as a function of beta is performed to approximate the optimal value of :math:`\beta`. Due to the high computational expense associated with the inversion, we generally cannot afford to perform the line search by carrying out complete solutions for a series of :math:`\beta`'s. Starting with a sufficiently large value of :math:`\beta` ensures that the line search will successfully find an appropriate value while avoiding the computational expense of a full line search.
-
-By reducing :math:`\beta` by a fixed factor and performing one or two Gauss-Newton updates (which brings the recovered model close to its final solution for that :math:`\beta`) for each value in the decreasing sequence it is possible to determine a general range for the optimal :math:`\beta` value. Once this range is established the inversion is run to convergence for a few :math:`\beta` values using the recovered model from a nearby :math:`\beta` value inversion as the initial model for the next inversion. This greatly reduces the computational expense, by limiting the number of iterations required for convergence. The way optimal :math:`\beta` value determined using the same basic strategy in both the DC and IP inversion codes. The only difference is that which the DC inversion we need to factor the forward modeling matrix every time that the conductivity model is updated, while in the IP case, only one (initial) factorization is required. The pseudo-code for computing the optimal :math:`\beta` is shown in :numref:`chart`.
-
-.. figure:: ../images/chart.png
-        :align: center
-        :name: chart
-        :figwidth: 75%
-
-        Pseudo-code describing the DC/IP inversion algorithm.
-
-This inversion methodology provides a basic framework for solving a 3D geophysical inversion with arbitrary observation locations. The basic components are: the forward modelling operator, a model objective function that incorporates information about the reference model, a data misfit function, a trade-off parameter that ultimately determines how well the data will be reproduced, and an optimization algorithm that minimizes an objective function, subject to optional bound constraints. The specifics of the DC and IP data inversion are discussed in the following sections.
 
 Inversion of DC resistivity data
 --------------------------------
@@ -238,7 +216,7 @@ In these formulations we assume that the matrix :math:`\mathbf{W}_d` has been ab
 
 where :math:`\alpha` in (0,1] limits the step size and is chosen to ensure that the total objective function is reduced.
 
-The major computational effort in this approach includes the calculation of the sensitivity matrix, solution of the basic linearized Equation :eq:`solution`, and the choice of regularization parameter :math:`\beta`. The sensitivity is computed using the standard adjoint equation approach, and Equation :eq:`solution` or :eq:`solution2` is solved using a pre-conditioned conjugate gradient (CG) technique.
+The major computational effort in this approach includes the calculation of the sensitivity matrix, solution of the basic linearized Equation :eq:`solution`, and the choice of regularization parameter :math:`\beta`. The sensitivity is computed using the standard adjoint equation approach, and Equation :eq:`solution` or :eq:`solution2` is solved using a pre-conditioned conjugate gradient (CG) technique, in which the sensitivity matrix :math:`\mathbf{J}` is applied to vectors by sparse multiplications in the wavelet domain after it is compressed using fast wavelet transform.
 
 Inversion of IP data
 --------------------
@@ -270,21 +248,17 @@ Thus the :math:`i^{th}` datum (either secondary potential or apparent chargeabil
 where
 
 .. math::
+        J_{ij} =
         \left\{ \begin{array}{cl}
         \frac{\partial \phi_i \left[ \sigma \right]}{\partial ln\sigma_j}, &\mathbf{d}=\phi_s\\
         \\
         \frac{\partial ln\phi_i\left [ \sigma \right ]}{\partial ln\sigma_j},& \mathbf{d}=\eta_a
-        \end{array}\right\}
+        \end{array}
         :label: Jij
 
-is the sensitivity matrix. Our inverse problem is formulated as:
+is the sensitivity matrix.
 
-.. math::
-        \min \phi_m=\left \| \mathbf{W}_m(\eta-\eta_0) \right \|^2 \nonumber \\
-        \mbox{s. t. } \phi_{d}=\phi_{d}^* \\ \text{and} \\ \eta\geq 0
-        :label: inversion
-
-where :math:`\phi_d^{*}` is a target misfit. Again, for ease of future notation we incorporate the diagonal weighting matrix (:math:`\mathbf{W}_d`)  into :math:`\mathbf{J}` and :math:`\mathbf{d}`. In practice the true conductivity :math:`\sigma` is not known and so we must  use the conductivity found from the inversion of the DC resistivity data to construct the sensitivity matrix elements in Equation :eq:`Jij`.
+The general problem takes the form of d = Jm and can be solved as described in section 2.3. Bound constraints (e.g., positivity) for IP are imposed through projected gradients (:cite:`calamai1987projected` ; :cite:`vogel2002computational` ). The sensitivity matrix is dense and thus wavelets are used for compression.
 
 Wavelet Compression of Sensitivity Matrix
 -----------------------------------------
