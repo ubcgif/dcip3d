@@ -1,4 +1,4 @@
-.. _ipinv:
+.. _ipinv_example:
 
 IP Inversion
 ============

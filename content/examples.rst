@@ -34,6 +34,6 @@ website (without the exe files). The example is synthetic and is a :math:`10 \Om
 
         DC Forward Modeling <exeprism/dcfor>
         IP Forward Modeling <exeprism/ipfor>
-        DC inversion <exeprism/dcinv>
-        IP inversion <exeprism/ipinv>
+        DC inversion <exeprism/dcinv_example>
+        IP inversion <exeprism/ipinv_example>
         Version Comparison <exeprism/versioncomparison>

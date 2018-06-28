@@ -1,4 +1,4 @@
-.. _dcinv:
+.. _dcinv_example:
 
 DC Inversion
 ============
