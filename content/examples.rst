@@ -3,14 +3,14 @@
 Introduction
 ============
 
-.. figure:: ../images/example_model_DC.png
+.. figure:: ../images/example_model_DC.PNG
         :name: dcmodel
         :align: center
         :figwidth: 50%
 
         Pyramid topographic model of a used for DC forward modelling and the inversion examples. The block is a :math:`10 \Omega m~(0.1 S/m)` block in a :math:`1000 \Omega m~(0.001 S/m)` half-space. The colour scale is in S/m. The electrode locations are shown in white.
 
-.. figure:: ../images/example_model_IP.png
+.. figure:: ../images/example_model_IP.PNG
         :name: ipmodel
         :align: center
         :figwidth: 50%
