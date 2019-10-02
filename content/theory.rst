@@ -249,11 +249,13 @@ where
 
 .. math::
         J_{ij} =
-        \left\{ \begin{array}{cl}
-        \frac{\partial \phi_i \left[ \sigma \right]}{\partial ln\sigma_j}, &\mathbf{d}=\phi_s\\
+        \left\{
+        \begin{array}{cl}
+        \frac{\partial \phi_i \left[ \sigma \right]}{\partial ln\sigma_j}, \mathbf{d}=\phi_s\\
         \\
-        \frac{\partial ln\phi_i\left [ \sigma \right ]}{\partial ln\sigma_j},& \mathbf{d}=\eta_a
+        \frac{\partial ln\phi_i\left [ \sigma \right ]}{\partial ln\sigma_j}, \mathbf{d}=\eta_a
         \end{array}
+        \right\}
         :label: Jij
 
 is the sensitivity matrix.
@@ -276,7 +278,7 @@ applying the transform to each row of :math:`\mathbf{J}` and forming a new matri
 where :math:`\tilde{\mathbf{J}}` is the transformed matrix. The thresholding is applied to individual rows of :math:`\mathbf{J}` by the following rule to form the sparse representation :math:`\tilde{\mathbf{J}}^S`:
 
 .. math::
-        {\tilde{f{J}}_{ij}}^s =
+        {\tilde{{J}}_{ij}}^s =
         \left\{ \begin{array}{cl}
         {\tilde{{J}}_{ij}} \text{ if } |{\tilde{{J}}_{ij}}| \geq \delta_i
         \\
