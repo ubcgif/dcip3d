@@ -22,9 +22,9 @@ W.S\ :math:`_{i}`
         Cell weight for the :math:`i^{th}` cell of the smallest model component in the :ref:`model objective function <mof>`.
 
 M
-        The total number of cells in the model and its associated mesh (either octree or tensor).
+        The total number of cells in the model and its associated mesh.
 
-Within each part, the values are ordered in the same way as in :ref:`model file <modelFile>`, however, they can be all on one line, or broken up over several lines. 
+Within each part, the values are ordered in the same way as in :ref:`model file <modelFile>`, however, they can be all on one line, or broken up over several lines.
 
 If the topography surface is supplied, the cell weights above the surface will be ignored. It is recommended that these weights be assigned a value of ``-1.0`` to avoid confusion. If ``NO_WEIGHT`` is given in the input files instead of the weights file, then all of the cell weights will be set equal (``1.0``).
 

@@ -23,7 +23,7 @@ The initial research underlying this program library was funded principally by t
 DCIP3D program library content
 ------------------------------
 
-The package that can be licensed includes the following executable programs for performing forward modelling, and inversion of 3D DC resistivity or induced polarization (IP) surveys. Additional functionality is included in supplementary utility programs, which can be used to create and refine octree meshes, calculate octree cell centres, remesh octree models, create weighting files, and convert octree model to non-octree model or vise-versa on both: Windows and Linux platforms. The package contains the following programs:
+The package that can be licensed includes the following executable programs for performing forward modelling, and inversion of 3D DC resistivity or induced polarization (IP) surveys. Additional functionality is included in supplementary utility programs, which can be used to create weighting files on both Windows and Linux platforms. The package contains the following programs:
 
 - ``DCIPF3D``: Forward model conductivity/chargeability models to calculate data.
 - ``DCINV3D``: Invert 3D DC data to develop a conductivity models using a Gauss-Newton method
