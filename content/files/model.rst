@@ -17,7 +17,7 @@ This file contains the cell values of the conductivity or chargeability model. T
         Chargeability of the :math:`i^th` cell. The chargeability is typically unitless. Since chargeability ranges between [0,1), a positivity constraint should be applied.
 
 :math:`M`
-        The total number of cells in the model and its associated mesh (either octree or tensor).
+        The total number of cells in the model and its associated mesh.
 
 
 
