@@ -1,3 +1,5 @@
+.. important:: In March of 2020, a new version of DCIP3D was released. The latest version has slightly different input files. We will provide documentation for the input files for current and past versions.
+
 DCIP3D package
 ==============
 

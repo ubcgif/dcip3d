@@ -1,5 +1,7 @@
 .. _dcinv:
 
+.. important:: In March of 2020, a new version of DCIP3D was released. The latest version has slightly different input files. We will provide documentation for the input files for current and past versions.
+
 DCInv3D
 ===========
 
@@ -11,14 +13,29 @@ DCInv3D
 
 where nThread is an optional integer argument to specify the number of OpenMP threads to use for the parallelization. If this value is missing, ``DCINV3D`` will use the maximum number of threads based on the processor. The input file, dcinv.inp is described below.
 
-Control parameters and input files
+Input file for version 5.5 and later
+------------------------------------
+
+As a command line argument, ``DCInv3D`` requires an input file containing all parameters and files needed to carry out the inversion. Below, we show the input file format for DCIP3D version 5.5 and later.
+
+.. figure:: ../../images/dcinv_new.PNG
+        :figwidth: 75%
+        :align: center
+
+
+Input file for versions before 5.5
 ----------------------------------
 
-As a command line argument, ``DCInv3D`` requires an input file containing all parameters and files needed to carry out the inversion. The following shows the required format:
+As a command line argument, ``DCInv3D`` requires an input file containing all parameters and files needed to carry out the inversion. Below, we show the input file format for DCIP3D versions **before** 5.5.
 
 .. figure:: ../../images/dcinv.PNG
         :figwidth: 75%
         :align: center
+
+
+
+Parameter Definitions
+---------------------
 
 maxit,irest
         Two integers containing the maximum number of Gauss-newton iterations to be performed (maxit) and how to start the inversion. There are two choices for irest:
@@ -83,11 +100,14 @@ itol,eps
 weight
         Name of the file containing weighting matrix. If null is entered, the default value of one is used for no extra weighting.
 idisk
-        Integer flag of zero or one to write the sensitivities to disk
+        Integer flag of zero or one to write the sensitivities to disk. This functionality was rendered obsolete in version 5.5
 
                 1. idisk=0: Store the entire sensitivity matrix in memory. This option will be desired in almost all cases.
 
                 2. idisk=1: Access the sensitivity matrix from memory when needed
+
+constr
+        This functionality was introduced in version 5.5. SMOOTH_MOD runs the inversion without implementing a reference model (essential mref=0). “SMOOTH_MOD_DIF” constrains the inversion in the smallness and smoothness terms using a reference model.
 
 tol
         This value indicates how well the forward modelled system is solved (1e-5 is a standard input)
@@ -136,8 +156,8 @@ check sign.txt
         This file will prompt the user to check the sign of specific observed potentials after brief data checks. It may or may not be created.
 
 
-Example files
--------------
+Example file for dcinv3d v 5.5
+------------------------------
 
 Below is an example of the input file ``dcinv.inp``. It will start from scratch and stop after 40 iterations if the desired misfit is not achieved. The desired misfit is the number of data and the program will compute the trade-off parameter. The reference and initial models are the best fitting half space. There are bounds throughout the model with the lowest bound of 1e-8 S/m and the upper bound of 0.1 S/m.
 

@@ -2,6 +2,7 @@
 
 DC Inversion
 ============
+
 The data created in section 5.2.1 are contaminated with 5% Gaussian noise. The uncertainties are estimated at 5% and a  oor of 0.0001 Volts. In this case, we know the true datamisfit that should be achieved is near the number of data, therefore we select ``mode=1`` to have ``DCINV3D`` perform a line search to choose the appropriate trade-off parameter. The parameter will be 1.0 to signify 48 that the datamisfit is n number of data. The minimum file requirements for ``DCINV3D`` is just the data file. In this case, we will choose not to use bounds. However, we will use the w.dat that was created when discretizing the topography. We will cap the inversion at 40 iterations. We will use the default reference model (best fitting half-space) and initial model (same as the reference model). The inversion starts from scratch so ``irest=0`` is given. The new incorporation of bounds is useful in real-life situations where there is down-hole mea- surements that often have additional conductivity measurements from well logs. Soft constraints, such as the reference model and weighting file would attempt to enforce the values the geophysicist has chosen from the well log information (which would need to be discretized onto the mesh). The user could also use hard constraints on the inversion by incorporating bounds or by using a reference model in combination of an active cells file where the cells located along the borehole are inactive (i.e., set to 0 in the active file).
 
 The inversion of the DC data is run by using the command
@@ -10,7 +11,15 @@ The inversion of the DC data is run by using the command
 
     dcinv3d dcinv.inp
 
-where the input file, ``dcinv.inp`` looks like the following:
+For version 5.5 and later, the input file ``dcinv.inp`` looks like the following:
+
+.. figure:: ../../images/dcinvinp_new.png
+        :name: dcinvinp_new
+        :figwidth: 75%
+        :align: center
+
+
+For versions before 5.5, the input file would look like (**version 5.0 was used to create this example**):
 
 .. figure:: ../../images/dcinvinp.png
         :name: dcinvinp

@@ -2,6 +2,7 @@
 
 IP Inversion
 ============
+
 The data created in section 5.2 are contaminated with 5% Gaussian noise. The uncertainties are estimated at 5% and a floor of 0.0001. We first must create the sensitivity matrix by running ``IPSEN3D``. This is done via the command line:
 
 .. code-block:: rst
@@ -28,7 +29,15 @@ As with the DC, we know the true data misfit that should be achieved is near the
 
         ipinv3d ipinv.inp
 
-where the input file ipinv.inp is
+For version 5.5 and later, the input file ``ipinv.inp`` looks like the following:
+
+.. figure:: ../../images/ipinvinp_new.png
+        :name: ipinvinp_new
+        :figwidth: 75%
+        :align: center
+
+
+For versions before 5.5, the input file would look like (**version 5.0 was used to create this example**:
 
 .. figure:: ../../images/ipinvinp.png
         :name: ipinvinp

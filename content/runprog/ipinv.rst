@@ -1,5 +1,8 @@
 .. _ipinv:
 
+
+.. important:: In March of 2020, a new version of DCIP3D was released. The latest version has slightly different input files. We will provide documentation for the input files for current and past versions.
+
 IPInv3D
 ===========
 
@@ -11,30 +14,59 @@ This program performs the inversion of induced polarization data. Command line u
 
 For the control file ``ipinv.inp`` described below.
 
-Control parameters and input files
+Input file for version 5.5 and later
+------------------------------------
+
+The input file for *ipinv3d* versions 5.5 and later is as follows:
+
+.. figure:: ../../images/ipinv_new.PNG
+        :figwidth: 75%
+        :align: center
+
+
+
+
+Input file for versions before 5.5
 ----------------------------------
 
-The bounds for version 5.0 have NOT been added for IP data inversion. Positivity is enforced through the log-barrier method. The format for the main IP inversion input file is:
+The bounds for versions before 5.5 have NOT been added for IP data inversion. Positivity is enforced through the log-barrier method. The format for the main IP inversion input file in this case is:
 
 .. figure:: ../../images/ipinv.PNG
         :figwidth: 75%
         :align: center
 
+
+Parameter Definitions
+---------------------
+
+
 irest
-        An integer specifying how to start the inversion. There are two choices:
+        An integer specifying how to start the inversion. This functionality is no long relevant in version 5.5. There are two choices:
 
         1. irest=0 Begins the inversion from scratch
 
         2. irest=1 Restarts the inversion from a previous iteration. The files ``ipinv3d.aux`` and ``ipinv3d.eta`` must be present for this option.
 
-mode,par
+mode
         An integer specifying one of the two choices for determining the trade-off parameter (a real value):
 
-                1. mode=1: the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (e.g.,  :math:`\phi_d= N`). the target misfit value is given by the product of par and the number of data, N. Normally, the value of par should be 1.0 if the correct standard deviation of error is assigned to each datum.
+                1. mode=1: the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (e.g.,  :math:`\phi_d= N`). The target misfit is determined by the *par* parameter.
 
-                2. mode=2: the user inputs the trade off parameter as defined by par.
+                2. mode=2: the user inputs the trade off parameter as defined by *par*.
 
-                3. mode=3: the program calculates the trade-off parameter using generalized cross validation (GCV) and par is ignored
+                3. mode=3: the program calculates the trade-off parameter using generalized cross validation (GCV) and *par* is ignored
+
+
+par
+        Specifies the stopping criteria for the inversion:
+
+                1. If *mode* is set to equal 1, then the target misfit value is given by the product of *par* and the number of data, N. Normally, the value of *par* should be 1.0 if the correct standard deviation of error is assigned to each datum.
+
+                2. If *mode* is set to equal 2, the *par* defines the trade off parameter.
+
+
+tolc
+        If *mode* is set to equal 1, then *par* is used to set the target misfit. The *tolc* parameter gives us some 'wiggle room' for the target misfit. If we let *par* = 1 and *tolc* = 0.2, then we are saying the target misfit is somewhere within the number of data time 1 +/- 0.2.
 
 data
         The DC observation locations (with standard deviations).
@@ -111,6 +143,17 @@ ipinv3d.chg
 
 Example files
 -------------
+
+**Version 5.5 and later**
+
+This example of an IP inversion input file starts the inversion from scratch and performs a line search find the trade-off parameter. The sensitivity matrix file was renamed to ``diffTol.mtx`` so the use new that they had used a different tolerance (and so they could switch to the other matrix file without re-running ``IPSEN3D``). The initial model is set to null and depends upon the IP data type. The ref rence model was zero. Length scales were given to drive the recovered chargeabilities to more layered geometry. Additional weighting was applied through the file ``w.dat``, supplied by the user. Bounds were used to recover chargeabilities between 0 and 1.
+
+.. figure:: ../../images/ipinvexample_new.PNG
+        :figwidth: 75%
+        :align: center
+
+
+**Before version 5.5**
 
 This example of an IP inversion input file starts the inversion from scratch and performs GCV to find the trade-off parameter. The sensitivity matrix file was renamed to ``diffTol.mtx`` so the use new that they had used a different tolerance (and so they could switch to the other matrix file without re-running ``IPSEN3D``). The initial model is set to null and depends upon the IP data type. The ref rence model was zero. Length scales were given to drive the recovered chargeabilities to more layered geometry. Additional weighting was applied through the file ``w.dat``, supplied by the user.
 
