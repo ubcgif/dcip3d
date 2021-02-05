@@ -111,7 +111,7 @@ And the apparent chargeabilities are given by:
 
 
 Linearized IP Problem
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 In Version 5.0 we included the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
 
@@ -127,7 +127,7 @@ where :math:`\mathbf{d_{ip}}` is the IP data and :math:`\mathbf{J}_{ip}` is the 
 
 
 Mesh Design and Source Discretization
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To handle a current electrode that is at an arbitrary position :math:`(x_s; y_s; z_s)` in the cell we made a modification to distribute any current amongst the 8 nodes of the cell. This approach is shown in Figure 3, where a current I is distributed onto nodes P1 through P8. Effectively, we write
 
