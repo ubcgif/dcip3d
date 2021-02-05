@@ -63,7 +63,57 @@ The distribution of conductivity and chargeability in the earth can be extremely
 Forward modelling
 -----------------
 
-The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`dey1979resistivity` and a pre-conditioned conjugate gradient technique to solve Equation :eq:`DC`. The program that performs these calculations is ``DCIPF3D``. The DC modelling is performed by a single solution  of Equation :eq:`DC`. In Version 5.0 we include the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
+Discretized System
+^^^^^^^^^^^^^^^^^^
+
+The forward modelling for the DC potentials and IP apparent chargeabilities is accomplished using a finite volume method :cite:`DeyMorrison1979` and a pre-conditioned conjugate gradient technique.
+
+**For the DC problem**, :eq:`DC` is discretized and the electric potential on the nodes (:math:`\boldsymbol{\phi_\sigma}`) are computed by solving the following linear system:
+
+.. math::
+        \boldsymbol{[G^T M_{e\sigma} G ] \, \phi_\sigma} = \boldsymbol{q}
+        :label: DC_discretized
+
+where
+
+        - :math:`\boldsymbol{G}` is a discretize gradient operator whose transpose acts as a modified divergence operator
+        - :math:`\boldsymbol{M_{e\sigma}} = diag \big ( \boldsymbol{A_{ec}^T (v \odot \sigma)} \big )` where :math:`\boldsymbol{A_{ec}}` projects from edges to cell centers
+        - :math:`\boldsymbol{q}` is an integrated source term that lives on the nodes.
+
+Once the system is solved, a sparse projection matrix :math:`\mathbf{P}` maps the potentials on the nodes to the electrode positions and computes the data, i.e.:
+
+.. math::
+        \boldsymbol{d_{dc}} = \boldsymbol{P \phi_\sigma}
+
+
+**For the IP problem**, the secondary potential due to the IP is computed according to :eq:`potentialsdiff`. :math:`\phi_\eta` is obtained by replacing :math:`\sigma` with :math:`\sigma (1 - \eta)` in :eq:`DC_discretized`. Therefore:
+
+.. math::
+        \boldsymbol{[G^T M_{e\eta} G ] \, \phi_\eta} = \boldsymbol{q}
+        :label: IP_discretized
+
+where :math:`\boldsymbol{M_{e\eta}} = diag \big ( \boldsymbol{A_{ec}^T (v \odot \Delta\sigma )} \big )` such that :math:`\boldsymbol{\Delta \sigma} = \boldsymbol{\sigma \odot (1 - \eta)}`.
+
+Thus using :eq:`DC_discretized` and :eq:`IP_discretized`, the secondary potential at cell centers due to IP is:
+
+.. math::
+        \boldsymbol{\phi_s} = \boldsymbol{\phi_\eta - \phi_\sigma}
+
+The secondary potential data is given by:
+
+.. math::
+        \boldsymbol{d_{ip}} = \boldsymbol{P \phi_s}
+
+And the apparent chargeabilities are given by:
+
+.. math::
+        \boldsymbol{\eta_a} = \boldsymbol{P} \dfrac{\boldsymbol{\phi_\eta - \phi_\sigma}}{\boldsymbol{\phi_\eta}}
+
+
+Linearized IP Problem
+---------------------
+
+In Version 5.0 we included the option to calculate IP data by multiplying the sensitivity matrix :math:`\mathbf{J}` by the chargeability provide by user. That is, we forward model with the linear equations that will be used for the inve sion. The chargeability in this case can have arbitrary units. The forward modelled data are calculated as:
 
 .. math::
         \mathbf{d_{ip}} = \mathbf{J}_{ip} \eta
@@ -75,14 +125,9 @@ where :math:`\mathbf{d_{ip}}` is the IP data and :math:`\mathbf{J}_{ip}` is the 
         \mathbf{J}_{ip} = -\frac{\partial \ln \phi_{\eta}}{\partial \ln \sigma} = -\frac{1}{\sigma_{\eta}} \frac{\partial \phi_{\eta}}{\partial \ln \sigma} = -\frac{1}{\mathbf{d}_{dc}}\mathbf{J}_{dc}
         :label: sensitivity_ip
 
-.. figure:: ../images/mesh_design.png
-        :name: meshdesign
-        :figwidth: 75%
-        :align: center
 
-        Mesh design with ``DCIP3D``. Current and potential electrodes are located on the solid lines. (a) Version 1.0 required electrodes be placed on cell nodes. (b) Update versions allow for the electrodes to be placed anywhere.
-
-The forward (and inversion) code uses a nodal-based finite volume technique in which the current is input on a node. This is an important change from the original version of DCIP3D and is illustrated in Figure 2. When inverting field data, the usual procedure is to generate a mesh whose nodes coincide with the location of the current electrodes. The difficulty with accomplishing this task is illustrated in Figure :numref:`meshdesign` a. The left panel is an attempt to design a mesh that  permits each  electrode to be on a node. The number of cells required to accomplish this is large and the aspect ratio are undesirable. High aspect ratios of cells reduces the numerical accuracy and also reduces the peed at which the forward modeling equations can be solved. This problem is greatly exacerbated when field surveys are carried out in regions of considerable topography. It would be preferable to have a uniform gridding in which the cell size is dictated by the resolving power of the data rather than by small details regarding exact placement of electrodes. A desired grid is shown in Figure :numref:`meshdesign` b.
+Mesh Design and Source Discretization
+-------------------------------------
 
 To handle a current electrode that is at an arbitrary position :math:`(x_s; y_s; z_s)` in the cell we made a modification to distribute any current amongst the 8 nodes of the cell. This approach is shown in Figure 3, where a current I is distributed onto nodes P1 through P8. Effectively, we write
 
