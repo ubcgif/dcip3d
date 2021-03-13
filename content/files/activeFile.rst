@@ -1,7 +1,7 @@
 .. _activeFile:
 
-Active cells file
-=================
+Active Cells Model
+==================
 
 This file is optional. It has the exact same format as the :ref:`model file <modelFile>`, and thus must be the same size. 
 

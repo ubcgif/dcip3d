@@ -1,37 +1,54 @@
 .. _elements:
 
-Elements of the program DCIP3D
-==================================
+Elements of the DCIP3D package
+==============================
 
-The DCIP3D library consists of three core programs and nine utilities.
+This section provides a brief description of each program in the DCIP3D package. In addition, we describe the file formats for all input and supporting files used by the coding library.
 
-Core Programs:
+Executables
+-----------
 
-- ``DCIPF3D``: Forward model conductivity/chargeability models to calculate data.
-- ``DCINV3D``: Invert 3D DC data to develop a conductivity models using a Gauss-Newton method
-- ``IPSEN3D``: calculates the sensitivity matrix for the 3D IP inversion
-- ``IPINV3D``: Invert 3D IP data to develop a chargeability models using a Gauss-Newton method
+The main executable programs within the DCIP3D program library are:
 
-Utilities:
+    - **dcipf3d:** used to forward model DC or IP data
+    - **dcinv3d:** inverts DC data to recover a conductivity model
+    - **ipsen3d:** construct the sensitivity matrix for the linearized IP problem
+    - **ipinv3d:** inverts IP data to recover a chargeabitiliy model
 
-- ``MAKE_WDAT``: makes a weighting file for smoothing near surface zones of the model
+The following Octree utility programs may also be helpful:
 
-Each of the above programs requires an input file (or files) in order to run. Before detailing the procedures for running each of the above programs, we first present information about these general input/output files.
+    - **blk3cell:** creates models on a tensor mesh
 
-.. _fileformats:
 
-General files for DCIP3D programs
--------------------------------------
+Main Input Files
+----------------
 
-**Input** files can have any user-defined name, while **output** files have restricted file names. Generall speaking, the filename extensions are not important. While the user can provide different file extensions for each file type (i.e. ``*.msh`` for mesh files, ``*.con`` for conductivity models), some users prefer to use the ``*.txt`` filename convention so that files are more easily read and edited in the Windows environment. There are ten general file types which are used by the different codes in DCIP3D library:
+Here, we describe the main input files for executables contained with the DCIP3D coding package.
 
 .. toctree::
-        :maxdepth: 1
+    :maxdepth: 2
 
-        Tensor mesh <files/tensormeshfile>
-        Topography <files/topo>
-        Observation/Location <files/dcipfile>
-        Model <files/model>
-        Weighting <files/weight>
-        Bounds <files/bounds>
-        Active model <files/activemodel>
+    Create tensor model <inputfiles/createModel>
+    Forward modeling <inputfiles/forward>
+    DC inversion <inputfiles/dcinversion>
+    IP sensitivity matrix <inputfiles/ipsensitivity>
+    IP inversion <inputfiles/ipinversion>
+
+
+Supporting Files
+----------------
+
+Here, we describe the formats of supporting files used to run DCIP3D executable files. The input files for each executable program are described in the :ref:`running the programs<running>` section.
+
+.. toctree::
+    :maxdepth: 1
+
+    Survey File <files/surveyFile>
+    Predicted Data File <files/preFile>
+    Observations File <files/obsFile>
+    Topography File <files/topoFile>
+    Model File <files/modelFile>
+    Active Cells Model File <files/activeFile>
+    Tensor Mesh File <files/meshFile>
+    Weights Files <files/weightsFile>
+    Bounds Files <files/boundsFile>

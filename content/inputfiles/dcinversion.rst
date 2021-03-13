@@ -3,47 +3,46 @@
 DC Inversion Input File
 =======================
 
-The inverse problem is solved using the executable program **dcoctree_inv.exe**. The lines of input file are as follows:
+The inverse problem is solved using the executable program **dcinv3d.exe**. The lines of input file are as follows:
 
 .. tabularcolumns:: |L|C|C|
 
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
 | Line # | Description                                                         | Description                                                       |
 +========+=====================================================================+===================================================================+
-| 1      | :ref:`OcTree Mesh<dcip_input_dcinv_ln1>`                            | path to octree mesh file                                          |
+| 1      | :ref:`maxit<dcip_input_dcinv_ln1>`                                  | max trade off parameter iterations                                |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 2      | :ref:`Observations File<dcip_input_dcinv_ln2>`                      | path to observations file                                         |
+| 2      | :ref:`mode par<dcip_input_dcinv_ln2>`                               | inversion mode and stopping criteria                              |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 3      | :ref:`Initial/FWD Model<dcip_input_dcinv_ln3>`                      | initial/forward model                                             |
+| 3      | :ref:`DC Observations File<dcip_input_dcinv_ln3>`                   | path to observations file                                         |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 4      | :ref:`Reference Model<dcip_input_dcinv_ln4>`                        | reference model                                                   |
+| 4      | :ref:`Tensor Mesh<dcip_input_dcinv_ln4>`                            | path to tensor mesh file                                          |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 5      | :ref:`Active Topography Cells<dcip_input_dcinv_ln5>`                | topography                                                        |
+| 5      | :ref:`Topography<dcip_input_dcinv_ln5>`                             | topography                                                        |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 6      | :ref:`Active Model Cells<dcip_input_dcinv_ln6>`                     | active model cells                                                |
+| 6      | :ref:`Initial Model<dcip_input_dcinv_ln6>`                          | initial model                                                     |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 7      | :ref:`Global Cell Weights<dcip_input_dcinv_ln7>`                    | global cell weights                                               |
+| 7      | :ref:`Reference Model<dcip_input_dcinv_ln7>`                        | reference model                                                   |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 8      | :ref:`Global Face Weights<dcip_input_dcinv_ln8>`                    | global face weights                                               |
+| 8      | :ref:`Active Model Cells<dcip_input_dcinv_ln8>`                     | active model cells                                                |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 9      | :ref:`Additional Smallness Cell Weights<dcip_input_dcinv_ln9>`      | additional cell weights in smallness term                         |
+| 9      | :ref:`Bounds<dcip_input_dcinv_ln9>`                                 | upper and lower bounds for recovered model                        |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 10     | :ref:`beta_max beta_min beta_factor<dcip_input_dcinv_ln10>`         | cooling schedule for beta parameter                               |
+| 10     | :ref:`alpha_s alpha_x alpha_y alpha_z<dcip_input_dcinv_ln10>`       | weighting constants for smallness and smoothness constraints      |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 11     | :ref:`alpha_s alpha_x alpha_y alpha_z<dcip_input_dcinv_ln11>`       | weighting constants for smallness and smoothness constraints      |
+| 11     | :ref:`wvltx<dcip_input_dcinv_ln11>`                                 | wavelet type                                                      |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 12     | :ref:`Chi Factor<dcip_input_dcinv_ln12>`                            | stopping criteria for inversion                                   |
+| 12     | :ref:`itol eps<dcip_input_dcinv_ln12>`                              | reconstruction error for wavelet compression                      |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 13     | :ref:`tol_nl mindm iter_per_beta<dcip_input_dcinv_ln13>`            | set the number of Gauss-Newton iteration for each beta value      |
+| 13     | :ref:`Hard Constraints<dcip_input_dcinv_ln13>`                      | use *SMOOTH_MOD* or *SMOOTH_MOD_DIFF*                             |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 14     | :ref:`tol_ipcg max_iter_ipcg<dcip_input_dcinv_ln14>`                | set the tolerance and number of iterations for Gauss-Newton solve |
+| 14     | :ref:`Weights<dcip_input_dcinv_ln14>`                               | weights                                                           |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 15     | :ref:`Reference Model Update<dcip_input_dcinv_ln15>`                | reference model                                                   |
+| 15     | :ref:`tol<dcip_input_dcinv_ln15>`                                   | solver tolerance                                                  |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 16     | :ref:`Hard Constraints<dcip_input_dcinv_ln16>`                      | use *SMOOTH_MOD* or *SMOOTH_MOD_DIFF*                             |
+| 16     | :ref:`vec<dcip_input_dcinv_ln16>`                                   | Max number of stored solutions in memory                          |
 +--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
-| 17     | :ref:`Bounds<dcip_input_dcinv_ln17>`                                | upper and lower bounds for recovered model                        |
-+--------+---------------------------------------------------------------------+-------------------------------------------------------------------+
+
 
 
 
@@ -51,7 +50,7 @@ The inverse problem is solved using the executable program **dcoctree_inv.exe**.
      :align: center
      :width: 700
 
-     Example input file for the inversion program (`Download <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcip_input/dc_inv.inp>`__ ).
+     Example input file for the DC inversion program (`Download <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip_input/dc_inv.inp>`__ ).
 
 
 Line Descriptions
@@ -59,16 +58,39 @@ Line Descriptions
 
 .. _dcip_input_dcinv_ln1:
 
-    - **OcTree Mesh:** file path to the OcTree mesh file
+    - **maxit:** maximum number of trade-off parameter iterations. That is, the maximum number of time the trade-off parameters is reduced and the optimization problem is solved to recover a model
 
 .. _dcip_input_dcinv_ln2:
 
-    - **Observation File:** On this line, we enter a flag *LOC_XY* or *LOC_XYZ*, followed by the file path to the :ref:`observations file<obsFile>`. The flag tells the program whether the electrodes are only on the surface or whether there are borehole measurements.
+    - **mode par:** set the mode for choosing the trade-off parameter and stopping criteria. Choices are as follows:
 
-        - *LOC_XY filepath:* The electrodes are all on the Earth's surface. The vertical position is defined by the topography line.
-        - *LOC_XYZ filepath:* The observations file contains borehole data.
+        - An integer specifying one of the two choices for determining the trade-off parameter (a real value):
+
+            - *mode=1:* the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (e.g., :math:`\phi_d = N`). *par* is the chi-factor for the target misfit (usually 1.0).
+            - *mode=2:* the user solves the optimization problem for a user-defined trade-off parameter given by *par*.
+            - *mode=3:* the program calculates the trade-off parameter according to the L-curve criterion and *par* is ignored data The DC observation locations (with standard deviations).
 
 .. _dcip_input_dcinv_ln3:
+
+    - **DC Observation File:** path to a DC formatted observations file
+
+.. _dcip_input_dcinv_ln4:
+
+    - **Tensor Mesh:** file path to the tensor mesh file
+
+.. _dcip_input_dcinv_ln5:
+
+    - **Topography:** Define the cells which lie above and below the surface topography. There are three options:
+
+        - *null:* this flag is used if all cells are defined as being below the surface topography
+        - *active cells model:* the user can enter the path to an active cells model where 1 denotes cells below the surface and 0 denotes cells above the surface
+        - *topography file:* the user can enter the path to a topography file which contains the xyz locations for a discrete set of points
+
+
+.. note:: **Be carefull!!!** If the survey file uses the *surface format*, the code will project the electrode locations to the discrete surface when topography is applied. If the survey file uses the *general format*, cells might be modeled as being in the air.
+
+
+.. _dcip_input_dcinv_ln6:
 
     - **Initial Model:** On this line we specify the starting model for the inversion. On this line, there are 2 possible options:
 
@@ -76,68 +98,61 @@ Line Descriptions
         - If a homogeneous conductivity value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
 
-.. _dcip_input_dcinv_ln4:
+.. _dcip_input_dcinv_ln7:
 
     - **Reference Model:** The user may supply the file path to a reference conductivity model. On this line, there are 2 possible options:
 
         - Enter the path to a conductivity model
         - If a homogeneous conductivity value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
-.. _dcip_input_dcinv_ln5:
-
-    - **Active Topography Cells:** Here, the user can choose to specify the cells which lie below the surface topography. To do this, the user may supply the file path to an active cells model file or type "ALL_ACTIVE". The active cells model has values 1 for cells lying below the surface topography and values 0 for cells lying above.
-
-.. _dcip_input_dcinv_ln6:
-
-    - **Active Model Cells:** Here, the user can choose to specify the model cells which are active during the inversion. To do this, the user may supply the file path to an active cells model file or type "ALL_ACTIVE". The active cells model has values 1 for cells lying below the surface topography and values 0 for cells lying above. Values for inactive cells are provided by the background conductivity model.
-
-.. _dcip_input_dcinv_ln7:
-
-    - **Global Cell Weights:** Here, the user specifies cell weights that are applied in both the smallness and smoothness terms in the model objective function. The user can provide the file path to a :ref:`cell weights file <weightsFile>` . If no cell weights are supplied, the user enters "NO_WEIGHT".
 
 .. _dcip_input_dcinv_ln8:
 
-    - **Global Face Weights:** Here, the user specifies whether face weights are supplied. If so, the user provides the file path to a face weights file :ref:`cell weights file <weightsFile>`. If no additional cell weights are supplied, the user enters "NO_FACE_WEIGHT". The user may also enter "EKBLOM" for 1-norm approximation to recover sharper edges.
+    - **Active Model Cells:** Here, the user can choose to specify the model cells which are active during the inversion. There are two options:
 
+        - *null:* this flag is used if all cells below the surface topography are active
+        - *active cells model:* the user can enter the path to an active cells model where 1 denotes cells below the surface and 1 denotes active cells and 0 denotes inactive cells
 
 .. _dcip_input_dcinv_ln9:
-
-    - **Additional Cell Weights in Smallness term:** Here, the user can specify cell weights that are ONLY applied to the smallness term in the model objective function; e.g. they are not used in the smoothness. The user can provide the file path to a :ref:`cell weights file <weightsFile>` . For no additional weighting, the user enters the flag "NO_WEIGHT".
-
-
-.. _dcip_input_dcinv_ln10:
-
-    - **beta_max beta_min beta_factor:** Here, the user specifies protocols for the trade-off parameter (beta). *beta_max* is the initial value of beta, *beta_min* is the minimum allowable beta the program can use before quitting and *beta_factor* defines the factor by which beta is decreased at each iteration; example "1E4 10 0.2". The user may also enter "DEFAULT" if they wish to have beta calculated automatically.
-
-.. _dcip_input_dcinv_ln11:
-
-    - **alpha_s alpha_x alpha_y alpha_z:** `Alpha parameters <http://giftoolscookbook.readthedocs.io/en/latest/content/fundamentals/Alphas.html>`__ . Here, the user specifies the relative weighting between the smallness and smoothness component penalties on the recovered models.
-
-.. _dcip_input_dcinv_ln12:
-
-    - **Chi Factor:** The chi factor defines the target misfit for the inversion. A chi factor of 1 means the target misfit is equal to the total number of data observations.
-
-.. _dcip_input_dcinv_ln13:
-
-    - **tol_nl mindm iter_per_beta:** Here, the user specifies the number of Newton iterations. *tol_nl* is the Newton iteration tolerance (how close the gradient is to zero), *mindm* is the minimum model perturbation :math:`\delta m` allowed and *iter_per_beta* is the number of iterations per beta value.
-
-.. _dcip_input_dcinv_ln14:
-
-    - **tol_ipcg max_iter_ipcg:** Here, the user specifies solver parameters. *tol_ipcg* defines how well the iterative solver does when solving for :math:`\delta m` and *max_iter_ipcg* is the maximum iterations of incomplete-preconditioned-conjugate gradient.
-
-.. _dcip_input_dcinv_ln15:
-
-    - **Reference Model Update:** Here, the user specifies whether the reference model is updated at each inversion step result. If so, enter "CHANGE_MREF". If not, enter "NOT_CHANGE_MREF".
-
-.. _dcip_input_dcinv_ln16:
-
-    - **Hard Constraints:** SMOOTH_MOD runs the inversion without implementing a reference model (essential :math:`m_{ref}=0`). "SMOOTH_MOD_DIF" constrains the inversion in the smallness and smoothness terms using a reference model.
-
-.. _dcip_input_dcinv_ln17:
 
     - **Bounds:** Bound constraints on the recovered model. There are 3 options:
 
         - Enter the flag "BOUNDS_NONE" if the inversion is unbounded, or if there is no a-prior information about the subsurface model
         - Enter "BOUNDS_CONST" and enter the values of the minimum and maximum model conductivity; example "BOUNDS_CONST 1E-6 0.1"
         - Enter "BOUNDS_FILE" followed by the path to a :ref:`bounds file <boundsFile>`
+
+.. _dcip_input_dcinv_ln10:
+
+    - **alpha_s alpha_x alpha_y alpha_z:** `Alpha parameters <http://giftoolscookbook.readthedocs.io/en/latest/content/fundamentals/Alphas.html>`__ . Here, the user specifies the relative weighting between the smallness and smoothness component penalties on the recovered models.
+
+
+.. _dcip_input_sens_ln11:
+
+    - **wvltx:** A five-character string identifying the type of wavelet used to compress the sensitivity matrix. The types of wavelets available are Daubechies wavelet with 1 to 6 vanishing moments (*daub1*, *daub2*, and so on) and Symmlets with 4 to 6 vanishing moments (*symm4*, *symm5*, *symm6*). Note that daub1 is the Haar wavelet and daub2 is the Daubechies-4 wavelet. The Daubechies- 4 wavelet is suitable for most inversions (and is used for the null option, while the others are provided for users’ experimentation. If none is entered, the program does not use wavelet compression.
+
+.. _dcip_input_sens_ln12:
+
+    - **itol eps:** An integer and a real number that specify how the wavelet threshold level is to be determined. If *null* is entered on this line, a default relative reconstruction error of 0.05 (e.g. 5%) is used and the relative threshold level is calculated (i.e., itol=1, eps=0.05).
+
+        - *itol=1:* program calculates the relative threshold and *eps* is the relative reconstruction error of the sensitivity. A reconstruction error of 0.05 is usually adequate.
+        - *itol=2:* the user defines the threshold level and *eps* is the relative threshold to be used. 
+
+.. _dcip_input_dcinv_ln13:
+
+    - **Hard Constraints:** SMOOTH_MOD runs the inversion without implementing a reference model (essential :math:`m_{ref}=0`). "SMOOTH_MOD_DIF" constrains the inversion in the smallness and smoothness terms using a reference model.
+
+.. _dcip_input_dcinv_ln14:
+
+    - **Weights:** Apply cell and/or interface weights to the inversion. There are two options:
+
+        - *null:* enter this flag if no additional weights are applied
+        - *weights file:* enter the file path to a weights file to apply weights
+
+.. _dcip_input_fwd_ln15:
+
+    - **tol:** relative tolerance for solving the system. A default value of 1e-5 works well.
+
+.. _dcip_input_fwd_ln16:
+
+    - **vec:** An integer which specifies how many solution vectors are to be stored in the computer’s memory at one time. Use -1 to store all vectors in memory.
 

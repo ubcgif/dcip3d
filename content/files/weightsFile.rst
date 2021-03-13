@@ -1,9 +1,9 @@
 .. _weightsFile:
 
-Weight files
-============
+Weights Files
+=============
 
-There are two types of weighting files: cell-centred and interface weights. Each are described below.s
+There are two types of weighting files: cell-centred and interface weights. Each are described belows.
 
 Cell-centred weights file
 -------------------------

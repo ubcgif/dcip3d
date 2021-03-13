@@ -1,18 +1,18 @@
 .. _dcip_input_fwd:
 
-Forware Modeling Input File
+Forward Modeling Input File
 ===========================
 
-The forward problem is solved using the executable program **dcipoctree_fwd.exe**. The lines of input file are as follows:
+The forward problem is solved using the executable program **dcipf3d.exe**. The lines of input file are as follows:
 
 .. tabularcolumns:: |L|C|C|
 
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 | Line # | Description                                                       | Description                                                       |
 +========+===================================================================+===================================================================+
-| 1      | :ref:`Data Type<dcip_input_fwd_ln1>`                              | data being modeled: DC|IP|IPL                                     |
+| 1      | :ref:`Data Type<dcip_input_fwd_ln1>`                              | data being modeled: dc|ip|ipL                                     |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
-| 2      | :ref:`OcTree Mesh<dcip_input_fwd_ln2>`                            | path to octree mesh file                                          |
+| 2      | :ref:`Tensor Mesh<dcip_input_fwd_ln2>`                            | path to tensor mesh file                                          |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 | 3      | :ref:`Survey File<dcip_input_fwd_ln3>`                            | path to survey file                                               |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
@@ -22,6 +22,12 @@ The forward problem is solved using the executable program **dcipoctree_fwd.exe*
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 | 6      | :ref:`Active Topography Cells<dcip_input_fwd_ln6>`                | topography                                                        |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
+| 7      | :ref:`pot<dcip_input_fwd_ln7>`                                    | output potentials file                                            |
++--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
+| 8      | :ref:`tol<dcip_input_fwd_ln8>`                                    | relative tolerance for solver                                     |
++--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
+| 9      | :ref:`vec<dcip_input_fwd_ln9>`                                    | Max number of vectors to store                                    |
++--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 
 
 
@@ -29,7 +35,7 @@ The forward problem is solved using the executable program **dcipoctree_fwd.exe*
      :align: center
      :width: 700
 
-     Example input file for the inversion program (`Download <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcip_input/dcip_fwd.inp>`__ ).
+     Example input file for modeling DC data (`Download <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip_input/dc_fwd.inp>`__ ).
 
 
 Line Descriptions
@@ -37,22 +43,19 @@ Line Descriptions
 
 .. _dcip_input_fwd_ln1:
 
-	- **Data Type:** This line chooses the data which are modeled by the program:
+    - **Data Type:** This line chooses the data which are modeled by the program:
 
-		- *DC:* DC resistivity data are modeled. Although the line for the chargeability input file is ignore, something must be put there as a placeholder.
-		- *IP:* DC resistivity data and IP data are modeled. IP data are modeled with a non-linear formulation.
-		- *IPL:* DC resistivity data and IP data are modeled. IP data are modeled with a linear formulation.
+        - *dc:* DC resistivity data are modeled. Although the line for the chargeability input file is ignored, something must be put there as a placeholder.
+        - *ip:* IP data are modeled with a non-linear formulation.
+        - *ipL:* IP data are modeled with a linear formulation.
 
 .. _dcip_input_fwd_ln2:
 
-    - **OcTree Mesh:** file path to the :ref:`OcTree mesh file <octreeFile>`
+    - **Tensor Mesh:** file path to the :ref:`tensor mesh file <meshFile>`
 
 .. _dcip_input_fwd_ln3:
 
-    - **Survey File:** On this line, we enter a flag *LOC_XY* or *LOC_XYZ*, followed by the file path to the :ref:`survey file<surveyFile>`. The flag tells the program whether the electrodes are only on the surface or whether there are borehole measurements.
-
-    	- *LOC_XY filepath:* The electrodes are all on the Earth's surface. The vertical position is defined by the topography line.
-    	- *LOC_XYZ filepath:* The survey file contains borehole data.
+    - **Survey File:** file path to the :ref:`survey file<surveyFile>`
 
 .. _dcip_input_fwd_ln4:
 
@@ -60,9 +63,31 @@ Line Descriptions
 
 .. _dcip_input_fwd_ln5:
 
-    - **Chargeability Model:** file path to the :ref:`chargeability model <modelFile>`
+    - **Chargeability Model:** The user may enter
+
+        - the file path to a :ref:`chargeability model <modelFile>`
+        - the flag *VALUE* followed by a float representing a homogeneous background conductivity
 
 .. _dcip_input_fwd_ln6:
 
-    - **Active Topography Cells:** Here, the user can choose to specify the cells which lie below the surface topography. To do this, the user may supply the file path to an active cells model file or type "ALL_ACTIVE". The active cells model has values 1 for cells lying below the surface topography and values 0 for cells lying above.
+    - **Active Topography Cells:** Here, the user can choose to define the surface topography.
 
+        - *null:* all cells lie below the surface topography
+        - *topography file:* the user supplies the file path to a topography file which has the xyz locations for discrete topography
+        - *active cells model:* the user supplies the file path to an active cells model which 1 denotes cells below the surface and 0 denotes cells above
+
+
+.. note:: If the survey file is *surface format*, the electrode locations will be projected to the discretized surface when topography is included. If the survey file is *general format*, electrodes may be modeled as being in the air.
+
+
+.. _dcip_input_fwd_ln7:
+
+    - **pot:** Enter a flag of *1* to output a file containing the potentials or enter a flag of *0* to ignore.
+
+.. _dcip_input_fwd_ln8:
+
+    - **tol:** relative tolerance for solving the system. A default value of 1e-5 works well.
+
+.. _dcip_input_fwd_ln9:
+
+    - **vec:** An integer which specifies how many solution vectors are to be stored in the computer’s memory at one time. Use -1 to store all vectors in memory.
