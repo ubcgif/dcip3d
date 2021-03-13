@@ -1,4 +1,4 @@
-.. _dcfor:
+.. _example_legacy_dcfwd:
 
 DC Forward Modeling
 ===================

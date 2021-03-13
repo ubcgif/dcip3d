@@ -1,4 +1,4 @@
-.. _versioncomparison:
+.. _example_legacy_versioncomparison:
 
 Version comparison
 ==================

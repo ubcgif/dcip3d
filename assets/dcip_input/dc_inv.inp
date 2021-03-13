@@ -1,0 +1,16 @@
+20                          ! max iterations
+1 0.25                      ! mode par
+dc_data.obs                 ! data file
+tensor_mesh.txt             ! tensor mesh
+null                        ! topography file | null
+VALUE 0.01                  ! initial model
+VALUE 0.01                  ! reference model
+null                        ! active model cells | null
+BOUNDS_NONE                 ! bounds
+1e-4 1 1 1                  ! as ax ay az
+daub4                       ! wavelet type
+1 0.05                      ! itol eps
+SMOOTH_MOD_DIF              ! SMOOTH_MOD | SMOOTH_MOD_DIF
+null                        ! 3D weighting | null
+1e-5                        ! Solver tolerance
+-1                          ! Max # of vectors to store

@@ -1,0 +1,9 @@
+dc                          ! data type: dc|ip|ipL
+tensor_mesh.txt             ! tensor mesh
+survey.loc                  ! filename
+true_model.con              ! conductivity model
+null                        ! chargeability model
+null                        ! ALL_ACTIVE | active cells model
+0                           ! output potentials: no (0) or yes (1)
+1e-5                        ! solver tolerance
+-1                          ! Max # of vectors to store

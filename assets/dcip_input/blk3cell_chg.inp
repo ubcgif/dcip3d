@@ -1,0 +1,3 @@
+0                                      ! background value
+1                                      ! number of blocks
+-560 -240 -600 600 -160 -440 0.1       ! x1 x2 y1 y2 z1 z2 val

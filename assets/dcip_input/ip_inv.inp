@@ -1,0 +1,12 @@
+1                           ! mode
+0.5 0.2                     ! par tolc
+ip_data.obs                 ! data filename
+../ip_sens/ipinv3d.mtx      ! IP sensitivity matrix
+VALUE 1e-6                  ! initial model
+VALUE 0                     ! reference model
+null                        ! active model cells | null
+VALUE 0                     ! lower bounds
+VALUE 1e6                   ! upper bounds
+1e-4 1 1 1                  ! as ax ay az
+SMOOTH_MOD_DIF              ! SMOOTH_MOD | SMOOTH_MOD_DIF
+null                        ! cell weights | null

@@ -1,4 +1,4 @@
-.. _ipfor:
+.. _example_legacy_ipfwd:
 
 IP Forward Modeling
 ===================

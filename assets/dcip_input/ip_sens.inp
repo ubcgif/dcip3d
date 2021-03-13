@@ -1,0 +1,9 @@
+ip_data.obs                        ! IP data
+tensor_mesh.txt                    ! tensor mesh
+true_model.con                     ! background conductivity model
+null                               ! null | topography file
+null                               ! null | active cells model
+daub4                              ! wavelet type
+1 0.02                             ! itol eps
+1e-5                               ! solver tolerance
+-1                                 ! Number of vectors stored
