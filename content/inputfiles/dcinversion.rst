@@ -126,11 +126,11 @@ Line Descriptions
     - **alpha_s alpha_x alpha_y alpha_z:** `Alpha parameters <http://giftoolscookbook.readthedocs.io/en/latest/content/fundamentals/Alphas.html>`__ . Here, the user specifies the relative weighting between the smallness and smoothness component penalties on the recovered models.
 
 
-.. _dcip_input_sens_ln11:
+.. _dcip_input_dcinv_ln11:
 
     - **wvltx:** A five-character string identifying the type of wavelet used to compress the sensitivity matrix. The types of wavelets available are Daubechies wavelet with 1 to 6 vanishing moments (*daub1*, *daub2*, and so on) and Symmlets with 4 to 6 vanishing moments (*symm4*, *symm5*, *symm6*). Note that daub1 is the Haar wavelet and daub2 is the Daubechies-4 wavelet. The Daubechies- 4 wavelet is suitable for most inversions (and is used for the null option, while the others are provided for users’ experimentation. If none is entered, the program does not use wavelet compression.
 
-.. _dcip_input_sens_ln12:
+.. _dcip_input_dcinv_ln12:
 
     - **itol eps:** An integer and a real number that specify how the wavelet threshold level is to be determined. If *null* is entered on this line, a default relative reconstruction error of 0.05 (e.g. 5%) is used and the relative threshold level is calculated (i.e., itol=1, eps=0.05).
 
@@ -148,11 +148,11 @@ Line Descriptions
         - *null:* enter this flag if no additional weights are applied
         - *weights file:* enter the file path to a :ref:`weights file <weightsFile>` to apply weights
 
-.. _dcip_input_fwd_ln15:
+.. _dcip_input_dcinv_ln15:
 
     - **tol:** relative tolerance for solving the system. A default value of 1e-5 works well.
 
-.. _dcip_input_fwd_ln16:
+.. _dcip_input_dcinv_ln16:
 
     - **vec:** An integer which specifies how many solution vectors are to be stored in the computer’s memory at one time. Use -1 to store all vectors in memory.
 

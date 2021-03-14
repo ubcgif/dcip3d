@@ -22,8 +22,9 @@ Units
 
 - **IP data:** Depends on the IP data type set in the :ref:`observations file <obsFile>`, the data are either secondary voltage or apparent chargeability
 - **Background conductivity model:** S/m
-- **Chargeability model:** intinsic chargeability - unitless from [0,1)
+- **Chargeability model:** chargeability in whatever units you had as apparent chargeability data.
 
+.. note:: IP data are inverted using a linearized formulation. If the data are apparent chargeabilities, the recovered chargeability model will be in the same units as the data. That is, you could invert apparent chargeability data that have units V/V, mV/V or ms and the recovered chargeability model would have units V/V, mV/V and ms, respectively.
 
 Output Files
 ^^^^^^^^^^^^

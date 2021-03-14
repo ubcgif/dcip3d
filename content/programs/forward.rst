@@ -35,6 +35,8 @@ Units
     - **Chargeability model:** intinsic chargeability - unitless from [0,1) 
 
 
+.. note:: If you use the linear IP formulation, the chargeability model and predicted apparent chargeability data can use any normalization you want. That is, your chargeability model could be V/V, mV/V or ms and the resulting apparent chargeabilities would be V/V, mV/V and ms, respectively.
+
 
 Output Files
 ^^^^^^^^^^^^

@@ -1,4 +1,4 @@
-.. _example_fwd:
+.. _example_ip_fwd:
 
 IP Forward Modeling
 ===================

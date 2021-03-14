@@ -18,7 +18,7 @@ The lines for the input file are as follows:
 +--------+----------------------------------------------------+---------------------------------------------------------+
 | 2      | :ref:`Topography<dcip_input_weights_ln2>`          | topography                                              |
 +--------+----------------------------------------------------+---------------------------------------------------------+
-| 3      | :ref:`N<dcip_input_weights_ln3`                    | number of layers                                        |
+| 3      | :ref:`nLayer<dcip_input_weights_ln3`               | number of layers                                        |
 +--------+----------------------------------------------------+---------------------------------------------------------+
 | 4      | :ref:`Interface weights<dcip_input_weights_ln4>`   | w1 w2 w3 ...                                            |
 +--------+----------------------------------------------------+---------------------------------------------------------+
@@ -49,15 +49,16 @@ Line Descriptions
 
         - *null:* all cells lie below the surface topography
         - *topography file:* the user supplies the file path to a :ref:`topography file <topoFile>` which has the xyz locations for discrete topography
-        
+
+
 .. _dcip_input_weights_ln3:
 
-    - **N:** The number of layers down from the surface that interface weights will be applied.
+    - **nLayer:** The number of layers down from the surface that interface weights will be applied.
 
-.. _dcip_input_weights_ln6:
+.. _dcip_input_weights_ln4:
 
     - **Interface weights:** From the surface layer down, the user enters the values for the interface weights applied to each layer. For example, if the number of layers is *N=4*, the user may define this line as *40 20 10 5*. Interface weights will take topography into account. And generally, the weight value is decreased exponentially for each layer.
 
-.. _dcip_input_weights_ln7:
+.. _dcip_input_weights_ln5:
 
     - **idx:** The user and override the topography file and use an *idx* formatted topography file instead. This functionality is not relevant to DCIP3D and should be kept as *null*.

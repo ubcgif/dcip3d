@@ -55,6 +55,7 @@ Line Descriptions
         - *mode=1:* the program chooses the trade off parameter by carrying out a line search so that the target value of data misfit is achieved (e.g., :math:`\phi_d = N`). *par* is the chi-factor for the target misfit (usually 1.0).
         - *mode=2:* the user solves the optimization problem for a user-defined trade-off parameter given by *par*.
 
+
 .. _dcip_input_ipinv_ln2:
 
     - **par tolc:** set the mode for stopping criteria for the inversion. If *mode*=1, then the inversion will terminate when the data misfit is equivalent to a chi factor of :math:`par \pm tolc`
@@ -67,7 +68,7 @@ Line Descriptions
 
     - **Sensitivity Matrix:** file path to sensitivity matrix file (.mtx) that is output by *ipsens3d.exe*
 
-.. _dcip_input_ipinv_ln6:
+.. _dcip_input_ipinv_ln5:
 
     - **Initial Model:** On this line we specify the starting model for the inversion. On this line, there are 2 possible options:
 
@@ -77,7 +78,7 @@ Line Descriptions
 
 .. note:: DO NOT use a starting value of 0 otherwise the inversion cannot compute a step direction at the first iteration. It acceptible to start with something like 1e-5 for all cells.
 
-.. _dcip_input_ipinv_ln7:
+.. _dcip_input_ipinv_ln6:
 
     - **Reference Model:** The user may supply the file path to a reference conductivity model. On this line, there are 2 possible options:
 
@@ -85,21 +86,21 @@ Line Descriptions
         - If a homogeneous chargeability value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
 
-.. _dcip_input_ipinv_ln8:
+.. _dcip_input_ipinv_ln7:
 
     - **Active Model Cells:** Here, the user can choose to specify the model cells which are active during the inversion. There are two options:
 
         - *null:* this flag is used if all cells below the surface topography are active
         - *active cells model:* the user can enter the path to an :ref:`active cells model <activeFile>` where 1 denotes cells below the surface and 1 denotes active cells and 0 denotes inactive cells
 
-.. _dcip_input_ipinv_ln9:
+.. _dcip_input_ipinv_ln8:
 
     - **Lower Bounds:** Lower bound constraints on the recovered model. There are 2 options:
 
         - Enter the flag *VALUE* followed by the lower bound value that will applied to all cells
         - Enter the path to :ref:`model file <modelFile>` which contains a lower bound value for every cell in the mesh. Bounds for inactive cells are ignored
 
-.. _dcip_input_ipinv_ln10:
+.. _dcip_input_ipinv_ln9:
 
     - **Upper Bounds:** Upper bound constraints on the recovered model. There are 2 options:
 

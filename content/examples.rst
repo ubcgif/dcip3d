@@ -8,9 +8,10 @@ Version 5.5
 
 Here, the program libraries for DCIP3D v5.5 will be used to:
 
-    - create tensor models
-    - DC and IP data for conductivity and chargeability models, respectively
-    - invert DC and IP data to recover conductivity and chargeability models, respectively
+    - Create conductivity and chargeability models on a tensor mesh
+    - Forward model DC and IP data
+    - Generate near-surface interface weights for DC/IP inversion
+    - Invert DC and IP data to recover conductivity and chargeability models, respectively
 
 Zip folders containing all necessary files can be downloaded here:
 
@@ -19,7 +20,7 @@ Zip folders containing all necessary files can be downloaded here:
 The full example is parsed into 6 sections:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     Create tensor models <example/create_model>
     DC Forward modeling <example/dcfwd>
@@ -43,6 +44,7 @@ The full example is parsed into 5 sections:
 .. toctree::
         :maxdepth: 2
 
+        Introduction <example_legacy/introduction>
         DC Forward Modeling <example_legacy/dcfor>
         IP Forward Modeling <example_legacy/ipfor>
         DC inversion <example_legacy/dcinv_example>

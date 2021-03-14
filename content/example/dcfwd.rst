@@ -1,4 +1,4 @@
-.. _example_fwd:
+.. _example_dc_fwd:
 
 DC Forward Modeling
 ===================

@@ -3,7 +3,7 @@
 IP Inversion
 ============
 
-IP inversion is carried out in two parts. First, we must use the code **ipsens3d.exe** to construct the sensitivity matrix for the linearized IP problem. Then we use **ipinv3d.exe** to invert the IP data. Because this is a simple example with no noise, we assigned a uncertainties of 0.0005 to all IP data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
+IP inversion is carried out in two parts. First, we must use the code **ipsens3d.exe** to construct the sensitivity matrix for the linearized IP problem. Then we use **ipinv3d.exe** to invert the IP data. Because this is a simple example with no noise, we assigned a uncertainties of 0.0005 V/V to all IP data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
 
 
 Sensitivity Matrix
@@ -13,7 +13,7 @@ Here, the code **ipsens3d.exe** and the input file **ip_sens.inp** (:ref:`see fo
 
 
      - `Download and open the zip folder containing the entire DCIP octree example <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcipoctree_example.zip>`__ (if not done already)
-     - :ref:`Learn how to run code from command line <dcip_sensitivity_weights>`
+     - :ref:`Learn how to run code from command line <dcip_weights>`
      - :ref:`Learn the format of the input file <dcip_input_sens>`
 
 
