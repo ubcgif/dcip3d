@@ -26,4 +26,4 @@ website (without the exe files). The example is synthetic and is a :math:`10 \Om
         :align: center
         :figwidth: 75%
 
-- `Download zip file for example <https://github.com/ubcgif/dcip3d/raw/master/example/dcip3dv5_example.zip>`__, which contains all the files necessary to run the forward and inverse problems.
+- `Download zip file for example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p0_example.zip>`__, which contains all the files necessary to run the forward and inverse problems.

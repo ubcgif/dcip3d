@@ -12,7 +12,7 @@ Sensitivity Matrix
 Here, the code **ipsens3d.exe** and the input file **ip_sens.inp** (:ref:`see format <dcip_input_sens>`) are used to approximate the sensitivity matrix for the linearized IP problem. Files relevant to this part of the example are in the sub-folder *ip_sens* . Before running this example, you may want to do the following:
 
 
-     - `Download and open the zip folder containing the entire DCIP octree example <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcipoctree_example.zip>`__ (if not done already)
+     - `Download and open the zip folder containing the entire DCIP3D v5.0 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
      - :ref:`Learn how to run code from command line <dcip_weights>`
      - :ref:`Learn the format of the input file <dcip_input_sens>`
 

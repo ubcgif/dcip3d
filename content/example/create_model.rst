@@ -5,7 +5,7 @@ Create Model
 
 Here, the code **blk3cell.exe** is used to create both a conductivity and an intrinsic chargeability model on the tensor mesh provided. Files relevant to this part of the example are in the sub-folder *tensor_model*. Before running this example, you may want to do the following:
 
-	- `Download and open the zip folder containing the entire DCIP octree example <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcipoctree_example.zip>`__ (if not done already)
+	- `Download and open the zip folder containing the entire DCIP3D v5.0 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
 	- Learn how to run :ref:`blk3cell<dcip_model>`
 	- Learn the format of the input files :ref:`blk3cell.inp<dcip_input_model>`
 

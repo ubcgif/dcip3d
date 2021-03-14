@@ -15,7 +15,7 @@ Here, the program libraries for DCIP3D v5.5 will be used to:
 
 Zip folders containing all necessary files can be downloaded here:
 
-    - `Download and open the zip folder containing the entire DCIP3D example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcipoctree_example.zip>`__
+    - - `Download and open the zip folder containing the entire DCIP3D v5.0 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
 
 The full example is parsed into 6 sections:
 

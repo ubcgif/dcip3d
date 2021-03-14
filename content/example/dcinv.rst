@@ -7,7 +7,7 @@ Here, we use the code **dcinv3d.exe** and the input file **dc_inv.inp** to recov
 
 Before running the example, you may want to:
 
-    - `Download and open the zip folder containing the entire DCIP octree example <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcipoctree_example.zip>`__ (if not done already)
+    - `Download and open the zip folder containing the entire DCIP3D v5.0 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
     - :ref:`Learn how to run code from command line <dc_inv>`
     - :ref:`Learn the format of the input file <dcip_input_dcinv>`
 
