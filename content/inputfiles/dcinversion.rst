@@ -156,3 +156,17 @@ Line Descriptions
 
     - **vec:** An integer which specifies how many solution vectors are to be stored in the computer’s memory at one time. Use -1 to store all vectors in memory.
 
+
+
+Format for v5.0
+^^^^^^^^^^^^^^^
+
+The input file format for **dcinv3d.exe v5.0** is almost identical. The only differences are:
+
+   - the **idisk** flag which allows the user to write the sensitivities to disk or store in RAM
+   - the **irest** which allows the user to restart the inversion from a previous iteration
+   - the ability to change the role of the reference model in the model objective function
+
+.. figure:: images/create_dc_inv_input_v5p0.PNG
+     :align: center
+     :width: 700

@@ -121,3 +121,18 @@ Line Descriptions
 
         - *null:* enter this flag if no additional weights are applied
         - *weights file:* enter the file path to a :ref:`weights file <weightsFile>` to apply weights
+
+
+
+Format for v5.0
+^^^^^^^^^^^^^^^
+
+The input file format for **ipinv3d.exe v5.0** is almost identical. The only difference are:
+
+    - the **idisk** flag which allows the user to write the sensitivities to disk or store in RAM
+    - the **irest** flag which allows the user restart the inversion from a previous iteration
+    - the ability to change the role of the reference model in the model objective function
+
+.. figure:: images/create_ip_inv_input_v5p0.PNG
+     :align: center
+     :width: 700
