@@ -23,13 +23,17 @@ The initial research underlying this program library was funded principally by t
 DCIP3D program library content
 ------------------------------
 
-The package that can be licensed includes the following executable programs for performing forward modelling, and inversion of 3D DC resistivity or induced polarization (IP) surveys. Additional functionality is included in supplementary utility programs, which can be used to create weighting files on both Windows and Linux platforms. The package contains the following programs:
+The main executable programs within the DCIP3D program library are:
 
-- ``DCIPF3D``: Forward model conductivity/chargeability models to calculate data.
-- ``DCINV3D``: Invert 3D DC data to develop a conductivity models using a Gauss-Newton method
-- ``IPSEN3D``: calculates the sensitivity matrix for the 3D IP inversion
-- ``IPINV3D``: Invert 3D IP data to develop a chargeability models using a Gauss-Newton method
-- ``MAKE_WDAT``: makes a weighting file for smoothing near surface zones of the model
+    - **dcipf3d:** used to forward model DC or IP data
+    - **dcinv3d:** inverts DC data to recover a conductivity model
+    - **ipsen3d:** construct the sensitivity matrix for the linearized IP problem
+    - **ipinv3d:** inverts IP data to recover a chargeabitiliy model
+
+The following Octree utility programs may also be helpful:
+
+    - **blk3cell:** creates models on a tensor mesh
+    - **make_wdat:** a utility for creating near-surface interface weights
 
 Licensing
 ---------

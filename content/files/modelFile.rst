@@ -1,4 +1,4 @@
-.. _modelfile:
+.. _modelFile:
 
 Model file
 ==========

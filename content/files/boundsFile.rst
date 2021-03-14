@@ -1,6 +1,6 @@
-.. _boundsfile:
+.. _boundsFile:
 
-Bounds file
+Bounds File
 ===========
 
 This file contains an upper and lower physical property bound for each cell in the model. It is optional for the inversion program. Bounds files have the following structure:
@@ -9,7 +9,7 @@ This file contains an upper and lower physical property bound for each cell in t
         :align: center
         :figwidth: 50%
 
-Parameter definitions:
+**Parameter definitions:**
 
 :math:`b^l_{i}`
         The lower bound on the :math:`i^th` model cell.

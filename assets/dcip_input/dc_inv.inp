@@ -11,6 +11,6 @@ BOUNDS_NONE                 ! bounds
 daub4                       ! wavelet type
 1 0.05                      ! itol eps
 SMOOTH_MOD_DIF              ! SMOOTH_MOD | SMOOTH_MOD_DIF
-null                        ! 3D weighting | null
+w.dat                       ! 3D weighting | null
 1e-5                        ! Solver tolerance
 -1                          ! Max # of vectors to store

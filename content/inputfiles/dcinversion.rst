@@ -72,19 +72,19 @@ Line Descriptions
 
 .. _dcip_input_dcinv_ln3:
 
-    - **DC Observation File:** path to a DC formatted observations file
+    - **DC Observation File:** path to a DC formatted :ref:`observations file <obsFile>`
 
 .. _dcip_input_dcinv_ln4:
 
-    - **Tensor Mesh:** file path to the tensor mesh file
+    - **Tensor Mesh:** file path to the :ref:`tensor mesh <meshFile>` file
 
 .. _dcip_input_dcinv_ln5:
 
     - **Topography:** Define the cells which lie above and below the surface topography. There are three options:
 
         - *null:* this flag is used if all cells are defined as being below the surface topography
-        - *active cells model:* the user can enter the path to an active cells model where 1 denotes cells below the surface and 0 denotes cells above the surface
-        - *topography file:* the user can enter the path to a topography file which contains the xyz locations for a discrete set of points
+        - *active cells model:* the user can enter the path to an :ref:`active cells model <activeFile>` where 1 denotes cells below the surface and 0 denotes cells above the surface
+        - *topography file:* the user can enter the path to a :ref:`topography file <topoFile>` which contains the xyz locations for a discrete set of points
 
 
 .. note:: **Be carefull!!!** If the survey file uses the *surface format*, the code will project the electrode locations to the discrete surface when topography is applied. If the survey file uses the *general format*, cells might be modeled as being in the air.
@@ -94,7 +94,7 @@ Line Descriptions
 
     - **Initial Model:** On this line we specify the starting model for the inversion. On this line, there are 2 possible options:
 
-        - Enter the path to a conductivity model
+        - Enter the path to a conductivity :ref:`model <modelFile>`
         - If a homogeneous conductivity value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
 
@@ -102,7 +102,7 @@ Line Descriptions
 
     - **Reference Model:** The user may supply the file path to a reference conductivity model. On this line, there are 2 possible options:
 
-        - Enter the path to a conductivity model
+        - Enter the path to a conductivity :ref:`model <modelFile>`
         - If a homogeneous conductivity value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
 
@@ -111,7 +111,7 @@ Line Descriptions
     - **Active Model Cells:** Here, the user can choose to specify the model cells which are active during the inversion. There are two options:
 
         - *null:* this flag is used if all cells below the surface topography are active
-        - *active cells model:* the user can enter the path to an active cells model where 1 denotes cells below the surface and 1 denotes active cells and 0 denotes inactive cells
+        - *active cells model:* the user can enter the path to an :ref:`active cells model <activeFile>` where 1 denotes cells below the surface and 1 denotes active cells and 0 denotes inactive cells
 
 .. _dcip_input_dcinv_ln9:
 
@@ -146,7 +146,7 @@ Line Descriptions
     - **Weights:** Apply cell and/or interface weights to the inversion. There are two options:
 
         - *null:* enter this flag if no additional weights are applied
-        - *weights file:* enter the file path to a weights file to apply weights
+        - *weights file:* enter the file path to a :ref:`weights file <weightsFile>` to apply weights
 
 .. _dcip_input_fwd_ln15:
 

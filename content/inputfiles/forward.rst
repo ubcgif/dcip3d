@@ -3,14 +3,14 @@
 Forward Modeling Input File
 ===========================
 
-The forward problem is solved using the executable program **dcipf3d.exe**. The lines of input file are as follows:
+The forward problem for both DC and IP data is solved using the executable program **dcipf3d.exe**. The lines of input file are as follows:
 
 .. tabularcolumns:: |L|C|C|
 
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 | Line # | Description                                                       | Description                                                       |
 +========+===================================================================+===================================================================+
-| 1      | :ref:`Data Type<dcip_input_fwd_ln1>`                              | data being modeled: dc|ip|ipL                                     |
+| 1      | :ref:`Data Type<dcip_input_fwd_ln1>`                              | data being modeled: dc | ip | ipL                                 |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
 | 2      | :ref:`Tensor Mesh<dcip_input_fwd_ln2>`                            | path to tensor mesh file                                          |
 +--------+-------------------------------------------------------------------+-------------------------------------------------------------------+
@@ -31,7 +31,7 @@ The forward problem is solved using the executable program **dcipf3d.exe**. The 
 
 
 
-.. figure:: images/create_fwd_input.png
+.. figure:: images/create_dc_fwd_input.png
      :align: center
      :width: 700
 
@@ -43,9 +43,9 @@ Line Descriptions
 
 .. _dcip_input_fwd_ln1:
 
-    - **Data Type:** This line chooses the data which are modeled by the program:
+    - **Data Type:** the user chooses a flag specifying the data which are modeled by the program:
 
-        - *dc:* DC resistivity data are modeled. Although the line for the chargeability input file is ignored, something must be put there as a placeholder.
+        - *dc:* DC resistivity data are modeled. Although the line for the chargeability model is ignored, something must be put there as a placeholder.
         - *ip:* IP data are modeled with a non-linear formulation.
         - *ipL:* IP data are modeled with a linear formulation.
 
@@ -55,7 +55,7 @@ Line Descriptions
 
 .. _dcip_input_fwd_ln3:
 
-    - **Survey File:** file path to the :ref:`survey file<surveyFile>`
+    - **Survey File:** file path to the :ref:`survey file <surveyFile>`
 
 .. _dcip_input_fwd_ln4:
 
@@ -73,8 +73,8 @@ Line Descriptions
     - **Active Topography Cells:** Here, the user can choose to define the surface topography.
 
         - *null:* all cells lie below the surface topography
-        - *topography file:* the user supplies the file path to a topography file which has the xyz locations for discrete topography
-        - *active cells model:* the user supplies the file path to an active cells model which 1 denotes cells below the surface and 0 denotes cells above
+        - *topography file:* the user supplies the file path to a :ref:`topography file <topoFile>` which has the xyz locations for discrete topography
+        - *active cells model:* the user supplies the file path to an :ref:`active cells model <activeFile>` which 1 denotes cells below the surface and 0 denotes cells above
 
 
 .. note:: If the survey file is *surface format*, the electrode locations will be projected to the discretized surface when topography is included. If the survey file is *general format*, electrodes may be modeled as being in the air.

@@ -9,4 +9,4 @@ VALUE 0                     ! lower bounds
 VALUE 1e6                   ! upper bounds
 1e-4 1 1 1                  ! as ax ay az
 SMOOTH_MOD_DIF              ! SMOOTH_MOD | SMOOTH_MOD_DIF
-null                        ! cell weights | null
+w.dat                       ! weights | null

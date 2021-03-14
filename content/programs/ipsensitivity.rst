@@ -3,26 +3,27 @@
 IP Inversion
 ============
 
-The program **ipsen3d.exe** constructs the sensitivitiy matrix for the linearized IP problem.
+The program **ipsen3d.exe** constructs the sensitivitiy matrix for the linearized IP inversion.
 
 Running the Program
 ^^^^^^^^^^^^^^^^^^^
 
 To run the executable, open a command window and type the following:
 
-.. figure:: images/run_ipinv.png
+.. figure:: images/run_sensitivity.png
      :align: center
      :width: 700
 
-Essentially you are calling the path to the executable followed by the path to the :ref:`input file <dcip_input_ipinv>` .
+Essentially you are calling the path to the executable followed by the path to the :ref:`input file <dcip_input_sens>` .
 
 
 Units
 ^^^^^
 
-	- **IP data:** Depends on the IP data type set in the :ref:`observations file <obsFile>`, the data are either secondary voltage or apparent chargeability
-    - **Background conductivity model:** S/m
-    - **Chargeability model:** intinsic chargeability - unitless from [0,1) 
+- **IP data:** Depends on the IP data type set in the :ref:`observations file <obsFile>`, the data are either secondary voltage or apparent chargeability
+- **Background conductivity model:** S/m
+- **Chargeability model:** intinsic chargeability - unitless from [0,1)
+
 
 
 Output Files

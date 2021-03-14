@@ -3,9 +3,9 @@
 Create Model
 ============
 
-To generate the tensor model on the tensor mesh, open a command window. In order, enter the path to **blk3cell.exe**, followed by the path to the tensor mesh file name (**mesh.txt**), followed by the path to the :ref:`input file <dcip_blk3cell_input>` (denoted here as **blk3cell.inp**), followed by the desired name (or full path) for the output model file (denoted here as **model.con**), all separated by spaces.
+To generate the tensor model on the tensor mesh, open a command window. In order, enter the path to **blk3cell.exe**, followed by the path to the tensor mesh file name (**mesh.txt**), followed by the path to the :ref:`input file <dcip_input_model>` (denoted here as **blk3cell.inp**), followed by the desired name (or full path) for the output model file (denoted here as **model.con**), all separated by spaces.
 
-.. figure:: images/run_create_model.png
+.. figure:: images/run_blk3cell.png
      :align: center
      :width: 700
 

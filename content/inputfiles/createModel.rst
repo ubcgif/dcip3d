@@ -3,9 +3,9 @@
 Create Model Input File
 =======================
 
-The file **blk3cell.inp** is used to construct models comprised of a set of rectangular blocks.
-The user specifies the locations, dimensions and values for a set of blocks.
-All undefined cells within the mesh are set to the background value. The format for this file is as follows:
+The executable **blk3cell.exe** is used to construct models comprised of a set of rectangular blocks.
+The user specifies the locations, dimensions and values for a set of blocks within an input file.
+All undefined cells within the mesh are set to the background value. The format for the input file is as follows:
 
 .. tabularcolumns:: |C|C|C|
 

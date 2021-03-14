@@ -16,7 +16,7 @@ Zip folders containing all necessary files can be downloaded here:
 
     - `Download and open the zip folder containing the entire DCIP3D example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcipoctree_example.zip>`__
 
-The full example is parsed into 5 sections:
+The full example is parsed into 6 sections:
 
 .. toctree::
     :maxdepth: 2
@@ -24,6 +24,7 @@ The full example is parsed into 5 sections:
     Create tensor models <example/create_model>
     DC Forward modeling <example/dcfwd>
     IP Forward modeling <example/ipfwd>
+    Near Surface Interface Weights <example/interface_weights>
     DC Inversion <example/dcinv>
     IP Inversion <example/ipinv>
 

@@ -20,10 +20,9 @@ Essentially you are calling the path to the executable followed by the path to t
 Units
 ^^^^^
 
-	- **IP data:** Depends on the IP data type set in the :ref:`observations file <obsFile>`, the data are either secondary voltage or apparent chargeability
-    - **Background conductivity model:** S/m
-    - **Chargeability model:** intinsic chargeability - unitless from [0,1) 
-
+- **IP data:** Depends on the IP data type set in the :ref:`observations file <obsFile>`, the data are either secondary voltage or apparent chargeability
+- **Background conductivity model:** S/m
+- **Chargeability model:** intinsic chargeability - unitless from [0,1)
 
 
 Output Files

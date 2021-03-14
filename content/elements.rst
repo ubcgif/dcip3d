@@ -18,6 +18,7 @@ The main executable programs within the DCIP3D program library are:
 The following Octree utility programs may also be helpful:
 
     - **blk3cell:** creates models on a tensor mesh
+    - **make_wdat:** a utility for creating near-surface interface weights
 
 
 Main Input Files
@@ -26,10 +27,11 @@ Main Input Files
 Here, we describe the main input files for executables contained with the DCIP3D coding package.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     Create tensor model <inputfiles/createModel>
     Forward modeling <inputfiles/forward>
+    Near surface interface weights<inputfiles/interface_weights>
     DC inversion <inputfiles/dcinversion>
     IP sensitivity matrix <inputfiles/ipsensitivity>
     IP inversion <inputfiles/ipinversion>
@@ -38,7 +40,7 @@ Here, we describe the main input files for executables contained with the DCIP3D
 Supporting Files
 ----------------
 
-Here, we describe the formats of supporting files used to run DCIP3D executable files. The input files for each executable program are described in the :ref:`running the programs<running>` section.
+Here, we describe the formats of supporting files used to run DCIP3D executable files.
 
 .. toctree::
     :maxdepth: 1

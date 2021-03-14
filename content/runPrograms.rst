@@ -25,6 +25,7 @@ The main executable programs within the DCIP3D program library are:
 The following Octree utility programs may also be helpful:
 
     - **blk3cell:** creates models on a tensor mesh
+    - **make_wdat:** a utility for creating near-surface interface weights
 
 
 Contents
@@ -37,6 +38,7 @@ To learn the specifics of running each executable, see the following sections:
 
     Creating Tensor Models <programs/createModel>
     Forward Modeling <programs/forward>
+    Near Surface Interface Weights <programs/interface_weights>
     DC Inversion <programs/dcinversion>
     IP Sensitivity Matrix <programs/ipsensitivity>
     IP Inversion <programs/ipinversion>

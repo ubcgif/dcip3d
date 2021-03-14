@@ -1,0 +1,5 @@
+tensor_mesh.txt               ! tensor mesh file
+null                          ! topography file | null
+2                             ! number of layers
+32 8                          ! w1 w2 w3 .....
+null                          ! topo.idx file | null

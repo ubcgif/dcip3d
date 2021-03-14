@@ -1,4 +1,4 @@
-.. _tensormeshfile:
+.. _meshFile:
 
 Tensor mesh file
 ================

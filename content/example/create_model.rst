@@ -13,7 +13,7 @@ Here, the code **blk3cell.exe** is used to create both a conductivity and an int
 
 **Tensor mesh:** Here is the tensor mesh used throughout the example.
 
-.. figure:: ../inputfiles/images/tensor_mesh.png
+.. figure:: images/tensor_mesh.png
      :align: center
      :width: 700
 

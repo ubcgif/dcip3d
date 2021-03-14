@@ -44,11 +44,11 @@ Line Descriptions
 
 .. _dcip_input_sens_ln1:
 
-    - **IP Observations File:** file path to IP formatted observations file
+    - **IP Observations File:** file path to IP formatted :ref:`observations file <obsFile>`
 
 .. _dcip_input_sens_ln2:
 
-    - **Tensor Mesh:** file path to the tensor mesh file
+    - **Tensor Mesh:** file path to the :ref:`tensor mesh <meshFile>` file
 
 .. _dcip_input_sens_ln3:
 
@@ -62,15 +62,15 @@ Line Descriptions
     - **Active Topography Cells:** Here, the user can choose to define the surface topography.
 
         - *null:* all cells lie below the surface topography
-        - *topography file:* the user supplies the file path to a topography file which has the xyz locations for discrete topography
-        - *active cells model:* the user supplies the file path to an active cells model which 1 denotes cells below the surface and 0 denotes cells above
+        - *topography file:* the user supplies the file path to a :ref:`topography file <topoFile>` which has the xyz locations for discrete topography
+        - *active cells model:* the user supplies the file path to an :ref:`active cells model <activeFile>` which 1 denotes cells below the surface and 0 denotes cells above
 
 .. _dcip_input_sens_ln5:
 
     - **Active Model Cells:** Here, the user can choose to specify the model cells which will be active during the inversion.
 
         - *null:* all cells below the surface topography are active in the inversion
-        - *active cells model:* the user supplies the file path to an active cells model which 1 denotes active cells and 0 denotes inactive cells
+        - *active cells model:* the user supplies the file path to an :ref:`active cells model <activeFile>` which 1 denotes active cells and 0 denotes inactive cells
 
 .. _dcip_input_sens_ln6:
 

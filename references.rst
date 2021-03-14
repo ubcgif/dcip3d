@@ -3,9 +3,8 @@
 References
 ==========
 
- .. bibliography:: reference.bib
-    :cited:
-    :style: alpha
+ .. bibliography:: references.bib
+    :all:
 
 
 ..:encoding: latex+latin

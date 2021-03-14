@@ -1,6 +1,6 @@
-.. _topofile:
+.. _topoFile:
 
-Topography file
+Topography File
 ===============
 
 This file is used to define the surface topography of a mesh/model by the elevation at different locations. Lines starting with ! are comments. The topography file has the following general structure:
