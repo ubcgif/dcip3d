@@ -18,7 +18,7 @@ Here, the program libraries for DCIP3D v5.5 will be used to:
 
 Zip folders containing all necessary files can be downloaded here:
 
-    - - `Download and open the zip folder containing the entire DCIP3D v5.0 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
+    - `Download and open the zip folder containing the entire DCIP3D v5.5 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__
 
 The full example is parsed into 6 sections:
 
@@ -39,7 +39,7 @@ Version 5.0 Legacy Example
 
 We also have a legacy example that was created with DCIP3D v5.0. The results of this example can be reproduced with DCIP3D v5.5 but it will require some alteration of the input files.
 
-	- `Download zip file for legacy example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3dv5_example.zip>`__
+	- `Download zip file for legacy example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p0_example.zip>`__
 
 
 The full example is parsed into 5 sections:
