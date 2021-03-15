@@ -87,7 +87,7 @@ Line Descriptions
         - *topography file:* the user can enter the path to a :ref:`topography file <topoFile>` which contains the xyz locations for a discrete set of points
 
 
-.. note:: **Be carefull!!!** If the survey file uses the *surface format*, the code will project the electrode locations to the discrete surface when topography is applied. If the survey file uses the *general format*, cells might be modeled as being in the air.
+.. warning:: **Be carefull!!!** If the survey file uses the *surface format*, the code will project the electrode locations to the discrete surface when topography is applied. If the survey file uses the *general format*, cells might be modeled as being in the air.
 
 
 .. _dcip_input_dcinv_ln6:

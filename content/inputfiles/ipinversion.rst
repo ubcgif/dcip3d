@@ -76,7 +76,7 @@ Line Descriptions
         - If a homogeneous conductivity value is being used, enter "VALUE" followed by a space and a numerical value; example "VALUE 0.01".
 
 
-.. note:: DO NOT use a starting value of 0 otherwise the inversion cannot compute a step direction at the first iteration. It acceptible to start with something like 1e-5 for all cells.
+.. warning:: DO NOT use a starting value of 0 otherwise the inversion cannot compute a step direction at the first iteration. It acceptible to start with something like 1e-5 for all cells.
 
 .. _dcip_input_ipinv_ln6:
 
