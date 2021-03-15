@@ -1,15 +1,18 @@
+.. important:: In March of 2020, DCIP3D v5.5 was released with the intention of replacing v5.0. Online documentation is primarily intended for v5.5, although any differences in input file formats between v5.0 and v5.5 are documented when necessary.
+
+
 .. _overview:
 
 DCIP3D v5.5 Package Overview
 ============================
 
-DCIP3D v5.5 is a program library that performs forward modeling and inversion of DC resistivity and IP data over a 3D distribution of electrical conductivity and chargeability. Arbitrary transmitter and receiver electrode configurations are modeled along with 3D surface topography with the numerical processing distributed over multiple computers.
+DCIP3D is a program library that performs forward modeling and inversion of DC resistivity and IP data over a 3D distribution of electrical conductivity and chargeability. Arbitrary transmitter and receiver electrode configurations are modeled along with 3D surface topography with the numerical processing distributed over multiple computers.
 
-The basic structure of v5.5 is similar to the first version released for UBC-GIF sponsors in 1998. However the improvements since the initial release are substantial. Here, we outline the contents of the DCIP3D v5.5 program library, the major milestone achievements up to v5.5 and information on licensing.
+The basic structure of the latest release (v5.5) is similar to the first version released for UBC-GIF sponsors in 1998. However, improvements made since the initial release are substantial. Here, we outline the contents of the DCIP3D v5.5 program library, the major milestone achievements up to v5.5 and information on licensing.
 
 
-DCIP3D program library content
-------------------------------
+DCIP3D v5.5 Program Library Content
+-----------------------------------
 
 The main executable programs within the DCIP3D v5.5 program library are:
 
@@ -104,8 +107,8 @@ One additional note about installation:
 .. The input file now requires an extra line for the bounds, which can be two values (upper and
 .. lower), or a file. Details of the structure of the input file and optional bounds files can be found within the manual.
 
-Notes on computation speed
+Notes on Computation Speed
 --------------------------
 
-For large problems, DCIP3D v5.0 is significantly faster than the previous single processor inversion
+For large problems, DCIP3D v5.x is significantly faster than the previous single processor inversion
 because of the parallelization for computing the sensitivity matrix computation and inversion calculations. Using multiple threads for running the parallelized version resulted in sensitivity matrix calculation speedup proportional to the number of threads. The increase in speed for the inversion is substantial. It is strongly recommended to use multi-core processors for running the **DCINV3D** and **IPINV3D**. The calculation of the sensitivity matrix (G) is directly proportional to the number of data. The parallelized calculation of the n rows of G is split between p processors. By default, all available processors are used. There is a feature to limit p to a user-defined number of processors.

@@ -1,9 +1,12 @@
+.. important:: In March of 2020, DCIP3D v5.5 was released with the intention of replacing v5.0. Online documentation is primarily intended for v5.5, although any differences in input file formats between v5.0 and v5.5 are documented when necessary.
+
+
 .. _elements:
 
-Elements of the DCIP3D package
-==============================
+Elements of the DCIP3D v5.5 Package
+===================================
 
-This section provides a brief description of each program in the DCIP3D package. In addition, we describe the file formats for all input and supporting files used by the coding library.
+This section provides a brief description of each program in the DCIP3D v5.5 package. In addition, we describe the file formats for all input and supporting files used by the coding library.
 
 Executables
 -----------
