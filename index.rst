@@ -12,6 +12,13 @@ Highlights of DCIP3D v5.5
 
 The inversion executables allow the used to include a reference model in order to constrain the inversion with a-priori information. If the user wants to preserve structures in the reference model but is unsure of their boundaries, the SMOOTH_MOD flag can be set in the code’s input file. In this case, structures in the recovered model are constrained by the reference model but will have smooth boundaries. If the user wants to preserve sharp or well-defined boundaries within the reference model, the SMOOTH_MOD_DIF flag can be set in the code’s input file.
 
+Below, we have a DC resistivity example for 9 lines of dipole-dipole data collected over a conductive block buried beneath a resistive overburden. The true conductivity model is shown in figure (a). In figure (b) we have a reference model which provides constrains the inversion by assuming the overburden is known. In figure (c), we see the inversion result when the reference model is only included in the smallness term of the model objective. Thus we preserve the general structure of the overburden in the reference model but not its interface. In figure (d), we see the inversion result when the reference model is included in the smallness and smoothness terms of the model objective. In this case, we would like to ensure the sharp interface at the bottom of the overburden in the reference model is preserved.
+
+
+
+.. figure:: ./images/highlights.png
+     :align: center
+     :width: 700
 
 
 
