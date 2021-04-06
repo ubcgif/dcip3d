@@ -27,7 +27,7 @@ Below, we have a DC resistivity example for 9 lines of dipole-dipole data collec
 Parallelization with OpenMP and MPI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Parallelization significantly reduces computation time by parsing larger processes into small mathematical operations that can be performed simultaneously. On a single CPU, the implementation of parallel computing architecture (OpenMP) now allows the user to take full advantage of multi-core processors. Message Passing Interface (MPI) has also been implemented for cluster computing.
+Parallelization significantly reduces computation time by parsing larger processes into small mathematical operations that can be performed simultaneously. On a single CPU, the implementation of parallel computing architecture (OpenMP) now allows the user to take full advantage of multi-core processors.
 
 Reduced IP Inversion Run-Time
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
