@@ -36,6 +36,10 @@ Version 5.5
 
 - The use may now choose the behaviour of the reference model in the regularization. Either the reference model is implemented in the smallness term, or the reference model can be implemented in all terms (smallness and smoothness) in the model objective function.
 
+- Parallelization significantly reduces computation time by parsing larger processes into small mathematical operations that can be performed simultaneously. On a single CPU, the implementation of parallel computing architecture (OpenMP) now allows the user to take full advantage of multi-core processors. Message Passing Interface (MPI) has also been implemented for cluster computing.
+
+- Boundary constraints for 3D IP inversion are now enforced using a projected conjugate gradient method to reduce computation time; whereas previous versions used a log-barrier method to enforce positivity in the recovered chargeability model.
+
 
 Version 5.0
 ^^^^^^^^^^^
