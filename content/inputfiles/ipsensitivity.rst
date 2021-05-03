@@ -14,7 +14,7 @@ For the IP inverse problem, we use a linearized formulation. The linearized inve
 +--------+----------------------------------------------------+---------------------------------------------------------+
 | 2      | :ref:`Tensor Mesh<dcip_input_sens_ln2>`            | path to tensor mesh                                     |
 +--------+----------------------------------------------------+---------------------------------------------------------+
-| 3      | :ref:`Conductivity Model<dcip_input_sens_ln3`      | path to conductivity model                              |
+| 3      | :ref:`Conductivity Model<dcip_input_sens_ln3>`     | path to conductivity model                              |
 +--------+----------------------------------------------------+---------------------------------------------------------+
 | 4      | :ref:`Topography<dcip_input_sens_ln4>`             | topography                                              |
 +--------+----------------------------------------------------+---------------------------------------------------------+
@@ -30,7 +30,7 @@ For the IP inverse problem, we use a linearized formulation. The linearized inve
 +--------+----------------------------------------------------+---------------------------------------------------------+
 
 
-.. figure:: ./images/create_ip_sens_input.PNG
+.. figure:: ./images/create_ip_sens_input.png
     :align: center
     :width: 700
 
