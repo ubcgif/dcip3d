@@ -3,7 +3,7 @@
 DC Inversion Input File
 =======================
 
-The inverse problem is solved using the executable program **dcinv3d.exe**. The lines of input file are as follows:
+The inverse problem is solved using the executable program **dcinv3d_55.exe**. The lines of input file are as follows:
 
 .. tabularcolumns:: |L|C|C|
 

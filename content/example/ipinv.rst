@@ -3,13 +3,13 @@
 IP Inversion
 ============
 
-IP inversion is carried out in two parts. First, we must use the code **ipsens3d.exe** to construct the sensitivity matrix for the linearized IP problem. Then we use **ipinv3d.exe** to invert the IP data. Because this is a simple example with no noise, we assigned a uncertainties of 0.0005 V/V to all IP data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
+IP inversion is carried out in two parts. First, we must use the code **ipsens3d_55.exe** to construct the sensitivity matrix for the linearized IP problem. Then we use **ipinv3d_55.exe** to invert the IP data. Because this is a simple example with no noise, we assigned a uncertainties of 0.0005 V/V to all IP data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
 
 
 Sensitivity Matrix
 ------------------
 
-Here, the code **ipsens3d.exe** and the input file **ip_sens.inp** (:ref:`see format <dcip_input_sens>`) are used to approximate the sensitivity matrix for the linearized IP problem. Files relevant to this part of the example are in the sub-folder *ip_sens* . Before running this example, you may want to do the following:
+Here, the code **ipsens3d_55.exe** and the input file **ip_sens.inp** (:ref:`see format <dcip_input_sens>`) are used to approximate the sensitivity matrix for the linearized IP problem. Files relevant to this part of the example are in the sub-folder *ip_sens* . Before running this example, you may want to do the following:
 
 
     - `Download and open the zip folder containing the entire DCIP3D v5.5 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
@@ -28,7 +28,7 @@ To compute the sensitivity matrix, the following input file was used:
 IP Inversion
 ------------
 
-Here we use the code **ipinv3d.exe** to recover a chargeability model. Before running this example, you may want to do the following:
+Here we use the code **ipinv3d_55.exe** to recover a chargeability model. Before running this example, you may want to do the following:
 
     - `Download and open the zip folder containing the entire DCIP octree example <https://github.com/ubcgif/DCIPoctree/raw/master/assets/dcipoctree_example.zip>`__ (if not done already)
     - :ref:`Learn how to run code from command line <ip_inv>`

@@ -3,7 +3,7 @@
 Forward Modeling
 ================
 
-The program **dcipf3d.exe** performs the 3D forward modelling of DC resistivity or IP data on tensor meshes.
+The program **dcipf3d_55.exe** performs the 3D forward modelling of DC resistivity or IP data on tensor meshes.
 
 Running the Program
 ^^^^^^^^^^^^^^^^^^^
@@ -41,7 +41,7 @@ Units
 Output Files
 ^^^^^^^^^^^^
 
-The program **dcipf3d.exe** creates the following output files:
+The program **dcipf3d_55.exe** creates the following output files:
 
     - **dc3d.dat:** Predicted DC data (output if data type set to *dc* )
 

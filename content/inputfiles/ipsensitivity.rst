@@ -3,7 +3,7 @@
 IP Sensitivity Matrix Input File
 ================================
 
-For the IP inverse problem, we use a linearized formulation. The linearized inverse problem requires that we construct the sensitivity matrix for the IP problem. This is done with the executable **ipsen3d.exe**. The lines of input file for creating the IP sensitivity matrix are as follows:
+For the IP inverse problem, we use a linearized formulation. The linearized inverse problem requires that we construct the sensitivity matrix for the IP problem. This is done with the executable **ipsen3d_55.exe**. The lines of input file for creating the IP sensitivity matrix are as follows:
 
 .. tabularcolumns:: |L|C|C|
 

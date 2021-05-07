@@ -3,7 +3,7 @@
 DC Forward Modeling
 ===================
 
-Here, the code **dcipf3d.exe** and the input file **dc_fwd.inp** (:ref:`see format <dcip_input_fwd>`) are used to forward model DC data along 9 pole-dipole profile lines oriented West to East. Files relevant to this part of the example are in the sub-folder *dc_fwd*. For this example, we use the conductivity model that was created in the example ":ref:`create model<example_model>`". Before running this example, you may want to do the following:
+Here, the code **dcipf3d_55.exe** and the input file **dc_fwd.inp** (:ref:`see format <dcip_input_fwd>`) are used to forward model DC data along 9 pole-dipole profile lines oriented West to East. Files relevant to this part of the example are in the sub-folder *dc_fwd*. For this example, we use the conductivity model that was created in the example ":ref:`create model<example_model>`". Before running this example, you may want to do the following:
 
 	- `Download and open the zip folder containing the entire DCIP3D v5.5 example <https://github.com/ubcgif/dcip3d/raw/master/assets/dcip3d_v5p5_example.zip>`__ (if not done already)
 	- :ref:`Learn how to run code from command line <dcip_fwd>`

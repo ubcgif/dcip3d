@@ -16,10 +16,10 @@ DCIP3D v5.5 Program Library Content
 
 The main executable programs within the DCIP3D v5.5 program library are:
 
-    - **dcipf3d:** used to forward model DC or IP data
-    - **dcinv3d:** inverts DC data to recover a conductivity model
-    - **ipsen3d:** construct the sensitivity matrix for the linearized IP problem
-    - **ipinv3d:** inverts IP data to recover a chargeabitiliy model
+    - **dcipf3d_55:** used to forward model DC or IP data
+    - **dcinv3d_55:** inverts DC data to recover a conductivity model
+    - **ipsen3d_55:** construct the sensitivity matrix for the linearized IP problem
+    - **ipinv3d_55:** inverts IP data to recover a chargeabitiliy model
 
 The following Octree utility programs may also be helpful:
 

@@ -3,7 +3,7 @@
 IP Inversion
 ============
 
-The program **ipinv3d.exe** performs the 3D inversion of IP data on tensor meshes.
+The program **ipinv3d_55.exe** performs the 3D inversion of IP data on tensor meshes.
 
 Running the Program
 ^^^^^^^^^^^^^^^^^^^
@@ -29,7 +29,7 @@ Units
 Output Files
 ^^^^^^^^^^^^
 
-The program **ipinv3d.exe** creates the following output files:
+The program **ipinv3d_55.exe** creates the following output files:
 
     - **ipinv3d_xx.con:** recovered model at iteration 'xx'
 

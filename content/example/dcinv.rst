@@ -3,7 +3,7 @@
 DC Inversion
 ============
 
-Here, we use the code **dcinv3d.exe** and the input file **dc_inv.inp** to recover a conductivity model. Because this is a simple example with no noise, we assigned a uncertainties of 1e-8 V + 1% to all DC data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
+Here, we use the code **dcinv3d_55.exe** and the input file **dc_inv.inp** to recover a conductivity model. Because this is a simple example with no noise, we assigned a uncertainties of 1e-8 V + 1% to all DC data. In practice, data are noisy and choosing appropriate uncertainties is very important for successful inversion.
 
 Before running the example, you may want to:
 

@@ -3,7 +3,7 @@
 Forward Modeling Input File
 ===========================
 
-The forward problem for both DC and IP data is solved using the executable program **dcipf3d.exe**. The lines of input file are as follows:
+The forward problem for both DC and IP data is solved using the executable program **dcipf3d_55.exe**. The lines of input file are as follows:
 
 .. tabularcolumns:: |L|C|C|
 

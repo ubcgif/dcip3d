@@ -3,7 +3,7 @@
 IP Inversion
 ============
 
-The program **ipsen3d.exe** constructs the sensitivitiy matrix for the linearized IP inversion.
+The program **ipsen3d_55.exe** constructs the sensitivitiy matrix for the linearized IP inversion.
 
 Running the Program
 ^^^^^^^^^^^^^^^^^^^
@@ -29,7 +29,7 @@ Units
 Output Files
 ^^^^^^^^^^^^
 
-The program **ipsen3d.exe** creates the following output files:
+The program **ipsen3d_55.exe** creates the following output files:
 
     - **ipinv3d.mtx:** binary file containing the sensitivity matrix for the IP inversion
 

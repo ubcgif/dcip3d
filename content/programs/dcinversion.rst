@@ -3,7 +3,7 @@
 DC Inversion
 ============
 
-The program **dcinv3d.exe** performs the 3D inversion of DC resistivity data on tensor meshes.
+The program **dcinv3d_55.exe** performs the 3D inversion of DC resistivity data on tensor meshes.
 
 Running the Program
 ^^^^^^^^^^^^^^^^^^^
@@ -37,7 +37,7 @@ Units
 Output Files
 ^^^^^^^^^^^^
 
-The program **dcinv3d.exe** creates the following output files:
+The program **dcinv3d_55.exe** creates the following output files:
 
     - **dcinv3d_xx.con:** recovered model at iteration 'xx'
 
